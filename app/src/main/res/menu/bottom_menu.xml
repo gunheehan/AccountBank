@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/mainItem"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="Main" />
+    <item
+        android:id="@+id/earningItem"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="Earning" />
+    <item
+        android:id="@+id/expensesItem"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_call"
+        android:title="Expenses" />
+    <item
+        android:id="@+id/fixedsettingItem"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="FixedSetting" />
+    <item
+        android:id="@+id/yearItem"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_call"
+        android:title="Year" />
+</menu>

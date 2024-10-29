@@ -2,59 +2,42 @@ package com.redhorse.accountbank
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity() , View.OnClickListener{
 
-    lateinit var btnAdd : Button
-    lateinit var btnSub : Button
-    lateinit var btnMul : Button
-    lateinit var btnDiv : Button
-    lateinit var etA : EditText
-    lateinit var etB : EditText
-    lateinit var resultTv : TextView
+class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btnAdd = findViewById(R.id.btn_add)
-        btnSub = findViewById(R.id.btn_subtraction)
-        btnMul = findViewById(R.id.btn_multiplication)
-        btnDiv = findViewById(R.id.btn_division)
+        val mainboardFragment = MainboardFragment()
+        val earningFragment = EarningFragment()
+        val expensesFragment = ExpensesFragment()
+        val fixedInformationFragment = FixedInformationFragment()
+        val yearFragment = YearFragment()
 
-        etA = findViewById(R.id.et_a)
-        etB = findViewById(R.id.et_b)
-        resultTv = findViewById(R.id.result_tv)
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavi)
+        replaceFragment(mainboardFragment)
 
-        btnAdd.setOnClickListener(this)
-        btnSub.setOnClickListener(this)
-        btnMul.setOnClickListener(this)
-        btnDiv.setOnClickListener(this)
+        bottomNavigationView.setOnItemSelectedListener {
+            when(it.itemId){
+                R.id.mainItem -> replaceFragment(mainboardFragment)
+                R.id.earningItem -> replaceFragment(earningFragment)
+                R.id.expensesItem -> replaceFragment(expensesFragment)
+                R.id.fixedsettingItem -> replaceFragment(fixedInformationFragment)
+                R.id.yearItem -> replaceFragment(yearFragment)
+            }
+            true
+        }
     }
 
-    override fun onClick(v: View?) {
-        var a = etA.text.toString().toDouble()
-        var b = etB.text.toString().toDouble()
-        var result = 0.0
-
-        when(v?.id){
-            R.id.btn_add -> {
-                result = a+b
-            }
-            R.id.btn_subtraction -> {
-                result = a-b
-            }
-            R.id.btn_multiplication -> {
-                result = a*b
-            }
-            R.id.btn_division -> {
-                result = a/b
-            }
+    private fun replaceFragment(fragment: Fragment) {
+        if(fragment != null){
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.replace(R.id.frame_layout, fragment)
+            transaction.commit()
         }
-        resultTv.text = "Result is $result"
     }
 }
