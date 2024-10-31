@@ -1,42 +1,81 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="20dp"
     android:background="#3DD6DC"
+    android:orientation="vertical"
     tools:context=".MainboardFragment">
 
+    <!-- 첫 번째 카드 -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-    android:layout_margin="20dp">
+        android:layout_marginBottom="20dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="오늘은 2025년 10월 28일 입니다."
-            android:textStyle="bold"
-            android:textSize="20sp" />
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingRight="15dp"
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:text="오늘은 2025년 10월 28일 입니다."
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+            android:paddingEnd="15dp"
             android:paddingBottom="10dp"
             android:text="월급날 D-27"
-            android:textStyle="bold"
             android:textColor="#1A630F"
             android:textSize="15sp"
-            android:gravity="right"
-            />
+            android:textStyle="bold" />
 
-    </LinearLayout>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-</androidx.cardview.widget.CardView>
-    </LinearLayout>
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="수입 : 3,000,000 원"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingVertical="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="지출 : 850,000 원"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingVertical="10dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="적금 : 2,000,000 원"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:paddingVertical="10dp"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>
