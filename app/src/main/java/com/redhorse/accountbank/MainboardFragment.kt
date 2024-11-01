@@ -5,7 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.redhorse.accountbank.databinding.FragmentMainboardBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,9 +20,6 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-
-    private var _binding: FragmentMainboardBinding? = null
-    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,20 +40,17 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 바인딩 초기화
-        _binding = FragmentMainboardBinding.bind(view)
+        val cardDay = view.findViewById<CustomCardView>(R.id.card_day)
+        cardDay.addContent(CustomCardView.ViewType.TITLE, "오늘은 2025년 10월 28일 입니다.")
+        cardDay.addContent(CustomCardView.ViewType.SUBTITLE, "월급날 D-27")
 
-        // 바인딩을 통해 뷰에 직접 접근
-        binding.titleDayText.text = "오늘은 2025년 10월 28일 입니다."
-        binding.titleDescriptionText.text = "월급날 D-27"
-        binding.earningText.text = "수입 : 3,000,000 원"
-        binding.expensesText.text = "지출 : 900,000 원"
-        binding.savingText.text = "적금 : 2,500,000 원"
-    }
+        val cardEarnings = view.findViewById<CustomCardView>(R.id.card_earnings)
+        cardEarnings.addContent(CustomCardView.ViewType.TITLE, "수입 : 3,000,000 원")
+        cardEarnings.addContent(CustomCardView.ViewType.INPUT, "수입 입력")
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        val cardRemain = view.findViewById<CustomCardView>(R.id.card_remain)
+        cardRemain.addContent(CustomCardView.ViewType.TITLE, "소비 가능 금액 : 950,000 원")
+        cardRemain.addContent(CustomCardView.ViewType.SUBTITLE, "아직 여유롭군요 :)")
     }
 
     companion object {
