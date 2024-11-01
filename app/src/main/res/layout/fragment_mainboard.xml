@@ -20,20 +20,20 @@
             android:padding="10dp">
 
             <TextView
+                android:id="@+id/title_day_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="20dp"
-                android:text="오늘은 2025년 10월 28일 입니다."
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/title_description_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="end"
             android:paddingEnd="15dp"
             android:paddingBottom="10dp"
-            android:text="월급날 D-27"
             android:textColor="#1A630F"
             android:textSize="15sp"
             android:textStyle="bold" />
@@ -52,25 +52,25 @@
             android:padding="10dp">
 
             <TextView
+                android:id="@+id/earning_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="수입 : 3,000,000 원"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingVertical="10dp"/>
 
             <TextView
+                android:id="@+id/expenses_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="지출 : 850,000 원"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingVertical="10dp"/>
 
             <TextView
+                android:id="@+id/saving_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="적금 : 2,000,000 원"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:paddingVertical="10dp"/>

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.redhorse.accountbank.databinding.FragmentMainboardBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -16,10 +17,13 @@ private const val ARG_PARAM2 = "param2"
  * Use the [MainboardFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MainboardFragment : Fragment() {
+class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+
+    private var _binding: FragmentMainboardBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +39,25 @@ class MainboardFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_mainboard, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // 바인딩 초기화
+        _binding = FragmentMainboardBinding.bind(view)
+
+        // 바인딩을 통해 뷰에 직접 접근
+        binding.titleDayText.text = "오늘은 2025년 10월 28일 입니다."
+        binding.titleDescriptionText.text = "월급날 D-27"
+        binding.earningText.text = "수입 : 3,000,000 원"
+        binding.expensesText.text = "지출 : 900,000 원"
+        binding.savingText.text = "적금 : 2,500,000 원"
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     companion object {
