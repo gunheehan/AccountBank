@@ -34,23 +34,25 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_mainboard, container, false)
-    }
+        val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+        // CustomCardView 초기화
         val cardDay = view.findViewById<CustomCardView>(R.id.card_day)
-        cardDay.addContent(CustomCardView.ViewType.TITLE, "오늘은 2025년 10월 28일 입니다.")
-        cardDay.addContent(CustomCardView.ViewType.SUBTITLE, "월급날 D-27")
-
         val cardEarnings = view.findViewById<CustomCardView>(R.id.card_earnings)
-        cardEarnings.addContent(CustomCardView.ViewType.TITLE, "수입 : 3,000,000 원")
-        cardEarnings.addContent(CustomCardView.ViewType.INPUT, "수입 입력")
-
         val cardRemain = view.findViewById<CustomCardView>(R.id.card_remain)
-        cardRemain.addContent(CustomCardView.ViewType.TITLE, "소비 가능 금액 : 950,000 원")
-        cardRemain.addContent(CustomCardView.ViewType.SUBTITLE, "아직 여유롭군요 :)")
+
+        // 카드에 내용 추가
+        cardDay.addTitle("오늘은 2025년 10월 28일 입니다.")
+        cardDay.addSubtitle("월급날 D-27")
+
+        cardEarnings.addTitle("수입 : 3,000,000 원")
+        cardEarnings.addTitle("지출 : 950,000 원")
+        cardEarnings.addTitle("적금 : 2,000,000 원")
+
+        cardRemain.addTitle("소비 가능 금액 : 950,000 원")
+        cardRemain.addSubtitle("아직 여유가 있군요 :)")
+
+        return view
     }
 
     companion object {
