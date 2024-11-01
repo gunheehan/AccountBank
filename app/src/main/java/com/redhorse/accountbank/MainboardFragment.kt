@@ -1,5 +1,6 @@
 package com.redhorse.accountbank
 
+import android.graphics.Color
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -43,7 +44,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
 
         // 카드에 내용 추가
         cardDay.addTitle("오늘은 2025년 10월 28일 입니다.")
-        cardDay.addSubtitle("월급날 D-27")
+        cardDay.addDescription("월급날 D-27", Color.RED)
 
         cardEarnings.addTitle("수입 : 3,000,000 원")
         cardEarnings.addTitle("지출 : 950,000 원")

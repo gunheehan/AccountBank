@@ -1,8 +1,11 @@
 package com.redhorse.accountbank
 
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Typeface
+import android.provider.CalendarContract.Colors
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.ImageView
@@ -50,6 +53,21 @@ class CustomCardView @JvmOverloads constructor(
         }
         container.addView(subtitleView)
     }
+
+    fun addDescription(content: String, color: Int = Color.BLACK) {
+        val subtitleView = TextView(context).apply {
+            text = content
+            textSize = 15f
+            setTextColor(color)
+            gravity = Gravity.END // 오른쪽 정렬
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = 16 }
+        }
+        container.addView(subtitleView)
+    }
+
 
     fun addInput(hint: String) {
         val inputView = EditText(context).apply {
