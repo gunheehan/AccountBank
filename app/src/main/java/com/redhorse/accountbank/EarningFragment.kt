@@ -1,10 +1,18 @@
 package com.redhorse.accountbank
 
+import CalendarAdapter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.redhorse.accountbank.data.DayData
+import java.time.LocalDate
+import java.time.YearMonth
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,6 +29,15 @@ class EarningFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+
+    private lateinit var calendarRecyclerView: RecyclerView
+    private lateinit var yearMonthTextView: TextView
+    private lateinit var prevMonthButton: Button
+    private lateinit var nextMonthButton: Button
+
+    private var currentMonth: YearMonth = YearMonth.now()
+    private val dayListAdapter = CalendarAdapter(emptyList())
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -34,8 +51,65 @@ class EarningFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_earning, container, false)
+        val view = inflater.inflate(R.layout.fragment_earning, container, false)
+        setupViews(view)
+        setupRecyclerView()
+        updateCalendar()
+        setupButtonListeners()
+        return view
     }
+
+    private fun setupViews(view: View) {
+        calendarRecyclerView = view.findViewById(R.id.calendarRecyclerView)
+        yearMonthTextView = view.findViewById(R.id.yearMonthTextView)
+        prevMonthButton = view.findViewById(R.id.prevMonthButton)
+        nextMonthButton = view.findViewById(R.id.nextMonthButton)
+    }
+
+    private fun setupRecyclerView() {
+        calendarRecyclerView.layoutManager = GridLayoutManager(context, 7) // 7일 기준
+        calendarRecyclerView.adapter = CalendarAdapter(emptyList()) // 초기 어댑터 설정
+    }
+
+    private fun updateCalendar() {
+        yearMonthTextView.text = "${currentMonth.year}년 ${currentMonth.monthValue}월"
+        val daysInMonth = generateCalendarDataForMonth(currentMonth)
+        (calendarRecyclerView.adapter as CalendarAdapter).updateDays(daysInMonth) // 어댑터에 데이터 업데이트
+    }
+
+    private fun setupButtonListeners() {
+        prevMonthButton.setOnClickListener {
+            currentMonth = currentMonth.minusMonths(1)
+            updateCalendar()
+        }
+        nextMonthButton.setOnClickListener {
+            currentMonth = currentMonth.plusMonths(1)
+            updateCalendar()
+        }
+    }
+
+    private fun generateCalendarDataForMonth(month: YearMonth): List<DayData> {
+        val startOfMonth = month.atDay(1)
+        val endOfMonth = month.atEndOfMonth()
+        val daysList = mutableListOf<DayData>()
+
+        // 첫 날의 요일에 맞춰 빈 칸 추가
+        val firstDayOfWeek = startOfMonth.dayOfWeek.value % 7 // 일요일을 0으로 설정
+        // 첫 날 이전의 빈 칸 추가
+        for (i in 0 until firstDayOfWeek) {
+            daysList.add(DayData(LocalDate.MIN, isEmpty = true)) // 빈 아이템 추가
+        }
+
+        // 해당 월 날짜 추가
+        for (day in 1..endOfMonth.dayOfMonth) {
+            val date = month.atDay(day)
+            daysList.add(DayData(date, income = (0..100000).random(), expense = (0..50000).random()))
+        }
+
+        return daysList
+    }
+
+
 
     companion object {
         /**
