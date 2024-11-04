@@ -36,7 +36,6 @@ class EarningFragment : Fragment() {
     private lateinit var nextMonthButton: Button
 
     private var currentMonth: YearMonth = YearMonth.now()
-    private val dayListAdapter = CalendarAdapter(emptyList())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
