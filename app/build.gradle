@@ -4,6 +4,8 @@ plugins {
 }
 
 android {
+    apply plugin: 'kotlin-kapt'
+
     namespace 'com.redhorse.accountbank'
     compileSdk 34
 
@@ -31,8 +33,15 @@ android {
         jvmTarget = '1.8'
     }
 }
-
+def room_version = "2.5.0" // Room 최신 버전
+def coroutine_version = "1.6.0" // Coroutine 최신 버전
 dependencies {
+    implementation "androidx.room:room-runtime:$room_version" // Room 라이브러리
+    implementation "androidx.room:room-ktx:$room_version" // Room KTX 라이브러리
+    kapt "androidx.room:room-compiler:$room_version" // Kotlin Annotation Processor
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version" // 코루틴 기본 라이브러리
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version" // 안드로이드용 코루틴 라이브러리
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
