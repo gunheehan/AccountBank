@@ -1,6 +1,6 @@
 package com.redhorse.accountbank
 
-import CalendarAdapter
+import com.redhorse.accountbank.adapter.CalendarAdapter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -96,7 +96,7 @@ class EarningFragment : Fragment() {
         val firstDayOfWeek = startOfMonth.dayOfWeek.value % 7 // 일요일을 0으로 설정
         // 첫 날 이전의 빈 칸 추가
         for (i in 0 until firstDayOfWeek) {
-            daysList.add(DayData(LocalDate.MIN, isEmpty = true)) // 빈 아이템 추가
+            daysList.add(DayData(LocalDate.MIN)) // income과 expense는 기본값으로 0
         }
 
         // 해당 월 날짜 추가
