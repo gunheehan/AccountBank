@@ -7,8 +7,15 @@ import androidx.room.Query
 @Dao
 interface PaymentDao {
     @Insert
-    suspend fun insertPayment(payment: Payment)
+    suspend fun insert(payment: Payment)
 
     @Query("SELECT * FROM payments WHERE date BETWEEN :startOfMonth AND :endOfMonth")
-    fun getPaymentsForMonth(startOfMonth: String, endOfMonth: String): List<Payment>
+    suspend fun getPaymentsForMonth(startOfMonth: String, endOfMonth: String): List<Payment>
+
+    @Query("SELECT SUM(amount) FROM payments WHERE date = :date AND type = 'income'")
+    fun getIncomeForDate(date: String): Int?
+
+    @Query("SELECT SUM(amount) FROM payments WHERE date = :date AND type = 'expense'")
+    fun getExpenseForDate(date: String): Int?
 }
+

@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity(){
         val yearFragment = YearFragment()
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavi)
-        replaceFragment(earningFragment)
+        replaceFragment(mainboardFragment)
 
         bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId){

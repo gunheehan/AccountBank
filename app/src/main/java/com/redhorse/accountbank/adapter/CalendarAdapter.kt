@@ -22,22 +22,23 @@ class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<Ca
                 incomeText.visibility = View.GONE
                 expenseText.visibility = View.GONE
             } else {
-                dayText.text = dayData.date.dayOfMonth.toString() // 날짜 표시
+                // 날짜와 수입, 지출 표시
+                dayText.text = dayData.date.dayOfMonth.toString()
 
-                // 수입과 지출 표시
-                if (dayData.income > 0) {
-                    incomeText.text = "${formatCurrency(dayData.income)}" // 포맷팅된 수입 표시
-                    incomeText.visibility = View.VISIBLE
+                // 수입과 지출 텍스트를 0으로 초기화하고 필요한 경우에만 업데이트
+                incomeText.text = if (dayData.income > 0) {
+                    "${formatCurrency(dayData.income)}" // 포맷팅된 수입 표시
                 } else {
-                    incomeText.visibility = View.GONE
+                    "0"
+                }
+                expenseText.text = if (dayData.expense > 0) {
+                    "${formatCurrency(dayData.expense)}" // 포맷팅된 지출 표시
+                } else {
+                    "0"
                 }
 
-                if (dayData.expense > 0) {
-                    expenseText.text = "${formatCurrency(dayData.expense)}" // 포맷팅된 지출 표시
-                    expenseText.visibility = View.VISIBLE
-                } else {
-                    expenseText.visibility = View.GONE
-                }
+                incomeText.visibility = View.VISIBLE
+                expenseText.visibility = View.VISIBLE
 
                 // 글자 크기 조정
                 adjustTextSize(incomeText)
@@ -60,7 +61,8 @@ class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<Ca
     }
 
     override fun onBindViewHolder(holder: CalendarViewHolder, position: Int) {
-        holder.bind(days[position]) // 해당 위치의 데이터를 바인딩
+        val dayData = days[position]
+        holder.bind(dayData)
     }
 
     override fun getItemCount(): Int {

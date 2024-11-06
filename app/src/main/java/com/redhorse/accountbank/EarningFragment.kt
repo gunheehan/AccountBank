@@ -3,6 +3,7 @@ package com.redhorse.accountbank
 import android.content.Context
 import com.redhorse.accountbank.adapter.CalendarAdapter
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,9 +21,9 @@ import com.redhorse.accountbank.utils.NotificationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -87,8 +88,19 @@ class EarningFragment : Fragment() {
     private fun updateCalendar() {
         yearMonthTextView.text = "${currentMonth.year}년 ${currentMonth.monthValue}월"
         val daysInMonth = generateCalendarDataForMonth(currentMonth)
-        (calendarRecyclerView.adapter as CalendarAdapter).updateDays(daysInMonth) // 어댑터에 데이터 업데이트
+        Log.d("EarningFragment", "daysInMonth: $daysInMonth")
+        // 비동기로 데이터 생성 후 어댑터에 업데이트
+        CoroutineScope(Dispatchers.IO).launch {
+            val daysInMonth = generateCalendarDataForMonth(currentMonth)
+
+            // 메인 스레드에서 어댑터 업데이트
+            withContext(Dispatchers.Main) {
+                (calendarRecyclerView.adapter as CalendarAdapter).updateDays(daysInMonth)
+            }
+        }
     }
+
+
 
     private fun setupButtonListeners() {
         prevMonthButton.setOnClickListener {
@@ -108,30 +120,18 @@ class EarningFragment : Fragment() {
 
         // 첫 날의 요일에 맞춰 빈 칸 추가
         val firstDayOfWeek = startOfMonth.dayOfWeek.value % 7 // 일요일을 0으로 설정
-        // 첫 날 이전의 빈 칸 추가
         for (i in 0 until firstDayOfWeek) {
             daysList.add(DayData(LocalDate.MIN)) // 빈 아이템 추가
         }
 
-        // 해당 월의 결제 정보 DB에서 조회
-        val payments = paymentDao.getPaymentsForMonth(startOfMonth.toString(), endOfMonth.toString())
-
         // 날짜별로 결제 정보를 추가
         for (day in 1..endOfMonth.dayOfMonth) {
             val date = month.atDay(day)
+            val income = paymentDao.getIncomeForDate(date.toString())
+            val expense = paymentDao.getExpenseForDate(date.toString())
 
-            // 해당 날짜의 결제 정보 찾기
-            val income = payments.filter { LocalDate.parse(it.date) == date && it.type == "income" }
-                .sumOf { it.amount }
-            val expense = payments.filter { LocalDate.parse(it.date) == date && it.type == "expense" }
-                .sumOf { it.amount }
-
-            // income과 expense가 0인 경우 DayData를 빈 값으로 설정
-            if (income > 0 || expense > 0) {
-                daysList.add(DayData(date, income = income.toInt(), expense = expense.toInt()))
-            } else {
-                daysList.add(DayData(date)) // 해당 날짜에 데이터가 없음을 표시
-            }
+            // 결제 정보가 없을 경우 0으로 초기화
+            daysList.add(DayData(date, income = income ?: 0, expense = expense ?: 0))
         }
 
         return daysList
@@ -152,14 +152,14 @@ class EarningFragment : Fragment() {
     }
 
     private suspend fun savePaymentAndNotify(context: Context, payment: Payment) {
-        val db = AppDatabase.getDatabase(context) // Context를 전달합니다.
-        db.paymentDao().insertPayment(payment)
+        val db = AppDatabase.getDatabase(context)
+        db.paymentDao().insert(payment)
 
-        // 로컬 알림 발송
         val title = payment.title
         val message = "결제 금액: ${formatCurrency(payment.amount)}원, 타입: ${payment.type}"
         NotificationUtils.showNotification(context, title, message)
     }
+
 
     companion object {
         /**
