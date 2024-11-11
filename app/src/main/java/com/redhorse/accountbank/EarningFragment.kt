@@ -87,11 +87,10 @@ class EarningFragment : Fragment() {
 
     private fun updateCalendar() {
         yearMonthTextView.text = "${currentMonth.year}년 ${currentMonth.monthValue}월"
-        val daysInMonth = generateCalendarDataForMonth(currentMonth)
-        Log.d("EarningFragment", "daysInMonth: $daysInMonth")
         // 비동기로 데이터 생성 후 어댑터에 업데이트
         CoroutineScope(Dispatchers.IO).launch {
             val daysInMonth = generateCalendarDataForMonth(currentMonth)
+            Log.d("EarningFragment", "daysInMonth: $daysInMonth")
 
             // 메인 스레드에서 어댑터 업데이트
             withContext(Dispatchers.Main) {
@@ -113,7 +112,7 @@ class EarningFragment : Fragment() {
         }
     }
 
-    private fun generateCalendarDataForMonth(month: YearMonth): List<DayData> {
+    private suspend fun generateCalendarDataForMonth(month: YearMonth): List<DayData> {
         val startOfMonth = month.atDay(1)
         val endOfMonth = month.atEndOfMonth()
         val daysList = mutableListOf<DayData>()
@@ -127,8 +126,12 @@ class EarningFragment : Fragment() {
         // 날짜별로 결제 정보를 추가
         for (day in 1..endOfMonth.dayOfMonth) {
             val date = month.atDay(day)
-            val income = paymentDao.getIncomeForDate(date.toString())
-            val expense = paymentDao.getExpenseForDate(date.toString())
+            val income = withContext(Dispatchers.IO) {
+                paymentDao.getIncomeForDate(date.toString())
+            }
+            val expense = withContext(Dispatchers.IO) {
+                paymentDao.getExpenseForDate(date.toString())
+            }
 
             // 결제 정보가 없을 경우 0으로 초기화
             daysList.add(DayData(date, income = income ?: 0, expense = expense ?: 0))
