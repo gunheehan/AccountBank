@@ -12,12 +12,32 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AccountBank"
         tools:targetApi="31">
+
+        <!-- SMS 리시버 등록 -->
+        <receiver
+            android:name=".receiver.SmsReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 푸시 알림 리시버 등록 -->
+        <receiver
+            android:name=".receiver.PushNotificationReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.redhorse.accountbank.PUSH_NOTIFICATION" />
+            </intent-filter>
+        </receiver>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
@@ -25,6 +45,14 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+
     </application>
+
+    <!-- 권한 요청 -->
+    <uses-permission android:name="android.permission.SEND_SMS"/>
+    <uses-permission android:name="android.permission.READ_SMS"/>
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <!-- Android 13 이상의 경우 푸시 알림 권한 추가 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" android:maxSdkVersion="33"/>
 
 </manifest>

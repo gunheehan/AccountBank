@@ -1,7 +1,13 @@
 package com.redhorse.accountbank
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -30,6 +36,20 @@ class MainActivity : AppCompatActivity(){
                 R.id.yearItem -> replaceFragment(yearFragment)
             }
             true
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 100) {  // 권한 요청 코드
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 권한이 허용되었을 때 처리할 작업
+                // 예: 푸시 알림 보내기
+            } else {
+                // 권한 거부 처리
+                Toast.makeText(this, "푸시 알림 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
