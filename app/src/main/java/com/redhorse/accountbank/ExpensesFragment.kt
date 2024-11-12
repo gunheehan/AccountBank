@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import com.redhorse.accountbank.utils.NotificationUtils
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -20,6 +22,7 @@ class ExpensesFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var testButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,7 +37,17 @@ class ExpensesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_expenses, container, false)
+        val view = inflater.inflate(R.layout.fragment_expenses, container, false)
+        SetButton(view)
+        return view
+    }
+
+    private fun SetButton(view: View)
+    {
+        testButton = view.findViewById(R.id.btn)
+        testButton.setOnClickListener{
+            NotificationUtils.showNotification(requireContext(),"테스트 알림","푸시 메시지")
+        }
     }
 
     companion object {

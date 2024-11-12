@@ -49,10 +49,9 @@
     </application>
 
     <!-- 권한 요청 -->
-    <uses-permission android:name="android.permission.SEND_SMS"/>
     <uses-permission android:name="android.permission.READ_SMS"/>
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <!-- Android 13 이상의 경우 푸시 알림 권한 추가 -->
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" android:maxSdkVersion="33"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
 </manifest>

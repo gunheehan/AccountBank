@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat.getSystemService
 import com.redhorse.accountbank.R
 
 object NotificationUtils {
@@ -22,6 +23,7 @@ object NotificationUtils {
             .setSmallIcon(R.drawable.rounded_corners) // 알림 아이콘
             .setContentTitle(title)
             .setContentText(message)
+            .setAutoCancel(true)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .build()
 

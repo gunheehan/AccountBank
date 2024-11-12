@@ -1,13 +1,13 @@
 package com.redhorse.accountbank
 
-import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.*
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -17,6 +17,8 @@ class MainActivity : AppCompatActivity(){
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        checkNotificationPermission()
 
         val mainboardFragment = MainboardFragment()
         val earningFragment = EarningFragment()
@@ -58,4 +60,17 @@ class MainActivity : AppCompatActivity(){
             transaction.replace(R.id.frame_layout, fragment)
             transaction.commit()
     }
+
+    private fun checkNotificationPermission() {
+        val prefs = getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
+
+        if (isFirstLaunch && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS,
+                READ_SMS, RECEIVE_SMS), 1)
+        }
+
+        prefs.edit().putBoolean("isFirstLaunch", false).apply()
+    }
+
 }
