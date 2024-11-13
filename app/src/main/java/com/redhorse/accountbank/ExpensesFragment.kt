@@ -1,12 +1,22 @@
 package com.redhorse.accountbank
 
+import android.content.Context
 import android.os.Bundle
+import android.os.Environment
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
+import androidx.room.Room
+import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.utils.NotificationUtils
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -42,11 +52,60 @@ class ExpensesFragment : Fragment() {
         return view
     }
 
-    private fun SetButton(view: View)
-    {
-        testButton = view.findViewById(R.id.btn)
-        testButton.setOnClickListener{
-            NotificationUtils.showNotification(requireContext(),"테스트 알림","푸시 메시지")
+    // 내보내기 버튼 함수
+    private fun exportDatabase(context: Context) {
+        try {
+            // Room DB 파일의 기본 경로
+            val dbPath = context.getDatabasePath("app_database.db").absolutePath
+            val backupPath = File(Environment.getExternalStorageDirectory(), "BackupDatabase.db")
+
+            FileInputStream(dbPath).use { input ->
+                FileOutputStream(backupPath).use { output ->
+                    input.copyTo(output)
+                    Toast.makeText(context, "DB가 성공적으로 내보내졌습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(context, "DB 내보내기 실패: ${e.message}", Toast.LENGTH_LONG).show()
+            Log.d("DBError", "${e.message}")
+        }
+    }
+
+    // 가져오기 버튼 함수
+    private fun importDatabase(context: Context) {
+        try {
+            val dbPath = context.getDatabasePath("app_database.db").absolutePath
+            val backupPath = File(Environment.getExternalStorageDirectory(), "BackupDatabase.db")
+
+            FileInputStream(backupPath).use { input ->
+                FileOutputStream(dbPath).use { output ->
+                    input.copyTo(output)
+                    Toast.makeText(context, "DB가 성공적으로 가져와졌습니다.", Toast.LENGTH_SHORT).show()
+
+                    // Room DB 인스턴스 갱신
+                    Room.databaseBuilder(
+                        context.applicationContext,
+                        AppDatabase::class.java, "app_database.db"
+                    ).build()
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+            Toast.makeText(context, "DB 가져오기 실패: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // 버튼 설정 함수
+    private fun SetButton(view: View) {
+        val exportButton = view.findViewById<Button>(R.id.export_btn)
+        exportButton.setOnClickListener {
+            exportDatabase(requireContext())
+        }
+
+        val importButton = view.findViewById<Button>(R.id.import_btn)
+        importButton.setOnClickListener {
+            importDatabase(requireContext())
         }
     }
 
