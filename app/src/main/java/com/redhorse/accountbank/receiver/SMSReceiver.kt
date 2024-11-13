@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.SmsMessage
+import android.util.Log
+import android.widget.Toast
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.utils.NotificationUtils
@@ -16,6 +18,7 @@ class SmsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val message = extractMessageFromIntent(intent)
+
         if (message.isNotBlank()) {
             // 정규식으로 결제 정보 추출
             val payment = RegexUtils.parsePaymentInfo(message)

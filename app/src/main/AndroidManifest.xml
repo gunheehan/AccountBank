@@ -11,13 +11,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AccountBank"
+        android:exported="true"
         tools:targetApi="31">
 
         <!-- SMS 리시버 등록 -->
         <receiver
             android:name=".receiver.SmsReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
@@ -27,7 +28,7 @@
         <receiver
             android:name=".receiver.PushNotificationReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.redhorse.accountbank.PUSH_NOTIFICATION" />
             </intent-filter>
