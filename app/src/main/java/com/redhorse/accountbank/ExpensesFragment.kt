@@ -1,8 +1,11 @@
 package com.redhorse.accountbank
 
 import android.content.Context
+import android.database.Cursor
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Telephony
+import android.telephony.SmsMessage
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,13 +13,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.redhorse.accountbank.data.AppDatabase
+import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.utils.NotificationUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -32,7 +44,6 @@ class ExpensesFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
-    private lateinit var testButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +107,60 @@ class ExpensesFragment : Fragment() {
         }
     }
 
+    suspend fun fetchAndSavePaymentMessages(context: Context) {
+        val smsUri = Telephony.Sms.CONTENT_URI
+        val thirtyDaysAgo = LocalDate.now().minusDays(30).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val database = AppDatabase.getDatabase(context)
+        val paymentDao = database.paymentDao()
+
+        withContext(Dispatchers.IO) {
+            val cursor: Cursor? = context.contentResolver.query(
+                smsUri,
+                arrayOf(Telephony.Sms.BODY, Telephony.Sms.DATE),
+                "${Telephony.Sms.DATE} >= ?",
+                arrayOf(thirtyDaysAgo.toString()),
+                "${Telephony.Sms.DATE} DESC"
+            )
+
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val body = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.BODY))
+                    val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
+                    val date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
+
+                    Log.d("SMSReader", "Message Date: $date")
+                    Log.d("SMSReader", "Message Body: $body")
+
+                    if (RegexUtils.isPaymentMessage(body)) {
+                        try {
+                            val payment = RegexUtils.parsePaymentInfo(body, date)
+
+                            // 중복 데이터 확인
+                            val existingCount = paymentDao.countPaymentByDetails(payment.title, payment.amount, payment.date)
+                            if (existingCount == 0) {
+                                paymentDao.insert(payment)
+                                Log.d("SMSReader", "Inserted Payment: $payment")
+                            } else {
+                                Log.d("SMSReader", "Duplicate Payment Skipped: $payment")
+                            }
+                        } catch (e: Exception) {
+                            Log.e("SMS Parsing", "Error parsing payment info: ${e.message}")
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun savePaymentsToDatabase(context: Context, payments: List<Payment>) {
+        withContext(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+            val paymentDao = db.paymentDao()
+            payments.forEach { paymentDao.insert(it) }
+        }
+    }
+
     // 버튼 설정 함수
     private fun SetButton(view: View) {
         val exportButton = view.findViewById<Button>(R.id.export_btn)
@@ -106,6 +171,13 @@ class ExpensesFragment : Fragment() {
         val importButton = view.findViewById<Button>(R.id.import_btn)
         importButton.setOnClickListener {
             importDatabase(requireContext())
+        }
+
+        val patchButton = view.findViewById<Button>(R.id.patch_btn)
+        patchButton.setOnClickListener {
+            lifecycleScope.launch {
+                fetchAndSavePaymentMessages(requireContext())
+            }
         }
     }
 

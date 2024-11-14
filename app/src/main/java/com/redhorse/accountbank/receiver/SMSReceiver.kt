@@ -13,6 +13,7 @@ import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class SmsReceiver : BroadcastReceiver() {
 
@@ -21,7 +22,7 @@ class SmsReceiver : BroadcastReceiver() {
 
         if (message.isNotBlank()) {
             // 정규식으로 결제 정보 추출
-            val payment = RegexUtils.parsePaymentInfo(message)
+            val payment = RegexUtils.parsePaymentInfo(message, LocalDate.now().toString())
             // DB에 저장 및 알림 발송
             CoroutineScope(Dispatchers.IO).launch {
                 savePaymentAndNotify(context, payment)

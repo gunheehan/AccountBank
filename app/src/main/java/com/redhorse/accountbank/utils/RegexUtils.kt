@@ -26,7 +26,7 @@ object RegexUtils {
     }
 
     // 메시지에서 결제 정보를 추출하여 Payment 객체를 반환
-    fun parsePaymentInfo(message: String): Payment {
+    fun parsePaymentInfo(message: String, date: String): Payment {
         val title = extractMerchant(message) ?: "Unknown Merchant"
         val amountString = extractAmount(message) ?: "0" // 금액이 없는 경우 기본값 0
         val amount = amountString.toIntOrNull() ?: 0
@@ -35,7 +35,6 @@ object RegexUtils {
         } else {
             "income"
         }
-        val date = LocalDate.now().toString() // 오늘 날짜
 
         return Payment(title = title, type = type, amount = amount, date = date)
     }
