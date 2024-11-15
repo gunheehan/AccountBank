@@ -1,14 +1,9 @@
 package com.redhorse.accountbank
 
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Telephony
-import android.provider.Telephony.TextBasedSmsColumns.BODY
-import android.telephony.SmsMessage
-import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -20,10 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
-import com.redhorse.accountbank.utils.NotificationUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -32,6 +27,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,113 +106,163 @@ class ExpensesFragment : Fragment() {
         }
     }
 
+    fun jsonTest(json:String) {
+        val jsonObject = JSONObject(json)
+        val layout = jsonObject.getJSONObject("layout")
+        val text = when (layout.getString("widget")) {
+            "LinearLayout" -> parseLinearLayout(layout)
+            "TextView" -> layout.getString("text")
+            else -> ""
+        }
+    }
+
+    private fun parseLinearLayout(widget: JSONObject): String {
+        val sb = StringBuilder()
+        val isVertical = widget.getString("orientation") == "vertical"
+        val children = widget.getJSONArray("children")
+        for(i in 0 until children.length()) {
+            val widget = children.getJSONObject(i)
+            val widgetName = widget.getString("widget")
+            if (widgetName == "LinearLayout") {
+                val text = parseLinearLayout(widget)
+                sb.append(text)
+                if (isVertical) sb.append("\n")
+            } else if (widgetName == "TextView") {
+                val text = widget.getString("text")
+                sb.append(text)
+                if (isVertical) sb.append("\n")
+            }
+        }
+        return sb.toString()
+    }
+
+    fun extractAndFormatDate(dateString: String): String {
+        try {
+            // 현재 년도 가져오기
+            val currentYear = LocalDate.now().year
+
+            // 날짜 정보 추출: 예시 "11/15 22:03"에서 "11/15"만 추출
+            val datePart = dateString.substringBefore(" ") // "11/15"
+
+            // 월과 일 분리
+            val (month, day) = datePart.split("/").map { it.toInt() }
+
+            // 현재 년도를 추가하여 LocalDate 객체 생성
+            val formattedDate = LocalDate.of(currentYear, month, day)
+
+            // 원하는 포맷으로 변환
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            return formattedDate.format(formatter)
+
+        } catch (e: DateTimeParseException) {
+            e.printStackTrace()
+            return "Invalid Date"
+        }
+    }
+
+    fun parseMessageBody(messageBody: String): String? {
+        // 날짜를 추출하기 위한 정규 표현식 (MM/dd 형식만 추출)
+        val dateRegex = """(\d{1,2}/\d{1,2})""".toRegex()  // "MM/dd" 형식의 날짜 추출
+        val matchResult = dateRegex.find(messageBody)
+
+        return matchResult?.value?.let { extractAndFormatDate(it) }
+    }
+
     suspend fun fetchAndSavePaymentMessages(context: Context) {
-        val smsUri = Telephony.Sms.CONTENT_URI
-        val mmsUri = Telephony.Mms.CONTENT_URI
-        val thirtyDaysAgo = LocalDate.now().minusDays(30)
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val database = AppDatabase.getDatabase(context)
         val paymentDao = database.paymentDao()
+        val thirtyDaysAgo = LocalDate.now().minusDays(30)  // 30일로 수정
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        Log.d("RCSReader", "Start load RCS")
+        val rcsUri = Uri.parse("content://im/chat")
 
         withContext(Dispatchers.IO) {
-            // SMS 데이터 쿼리
-            val smsCursor: Cursor? = context.contentResolver.query(
-                smsUri,
-                arrayOf(Telephony.Sms.BODY, Telephony.Sms.DATE),
-                "${Telephony.Sms.DATE} >= ?",
-                arrayOf(
-                    thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                        .toString()
-                ),
-                "${Telephony.Sms.DATE} DESC"
-            )
+            try {
+                // 30일 전의 날짜로 쿼리
+                val cursor = context.contentResolver.query(
+                    rcsUri,
+                    null,  // 모든 컬럼 선택
+                    "date >= ?",  // 조건: 30일 이내
+                    arrayOf(thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
+                    "date DESC"  // 최신 메시지부터 정렬
+                )
 
-            smsCursor?.use {
-                while (it.moveToNext()) {
-                    val body = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.BODY))
-                    val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
-                    val date =
-                        Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate()
-                            .format(formatter)
+                cursor?.use {
+                    if (it.moveToFirst()) {
+                        val columnCount = it.columnCount
 
-                    Log.d("SMSReader", "Message Date: $date")
-                    Log.d("SMSReader", "Message Body: $body")
+                        // 여러 메시지를 처리하기 위한 반복문
+                        do {
+                            val messageData = mutableMapOf<String, String>()
 
-                    if (RegexUtils.isPaymentMessage(body)) {
-                        try {
-                            val payment = RegexUtils.parsePaymentInfo(body, date)
-
-                            // 중복 데이터 확인
-                            val existingCount = paymentDao.countPaymentByDetails(
-                                payment.title,
-                                payment.amount,
-                                payment.date
-                            )
-                            if (existingCount == 0) {
-                                paymentDao.insert(payment)
-                                Log.d("SMSReader", "Inserted Payment: $payment")
-                            } else {
-                                Log.d("SMSReader", "Duplicate Payment Skipped: $payment")
+                            for (i in 0 until columnCount) {
+                                val columnName = it.getColumnName(i)
+                                val columnValue = it.getString(i) ?: "null"  // null 체크 추가
+                                messageData[columnName] = columnValue
                             }
-                        } catch (e: Exception) {
-                            Log.e("SMS Parsing", "Error parsing payment info: ${e.message}")
-                        }
-                    }
-                }
-            }
 
-            // MMS 데이터 쿼리
-            val mmsCursor: Cursor? = context.contentResolver.query(
-                mmsUri,
-                arrayOf(Telephony.Mms.DATE),
-                "${Telephony.Mms.DATE} >= ?",
-                arrayOf(thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
-                "${Telephony.Mms.DATE} DESC"
-            )
+                            val body = messageData["body"] // body 내용 가져오기
+                            Log.d("RCSReader", "RCS Message Data: $body")
 
-            mmsCursor?.use {
-                while (it.moveToNext()) {
-                    val mmsId = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms._ID))
-                    val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms.DATE))
-                    val date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
-
-                    // MMS PART 쿼리로 본문 추출
-                    val partCursor = context.contentResolver.query(
-                        Uri.parse("content://mms/part"),
-                        arrayOf("text"),
-                        "mid = ?",
-                        arrayOf(mmsId.toString()),
-                        null
-                    )
-
-                    partCursor?.use { part ->
-                        while (part.moveToNext()) {
-                            val body = part.getString(part.getColumnIndexOrThrow("text"))
-                            Log.d("MMSReader", "MMS Message Date: $date")
-                            Log.d("MMSReader", "MMS Message Body: $body")
-
-                            if (RegexUtils.isPaymentMessage(body)) {
+                            if (body != null) {
                                 try {
-                                    val payment = RegexUtils.parsePaymentInfo(body, date)
+                                    // JSON 파싱
+                                    val jsonObject = JSONObject(body)
+                                    val cardLayout = jsonObject.getJSONObject("layout")
+                                    val children = cardLayout.getJSONArray("children")
 
-                                    // 중복 데이터 확인
-                                    val existingCount = paymentDao.countPaymentByDetails(payment.title, payment.amount, payment.date)
-                                    if (existingCount == 0) {
-                                        paymentDao.insert(payment)
-                                        Log.d("MMSReader", "Inserted Payment: $payment")
-                                    } else {
-                                        Log.d("MMSReader", "Duplicate Payment Skipped: $payment")
+                                    // 첫 번째 child 요소의 내용 추출
+                                    val firstChild = children.getJSONObject(1) // 두 번째 child, 텍스트가 포함된 부분
+                                    val textWidget = firstChild.getJSONArray("children").getJSONObject(0)
+                                    val text = textWidget.getString("text")
+
+                                    Log.d("RCSReader", "Extracted Text: $text")
+
+                                    val formattedDate = parseMessageBody(text)
+
+
+                                    Log.d("RCSReader", "Extracted Date: ${formattedDate.toString()}")
+
+                                    // 추출된 텍스트 출력
+
+                                    if (RegexUtils.isPaymentMessage(body)) {
+                                        try {
+                                            val payment = RegexUtils.parsePaymentInfo(body, formattedDate.toString())
+
+                                            // 중복 데이터 확인
+                                            val existingCount = paymentDao.countPaymentByDetails(
+                                                payment.title,
+                                                payment.amount,
+                                                payment.date
+                                            )
+                                            if (existingCount == 0) {
+                                                paymentDao.insert(payment)
+                                                Log.d("SMSReader", "Inserted Payment: $payment")
+                                            } else {
+                                                Log.d("SMSReader", "Duplicate Payment Skipped: $payment")
+                                            }
+                                        } catch (e: Exception) {
+                                            Log.e("SMS Parsing", "Error parsing payment info: ${e.message}")
+                                        }
                                     }
+
                                 } catch (e: Exception) {
-                                    Log.e("MMS Parsing", "Error parsing payment info: ${e.message}")
+                                    Log.e("RCSReader", "Error parsing body: ${e.message}")
                                 }
                             }
-                        }
+                            // String으로 데이터를 넘겨주기 위해 jsonTest 호출
+                            jsonTest(messageData.toString())
+                        } while (it.moveToNext())  // 다음 메시지로 이동
+                    } else {
+                        Log.d("__T", "No data found in content://im/chat")
                     }
-                }
+                } ?: Log.e("__T", "Failed to query content://im/chat")
+            } catch (e: Exception) {
+                Log.e("__T", "Error fetching RCS messages: ${e.message}")
             }
         }
     }
+
 
 
     private suspend fun savePaymentsToDatabase(context: Context, payments: List<Payment>) {
