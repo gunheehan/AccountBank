@@ -45,7 +45,7 @@
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:nme="com.redhorse.accountbank.PUSH_NOTIFICATION" />
+                <action android:name="com.redhorse.accountbank.PUSH_NOTIFICATION" />
             </intent-filter>
         </receiver>
 
