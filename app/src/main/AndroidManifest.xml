@@ -24,13 +24,28 @@
             </intent-filter>
         </receiver>
 
+        <!-- RCS 리시버 등록 -->
+        <receiver
+            android:name=".receiver.RCSReceiver"
+            android:permission="com.samsung.rcs.permission.RCS_APP_PERMISSION"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="com.samsung.rcs.framework.instantmessaging.category.ACTION"/>
+                <category android:name="com.samsung.rcs.framework.instantmessaging"/>
+                <action android:name="com.samsung.rcs.framework.instantmessaging.action.RECEIVE_CHAT_INVITATION"/>
+                <action android:name="com.samsung.rcs.framework.instantmessaging.action.RECEIVE_PARTICIPANT_INSERTED"/>
+                <action android:name="com.samsung.rcs.framework.instantmessaging.action.RECEIVE_PARTICIPANT_UPDATED"/>
+            </intent-filter>
+        </receiver>
+
         <!-- 푸시 알림 리시버 등록 -->
         <receiver
             android:name=".receiver.PushNotificationReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <action android:name="com.redhorse.accountbank.PUSH_NOTIFICATION" />
+                <action android:nme="com.redhorse.accountbank.PUSH_NOTIFICATION" />
             </intent-filter>
         </receiver>
 
@@ -54,5 +69,6 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <!-- Android 13 이상의 경우 푸시 알림 권한 추가 -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
+    <!-- Android RCS Message 권한-->
+    <uses-permission android:name="com.samsung.rcs.im.READ_PERMISSION"/>
 </manifest>

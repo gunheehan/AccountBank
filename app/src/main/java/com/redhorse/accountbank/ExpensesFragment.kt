@@ -2,10 +2,13 @@ package com.redhorse.accountbank
 
 import android.content.Context
 import android.database.Cursor
+import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.Telephony
+import android.provider.Telephony.TextBasedSmsColumns.BODY
 import android.telephony.SmsMessage
+import android.telephony.TelephonyManager
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -109,25 +112,32 @@ class ExpensesFragment : Fragment() {
 
     suspend fun fetchAndSavePaymentMessages(context: Context) {
         val smsUri = Telephony.Sms.CONTENT_URI
-        val thirtyDaysAgo = LocalDate.now().minusDays(30).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+        val mmsUri = Telephony.Mms.CONTENT_URI
+        val thirtyDaysAgo = LocalDate.now().minusDays(30)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val database = AppDatabase.getDatabase(context)
         val paymentDao = database.paymentDao()
 
         withContext(Dispatchers.IO) {
-            val cursor: Cursor? = context.contentResolver.query(
+            // SMS 데이터 쿼리
+            val smsCursor: Cursor? = context.contentResolver.query(
                 smsUri,
                 arrayOf(Telephony.Sms.BODY, Telephony.Sms.DATE),
                 "${Telephony.Sms.DATE} >= ?",
-                arrayOf(thirtyDaysAgo.toString()),
+                arrayOf(
+                    thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+                        .toString()
+                ),
                 "${Telephony.Sms.DATE} DESC"
             )
 
-            cursor?.use {
+            smsCursor?.use {
                 while (it.moveToNext()) {
                     val body = it.getString(it.getColumnIndexOrThrow(Telephony.Sms.BODY))
                     val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Sms.DATE))
-                    val date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
+                    val date =
+                        Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate()
+                            .format(formatter)
 
                     Log.d("SMSReader", "Message Date: $date")
                     Log.d("SMSReader", "Message Body: $body")
@@ -137,7 +147,11 @@ class ExpensesFragment : Fragment() {
                             val payment = RegexUtils.parsePaymentInfo(body, date)
 
                             // 중복 데이터 확인
-                            val existingCount = paymentDao.countPaymentByDetails(payment.title, payment.amount, payment.date)
+                            val existingCount = paymentDao.countPaymentByDetails(
+                                payment.title,
+                                payment.amount,
+                                payment.date
+                            )
                             if (existingCount == 0) {
                                 paymentDao.insert(payment)
                                 Log.d("SMSReader", "Inserted Payment: $payment")
@@ -150,8 +164,60 @@ class ExpensesFragment : Fragment() {
                     }
                 }
             }
+
+            // MMS 데이터 쿼리
+            val mmsCursor: Cursor? = context.contentResolver.query(
+                mmsUri,
+                arrayOf(Telephony.Mms.DATE),
+                "${Telephony.Mms.DATE} >= ?",
+                arrayOf(thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
+                "${Telephony.Mms.DATE} DESC"
+            )
+
+            mmsCursor?.use {
+                while (it.moveToNext()) {
+                    val mmsId = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms._ID))
+                    val timestamp = it.getLong(it.getColumnIndexOrThrow(Telephony.Mms.DATE))
+                    val date = Instant.ofEpochMilli(timestamp).atZone(ZoneId.systemDefault()).toLocalDate().format(formatter)
+
+                    // MMS PART 쿼리로 본문 추출
+                    val partCursor = context.contentResolver.query(
+                        Uri.parse("content://mms/part"),
+                        arrayOf("text"),
+                        "mid = ?",
+                        arrayOf(mmsId.toString()),
+                        null
+                    )
+
+                    partCursor?.use { part ->
+                        while (part.moveToNext()) {
+                            val body = part.getString(part.getColumnIndexOrThrow("text"))
+                            Log.d("MMSReader", "MMS Message Date: $date")
+                            Log.d("MMSReader", "MMS Message Body: $body")
+
+                            if (RegexUtils.isPaymentMessage(body)) {
+                                try {
+                                    val payment = RegexUtils.parsePaymentInfo(body, date)
+
+                                    // 중복 데이터 확인
+                                    val existingCount = paymentDao.countPaymentByDetails(payment.title, payment.amount, payment.date)
+                                    if (existingCount == 0) {
+                                        paymentDao.insert(payment)
+                                        Log.d("MMSReader", "Inserted Payment: $payment")
+                                    } else {
+                                        Log.d("MMSReader", "Duplicate Payment Skipped: $payment")
+                                    }
+                                } catch (e: Exception) {
+                                    Log.e("MMS Parsing", "Error parsing payment info: ${e.message}")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
+
 
     private suspend fun savePaymentsToDatabase(context: Context, payments: List<Payment>) {
         withContext(Dispatchers.IO) {
