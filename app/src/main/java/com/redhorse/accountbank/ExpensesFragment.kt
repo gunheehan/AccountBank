@@ -171,7 +171,7 @@ class ExpensesFragment : Fragment() {
     suspend fun fetchAndSavePaymentMessages(context: Context) {
         val database = AppDatabase.getDatabase(context)
         val paymentDao = database.paymentDao()
-        val thirtyDaysAgo = LocalDate.now().minusDays(30)  // 30일로 수정
+        val thirtyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 날짜(오늘부터 이전 DAY)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         Log.d("RCSReader", "Start load RCS")
         val rcsUri = Uri.parse("content://im/chat")
