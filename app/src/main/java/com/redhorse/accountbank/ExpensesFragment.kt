@@ -181,49 +181,56 @@ class ExpensesFragment : Fragment() {
                 // 30일 전의 날짜로 쿼리
                 val cursor = context.contentResolver.query(
                     rcsUri,
-                    null,  // 모든 컬럼 선택
-                    "date >= ?",  // 조건: 30일 이내
+                    null, // 모든 컬럼 선택
+                    "date >= ?", // 조건: 30일 이내
                     arrayOf(thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
-                    "date DESC"  // 최신 메시지부터 정렬
+                    "date DESC" // 최신 메시지부터 정렬
                 )
 
                 cursor?.use {
+                    val messageCount = it.count
+
+                    if (messageCount == 0) {
+                        Log.d("RCSReader", "No messages found.")
+                        return@use
+                    }
+
                     if (it.moveToFirst()) {
                         val columnCount = it.columnCount
 
-                        // 여러 메시지를 처리하기 위한 반복문
+                        // 모든 메시지를 리스트로 저장
+                        val messages = mutableListOf<Map<String, String>>()
+
                         do {
                             val messageData = mutableMapOf<String, String>()
 
                             for (i in 0 until columnCount) {
                                 val columnName = it.getColumnName(i)
-                                val columnValue = it.getString(i) ?: "null"  // null 체크 추가
+                                val columnValue = it.getString(i) ?: "null" // null 체크 추가
                                 messageData[columnName] = columnValue
                             }
 
-                            val body = messageData["body"] // body 내용 가져오기
-                            Log.d("RCSReader", "RCS Message Data: $body")
+                            // 메시지 데이터 로그 출력
+                            Log.d("RCSReader", "Message Data: $messageData")
+                            messages.add(messageData)
+
+                            // body 내용 처리
+                            val body = messageData["body"]
+                            Log.d("RCSReader", "RCS Message Body: $body")
 
                             if (body != null) {
                                 try {
-                                    // JSON 파싱
                                     val jsonObject = JSONObject(body)
                                     val cardLayout = jsonObject.getJSONObject("layout")
                                     val children = cardLayout.getJSONArray("children")
-
-                                    // 첫 번째 child 요소의 내용 추출
-                                    val firstChild = children.getJSONObject(1) // 두 번째 child, 텍스트가 포함된 부분
+                                    val firstChild = children.getJSONObject(1) // 두 번째 child
                                     val textWidget = firstChild.getJSONArray("children").getJSONObject(0)
                                     val text = textWidget.getString("text")
 
                                     Log.d("RCSReader", "Extracted Text: $text")
 
                                     val formattedDate = parseMessageBody(text)
-
-
                                     Log.d("RCSReader", "Extracted Date: ${formattedDate.toString()}")
-
-                                    // 추출된 텍스트 출력
 
                                     if (RegexUtils.isPaymentMessage(body)) {
                                         try {
@@ -250,13 +257,14 @@ class ExpensesFragment : Fragment() {
                                     Log.e("RCSReader", "Error parsing body: ${e.message}")
                                 }
                             }
-                            // String으로 데이터를 넘겨주기 위해 jsonTest 호출
-                            jsonTest(messageData.toString())
-                        } while (it.moveToNext())  // 다음 메시지로 이동
+                        } while (it.moveToNext()) // 다음 메시지로 이동
+
+                        // 모든 메시지 로그 출력
+                        Log.d("RCSReader", "All Messages: $messages")
                     } else {
-                        Log.d("__T", "No data found in content://im/chat")
+                        Log.d("RCSReader", "No messages found in content://im/chat")
                     }
-                } ?: Log.e("__T", "Failed to query content://im/chat")
+                } ?: Log.e("RCSReader", "Failed to query content://im/chat")
             } catch (e: Exception) {
                 Log.e("__T", "Error fetching RCS messages: ${e.message}")
             }
