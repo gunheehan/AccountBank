@@ -71,4 +71,5 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <!-- Android RCS Message 권한-->
     <uses-permission android:name="com.samsung.rcs.im.READ_PERMISSION"/>
+    <uses-permission android:name="com.samsung.rcs.permission.RCS_APP_PERMISSION" />
 </manifest>

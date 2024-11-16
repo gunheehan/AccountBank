@@ -3,7 +3,7 @@ package com.redhorse.accountbank.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.telephony.SmsMessage
+import android.util.Log
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.utils.NotificationUtils
@@ -13,53 +13,57 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-
 class RCSReceiver : BroadcastReceiver() {
 
-    override fun onReceive(context: Context?, intent: Intent) {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (intent == null || context == null) {
+            Log.e("RCSReceiver", "Context or Intent is null.")
+            return
+        }
+
+        // 디버깅: Intent Extras 확인
+        val bundle = intent.extras
+        bundle?.keySet()?.forEach { key ->
+            Log.d("RCSReceiver", "Key: $key, Value: ${bundle.get(key)}")
+        }
 
         val message = extractMessageFromIntent(intent)
-
         if (message.isNotBlank()) {
-            // 정규식으로 결제 정보 추출
-            val payment = RegexUtils.parsePaymentInfo(message, LocalDate.now().toString())
-            // DB에 저장 및 알림 발송
             CoroutineScope(Dispatchers.IO).launch {
-                if (context != null) {
+                try {
+                    val payment = RegexUtils.parsePaymentInfo(message, LocalDate.now().toString())
                     savePaymentAndNotify(context, payment)
+                } catch (e: Exception) {
+                    Log.e("RCSReceiver", "Error processing payment: ${e.message}")
                 }
             }
+        } else {
+            Log.d("RCSReceiver", "No valid message found.")
         }
     }
 
     private fun extractMessageFromIntent(intent: Intent): String {
-        // 메시지 추출 로직 (예시: SMS 메시지 내용)
         val bundle = intent.extras
-        val smsMessage = bundle?.get("pdus") as Array<*>
-        val messages = smsMessage.map {
-            val format = bundle.getString("format")
-            SmsMessage.createFromPdu(it as ByteArray, format).messageBody
+        if (bundle == null) {
+            Log.e("RCSReceiver", "No extras in intent.")
+            return ""
         }
-        return messages.joinToString(" ")
+
+        // RCS 메시지 확인 (예: Samsung RCS 메시지 데이터 구조)
+        return bundle.getString("rcs_message_body") ?: "Unknown message format"
     }
 
     private suspend fun savePaymentAndNotify(context: Context, payment: Payment) {
-        // DB에 결제 정보 저장
         val db = AppDatabase.getDatabase(context)
-        db.paymentDao().insert(payment)
+        val existingCount = db.paymentDao().countPaymentByDetails(payment.title, payment.amount, payment.date)
 
-        // 알림 표시
-        val title = payment.title
-        val message = "결제 금액: ${formatCurrency(payment.amount)}원, 타입: ${payment.type}"
-        NotificationUtils.showNotification(context, title, message)
-    }
-
-    companion object {
-        private const val RECEIVE_CHAT_INVITATION =
-            "com.samsung.rcs.framework.instantmessaging.action.RECEIVE_CHAT_INVITATION"
-        private const val RECEIVE_PARTICIPANT_UPDATED =
-            "com.samsung.rcs.framework.instantmessaging.action.RECEIVE_PARTICIPANT_UPDATED"
-        private const val RECEIVE_PARTICIPANT_INSERTED =
-            "com.samsung.rcs.framework.instantmessaging.action.RECEIVE_PARTICIPANT_INSERTED"
+        if (existingCount == 0) {
+            db.paymentDao().insert(payment)
+            val title = payment.title
+            val message = "결제 금액: ${formatCurrency(payment.amount)}원, 타입: ${payment.type}"
+            NotificationUtils.showNotification(context, title, message)
+        } else {
+            Log.d("RCSReceiver", "Duplicate payment skipped.")
+        }
     }
 }
