@@ -33,6 +33,7 @@ class CustomCardView @JvmOverloads constructor(
         val titleView = TextView(context).apply {
             text = content
             textSize = 20f
+            setTextColor(Color.BLACK)
             setTypeface(typeface, Typeface.BOLD)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,

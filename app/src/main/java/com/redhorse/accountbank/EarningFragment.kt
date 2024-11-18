@@ -124,7 +124,7 @@ class EarningFragment : Fragment() {
         }
 
         // 날짜별로 결제 정보를 추가
-        for (day in 1..endOfMonth.dayOfMonth) {
+        for (day in 1.rangeTo(endOfMonth.dayOfMonth)) {
             val date = month.atDay(day)
             val payments = withContext(Dispatchers.IO) {
                 paymentDao.getPaymentsForDate(date.toString())
