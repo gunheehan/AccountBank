@@ -15,10 +15,8 @@ interface PaymentDao {
     @Query("SELECT COUNT(*) FROM Payments WHERE title = :title AND amount = :amount AND date = :date")
     suspend fun countPaymentByDetails(title: String, amount: Int, date: String): Int
 
-    @Query("SELECT SUM(amount) FROM payments WHERE date = :date AND type = 'income'")
-    fun getIncomeForDate(date: String): Int?
+    @Query("SELECT * FROM payments WHERE date = :date")
+    fun getPaymentsForDate(date: String): List<Payment>?
 
-    @Query("SELECT SUM(amount) FROM payments WHERE date = :date AND type = 'expense'")
-    fun getExpenseForDate(date: String): Int?
 }
 

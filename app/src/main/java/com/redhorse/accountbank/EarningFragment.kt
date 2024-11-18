@@ -126,19 +126,21 @@ class EarningFragment : Fragment() {
         // 날짜별로 결제 정보를 추가
         for (day in 1..endOfMonth.dayOfMonth) {
             val date = month.atDay(day)
-            val income = withContext(Dispatchers.IO) {
-                paymentDao.getIncomeForDate(date.toString())
-            }
-            val expense = withContext(Dispatchers.IO) {
-                paymentDao.getExpenseForDate(date.toString())
+            val payments = withContext(Dispatchers.IO) {
+                paymentDao.getPaymentsForDate(date.toString())
             }
 
-            // 결제 정보가 없을 경우 0으로 초기화
-            daysList.add(DayData(date, income = income ?: 0, expense = expense ?: 0))
+            val dayData = DayData(
+                date = date,
+                payments = payments?.toMutableList() ?: mutableListOf()
+            )
+
+            daysList.add(dayData)
         }
 
         return daysList
     }
+
 
 
     fun processPaymentMessage(context: Context, message: String) {

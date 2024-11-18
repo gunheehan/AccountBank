@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.DayData
 import com.redhorse.accountbank.utils.formatCurrency
+import java.time.LocalDate
 
 class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
 
@@ -17,7 +18,7 @@ class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<Ca
         val expenseText: TextView = itemView.findViewById(R.id.expenseText)
 
         fun bind(dayData: DayData) {
-            if (dayData.isEmpty) {
+            if (dayData.date == LocalDate.MIN) {
                 dayText.text = ""
                 incomeText.visibility = View.GONE
                 expenseText.visibility = View.GONE
@@ -26,13 +27,13 @@ class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<Ca
                 dayText.text = dayData.date.dayOfMonth.toString()
 
                 // 수입과 지출 텍스트를 0으로 초기화하고 필요한 경우에만 업데이트
-                incomeText.text = if (dayData.income > 0) {
-                    "${formatCurrency(dayData.income)}" // 포맷팅된 수입 표시
+                incomeText.text = if (dayData.getTotalIncome() > 0) {
+                    "${formatCurrency(dayData.getTotalIncome())}" // 포맷팅된 수입 표시
                 } else {
                     "0"
                 }
-                expenseText.text = if (dayData.expense > 0) {
-                    "${formatCurrency(dayData.expense)}" // 포맷팅된 지출 표시
+                expenseText.text = if (dayData.getTotalExpense() > 0) {
+                    "${formatCurrency(dayData.getTotalExpense())}" // 포맷팅된 지출 표시
                 } else {
                     "0"
                 }
