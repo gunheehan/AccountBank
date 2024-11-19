@@ -10,12 +10,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.DayData
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.PaymentDao
+import com.redhorse.accountbank.databinding.ActivityMainBinding
 import com.redhorse.accountbank.utils.formatCurrency
 import com.redhorse.accountbank.utils.NotificationUtils
 import kotlinx.coroutines.CoroutineScope
@@ -40,6 +43,8 @@ class EarningFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var paymentDao: PaymentDao
 
     private lateinit var calendarRecyclerView: RecyclerView
@@ -55,6 +60,8 @@ class EarningFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        //setContentView(binding.root)
     }
 
     override fun onCreateView(
@@ -71,6 +78,17 @@ class EarningFragment : Fragment() {
         updateCalendar()
         setupButtonListeners()
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val button: Button = view.findViewById(R.id.btn_showDetail)
+
+        button.setOnClickListener{
+            val showDetailPopup = DayDetailFragment()
+            showDetailPopup.show((activity as AppCompatActivity).supportFragmentManager, "showDetailPopup")
+        }
     }
 
     private fun setupViews(view: View) {
@@ -98,8 +116,6 @@ class EarningFragment : Fragment() {
             }
         }
     }
-
-
 
     private fun setupButtonListeners() {
         prevMonthButton.setOnClickListener {
