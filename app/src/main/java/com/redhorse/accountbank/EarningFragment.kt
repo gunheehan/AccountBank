@@ -1,6 +1,7 @@
 package com.redhorse.accountbank
 
 import DayDetailFragment
+import RegexUtils.parsePaymentInfo
 import android.content.Context
 import com.redhorse.accountbank.adapter.CalendarAdapter
 import android.os.Bundle
@@ -51,6 +52,8 @@ class EarningFragment : Fragment() {
     private lateinit var yearMonthTextView: TextView
     private lateinit var prevMonthButton: Button
     private lateinit var nextMonthButton: Button
+    private lateinit var calendarTotalEarningText : TextView
+    private lateinit var calendarTotalExpenseText : TextView
 
     private var currentMonth: YearMonth = YearMonth.now()
 
@@ -98,6 +101,8 @@ class EarningFragment : Fragment() {
         yearMonthTextView = view.findViewById(R.id.yearMonthTextView)
         prevMonthButton = view.findViewById(R.id.prevMonthButton)
         nextMonthButton = view.findViewById(R.id.nextMonthButton)
+        calendarTotalEarningText = view.findViewById(R.id.calendarTotalEarning)
+        calendarTotalExpenseText = view.findViewById(R.id.calendarTotalExpenses)
     }
 
     private fun setupRecyclerView() {
@@ -114,10 +119,20 @@ class EarningFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             val daysInMonth = generateCalendarDataForMonth(currentMonth)
             Log.d("EarningFragment", "daysInMonth: $daysInMonth")
-
             // 메인 스레드에서 어댑터 업데이트
             withContext(Dispatchers.Main) {
                 (calendarRecyclerView.adapter as CalendarAdapter).updateDays(daysInMonth)
+                var totalIncome = 0
+                var totalExpense = 0
+                daysInMonth.forEach { dayData ->
+                    totalIncome += dayData.getTotalIncome()
+                    totalExpense += dayData.getTotalExpense()
+                }
+
+                val formattedIncome = formatCurrency(totalIncome) + " 원"
+                val formattedExpense = formatCurrency(totalExpense) + " 원"
+                calendarTotalEarningText.text = "총 수입: ${formattedIncome}"
+                calendarTotalExpenseText.text = "총 지출: ${formattedExpense}"
             }
         }
     }
@@ -159,6 +174,7 @@ class EarningFragment : Fragment() {
                 date = date,
                 payments = payments
             )
+
 
             daysList.add(dayData)
         }
