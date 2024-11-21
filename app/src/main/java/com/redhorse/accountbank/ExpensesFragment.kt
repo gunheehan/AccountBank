@@ -232,9 +232,10 @@ class ExpensesFragment : Fragment() {
                                     val formattedDate = parseMessageBody(text)
                                     Log.d("RCSReader", "Extracted Date: ${formattedDate.toString()}")
 
-                                    if (RegexUtils.isPaymentMessage(body)) {
+                                    if (RegexUtils.isPaymentMessage(text)) {
                                         try {
-                                            val payment = RegexUtils.parsePaymentInfo(body, formattedDate.toString())
+                                            val payment = RegexUtils.parsePaymentInfo(text, formattedDate.toString())
+                                            Log.d("RCSReaderTitle", "Extracted Date: ${payment.title}")
 
                                             // 중복 데이터 확인
                                             val existingCount = paymentDao.countPaymentByDetails(

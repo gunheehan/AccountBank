@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:layout_marginBottom="8dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <!-- 결제 제목 -->
+    <TextView
+        android:id="@+id/titleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Payment Title"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"/>
+
+    <!-- 결제 타입 (수입/지출) -->
+    <TextView
+        android:id="@+id/typeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Type"
+        android:textColor="@color/black"
+        android:textSize="14sp"/>
+
+    <!-- 결제 금액 -->
+    <TextView
+        android:id="@+id/amountText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Amount"
+        android:textColor="@color/black"
+        android:textSize="14sp"/>
+</LinearLayout>

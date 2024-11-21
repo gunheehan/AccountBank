@@ -10,7 +10,7 @@ import com.redhorse.accountbank.data.DayData
 import com.redhorse.accountbank.utils.formatCurrency
 import java.time.LocalDate
 
-class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
+class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(DayData)->Unit) : RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder>() {
 
     inner class CalendarViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dayText: TextView = itemView.findViewById(R.id.dayText)
@@ -44,6 +44,11 @@ class CalendarAdapter(private var days: List<DayData>) : RecyclerView.Adapter<Ca
                 // 글자 크기 조정
                 adjustTextSize(incomeText)
                 adjustTextSize(expenseText)
+
+                // 클릭 리스너 설정
+                itemView.setOnClickListener{
+                    onItemClick(dayData) // 클릭된 DayData 객체를 전달
+                }
             }
         }
 

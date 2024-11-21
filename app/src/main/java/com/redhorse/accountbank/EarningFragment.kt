@@ -1,5 +1,6 @@
 package com.redhorse.accountbank
 
+import DayDetailFragment
 import android.content.Context
 import com.redhorse.accountbank.adapter.CalendarAdapter
 import android.os.Bundle
@@ -11,7 +12,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.redhorse.accountbank.data.AppDatabase
@@ -61,7 +61,6 @@ class EarningFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
-        //setContentView(binding.root)
     }
 
     override fun onCreateView(
@@ -82,13 +81,16 @@ class EarningFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+    }
 
-        val button: Button = view.findViewById(R.id.btn_showDetail)
 
-        button.setOnClickListener{
-            val showDetailPopup = DayDetailFragment()
-            showDetailPopup.show((activity as AppCompatActivity).supportFragmentManager, "showDetailPopup")
-        }
+    private fun showDayDetail(dayData: DayData) {
+        // DayData를 전달하여 DayDetailFragment를 띄운다.
+        val dayDetailFragment = DayDetailFragment.newInstance(
+            dayData.date.toString(),
+            dayData.payments.map { it.toPaymentDTO() } // 필요한 DTO 형태로 변환하여 전달
+        )
+        dayDetailFragment.show(childFragmentManager, "DayDetailFragment")
     }
 
     private fun setupViews(view: View) {
@@ -100,7 +102,10 @@ class EarningFragment : Fragment() {
 
     private fun setupRecyclerView() {
         calendarRecyclerView.layoutManager = GridLayoutManager(context, 7) // 7일 기준
-        calendarRecyclerView.adapter = CalendarAdapter(emptyList()) // 초기 어댑터 설정
+        calendarRecyclerView.adapter = CalendarAdapter(emptyList(), onItemClick = { dayData ->
+            // DayData 클릭 시 실행되는 콜백
+            showDayDetail(dayData)
+        })
     }
 
     private fun updateCalendar() {
@@ -128,6 +133,7 @@ class EarningFragment : Fragment() {
         }
     }
 
+    // DayData를 생성하는 함수에서 변환 사용
     private suspend fun generateCalendarDataForMonth(month: YearMonth): List<DayData> {
         val startOfMonth = month.atDay(1)
         val endOfMonth = month.atEndOfMonth()
@@ -142,13 +148,16 @@ class EarningFragment : Fragment() {
         // 날짜별로 결제 정보를 추가
         for (day in 1.rangeTo(endOfMonth.dayOfMonth)) {
             val date = month.atDay(day)
-            val payments = withContext(Dispatchers.IO) {
-                paymentDao.getPaymentsForDate(date.toString())
-            }
+
+            // PaymentDTO 리스트 가져오기
+            val paymentsDTO = paymentDao.getPaymentsForDate(date.toString()) // List<PaymentDTO>
+
+            // PaymentDTO를 Payment로 변환하여 사용
+            val payments = paymentsDTO?.map { it.toPayment() }?.toMutableList() ?: mutableListOf()
 
             val dayData = DayData(
                 date = date,
-                payments = payments?.toMutableList() ?: mutableListOf()
+                payments = payments
             )
 
             daysList.add(dayData)
@@ -156,6 +165,7 @@ class EarningFragment : Fragment() {
 
         return daysList
     }
+
 
 
 
