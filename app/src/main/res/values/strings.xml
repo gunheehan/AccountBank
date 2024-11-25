@@ -2,4 +2,8 @@
     <string name="app_name">AccountBank</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="payment_types">
+        <item>수입</item>
+        <item>지출</item>
+    </string-array>
 </resources>
