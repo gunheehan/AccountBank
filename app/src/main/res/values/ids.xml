@@ -4,8 +4,9 @@
     <item name="dayText" type="id" />
     <item name="incomeText" type="id" />
     <item name="expenseText" type="id" />
+    <item name="payment_Input_btn" type="id" />
 
-        <style name="DayOfWeekStyle">
+    <style name="DayOfWeekStyle">
             <item name="android:layout_width">0dp</item>
             <item name="android:layout_height">wrap_content</item>
             <item name="android:layout_weight">1</item>

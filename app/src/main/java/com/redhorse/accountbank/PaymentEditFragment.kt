@@ -113,10 +113,13 @@ class PaymentEditFragment : DialogFragment() {
     }
 
     companion object {
-        fun newInstance(payment: Payment): PaymentEditFragment {
+        // 새로운 인스턴스를 만들 때 Payment 객체가 null일 수 있으므로 null 처리 추가
+        fun newInstance(payment: Payment?): PaymentEditFragment {
             val fragment = PaymentEditFragment()
             val bundle = Bundle()
-            bundle.putParcelable("payment", payment) // Payment 객체 전달
+            payment?.let {
+                bundle.putParcelable("payment", it) // Payment 객체가 null이 아니면 전달
+            }
             fragment.arguments = bundle
             Log.e("PaymentEditFragment", "Creating new instance with payment: $payment")
             return fragment
@@ -207,5 +210,4 @@ class PaymentEditFragment : DialogFragment() {
             }
         }
     }
-
 }

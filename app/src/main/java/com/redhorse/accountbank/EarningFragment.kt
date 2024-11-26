@@ -54,6 +54,7 @@ class EarningFragment : Fragment() {
     private lateinit var nextMonthButton: Button
     private lateinit var calendarTotalEarningText : TextView
     private lateinit var calendarTotalExpenseText : TextView
+    private lateinit var payment_insert_Button: Button
 
     private var currentMonth: YearMonth = YearMonth.now()
 
@@ -103,6 +104,7 @@ class EarningFragment : Fragment() {
         nextMonthButton = view.findViewById(R.id.nextMonthButton)
         calendarTotalEarningText = view.findViewById(R.id.calendarTotalEarning)
         calendarTotalExpenseText = view.findViewById(R.id.calendarTotalExpenses)
+        payment_insert_Button = view.findViewById(R.id.payment_insert_btn)
     }
 
     private fun setupRecyclerView() {
@@ -145,6 +147,12 @@ class EarningFragment : Fragment() {
         nextMonthButton.setOnClickListener {
             currentMonth = currentMonth.plusMonths(1)
             updateCalendar()
+        }
+        payment_insert_Button.setOnClickListener{
+            val editPaymentDialog = PaymentEditFragment.newInstance(null)
+
+            // 수정 모달 표시
+            editPaymentDialog.show(parentFragmentManager, "PaymentEditFragment")
         }
     }
 
