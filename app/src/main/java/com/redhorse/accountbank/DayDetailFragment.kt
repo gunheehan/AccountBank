@@ -1,4 +1,5 @@
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,7 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.redhorse.accountbank.PaymentEditFragment
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.adapter.PaymentAdapter
 import com.redhorse.accountbank.data.DayData
@@ -74,7 +76,9 @@ class DayDetailFragment : DialogFragment() {
             // 결제 목록 표시
             val recyclerView = rootView.findViewById<RecyclerView>(R.id.paymentsRecyclerViews)
             recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = PaymentAdapter(it.payments) // PaymentDTO를 어댑터로 전달
+            recyclerView.adapter = PaymentAdapter(it.payments, onItemClick = {
+                payment -> showEditPayment(payment)
+            }) // PaymentDTO를 어댑터로 전달
         }
     }
 
@@ -88,4 +92,16 @@ class DayDetailFragment : DialogFragment() {
             dialog.window?.setGravity(Gravity.CENTER)  // 중앙 배치
         }
     }
+
+    private fun showEditPayment(payment: Payment) {
+        dismiss()
+        Log.e("PaymentAdapter", payment.title)
+
+        // 수정 모달 열기
+        val editPaymentDialog = PaymentEditFragment.newInstance(payment)
+
+        // 수정 모달 표시
+        editPaymentDialog.show(parentFragmentManager, "PaymentEditFragment")
+    }
+
 }

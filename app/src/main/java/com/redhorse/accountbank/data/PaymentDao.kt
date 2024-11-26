@@ -18,5 +18,8 @@ interface PaymentDao {
     @Query("SELECT * FROM payments WHERE date = :date")
     fun getPaymentsForDate(date: String): List<Payment>?
 
+    @Query("UPDATE payments SET title = :title, amount = :amount, date = :date, type = :type WHERE id = :id")
+    suspend fun updatePaymentById(id: Long, title: String, amount: Int, date: String, type: String)
+
 }
 

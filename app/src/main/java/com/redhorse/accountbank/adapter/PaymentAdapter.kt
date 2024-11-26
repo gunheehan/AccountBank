@@ -1,5 +1,6 @@
 package com.redhorse.accountbank.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.utils.formatCurrency
 
-class PaymentAdapter(private val payments: List<Payment>) : RecyclerView.Adapter<PaymentAdapter.PaymentViewHolder>() {
+class PaymentAdapter(private val payments: List<Payment>, private val onItemClick:(Payment)->Unit) : RecyclerView.Adapter<PaymentAdapter.PaymentViewHolder>() {
 
     inner class PaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.titleText)
@@ -20,6 +21,15 @@ class PaymentAdapter(private val payments: List<Payment>) : RecyclerView.Adapter
             titleText.text = payment.title
             typeText.text = payment.type
             amountText.text = "${formatCurrency(payment.amount)}" // 포맷된 금액 표시
+
+            itemView.setOnClickListener {
+                // 클릭 시 NullCheck 추가
+                if (payment != null) {
+                    onItemClick(payment)
+                } else {
+                    Log.e("PaymentAdapter", "Clicked payment is null!")
+                }
+            }
         }
     }
 
