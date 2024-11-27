@@ -36,21 +36,18 @@ class PaymentEditFragment : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.e("PaymentEditFragment", "onCreate called")
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.e("PaymentEditFragment", "onCreateView called")
 
         val db = AppDatabase.getDatabase(requireContext())
         paymentDao = db.paymentDao()
 
         arguments?.let {
             paymentData = it.getParcelable("payment") // 전달된 Payment 객체 받기
-            Log.e("PaymentEditFragment", "Payment data: $paymentData")
         }
 
         // Fragment의 레이아웃을 인플레이트합니다.
@@ -64,18 +61,15 @@ class PaymentEditFragment : DialogFragment() {
 
         // 날짜 버튼 초기화 추가
         select_day_Button = rootView.findViewById(R.id.payment_select_day_btn)
-        Log.e("PaymentEditFragment", "select_day_Button initialized")
 
         if(paymentData == null){
             isInsertMode = true
-            Log.e("PaymentEditFragment", "Insert mode enabled")
         }
 
         // UI에 데이터를 설정하는 로직
         setupUI(rootView)
 
         insert_Button.setOnClickListener {
-            Log.e("PaymentEditFragment", "Insert button clicked")
             if (isInsertMode) {
                 insertPayment()
             } else {
@@ -84,7 +78,6 @@ class PaymentEditFragment : DialogFragment() {
         }
 
         select_day_Button.setOnClickListener {
-            Log.e("PaymentEditFragment", "Select day button clicked")
             openDatePickerDialog()
         }
 
@@ -94,7 +87,6 @@ class PaymentEditFragment : DialogFragment() {
     private fun setupUI(rootView: View) {
         paymentData?.let {
             // 내역 표시
-            Log.e("PaymentEditFragment", "Setting up UI with paymentData: $it")
             payment_title_EditText.setText(it.title)
             if (isInsertMode)
             {
@@ -114,13 +106,11 @@ class PaymentEditFragment : DialogFragment() {
                 payment_type_Spinner.setSelection(0)
 
         } ?: run {
-            Log.e("PaymentEditFragment", "No paymentData available, skipping UI setup")
         }
     }
 
     fun setOnSaveCallback(callback: () -> Unit) {
         this.onSaveCallback = callback
-        Log.e("PaymentEditFragment", "onSaveCallback set")
     }
 
     companion object {
@@ -132,13 +122,11 @@ class PaymentEditFragment : DialogFragment() {
                 bundle.putParcelable("payment", it) // Payment 객체가 null이 아니면 전달
             }
             fragment.arguments = bundle
-            Log.e("PaymentEditFragment", "Creating new instance with payment: $payment")
             return fragment
         }
     }
 
     private fun openDatePickerDialog() {
-        Log.e("PaymentEditFragment", "Opening DatePickerDialog")
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)
         val month = calendar.get(Calendar.MONTH)
@@ -151,7 +139,6 @@ class PaymentEditFragment : DialogFragment() {
                 // 선택된 날짜를 yyyy-MM-dd 형식으로 TextView에 설정
                 val selectedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
                 select_day_TextView.text = selectedDate
-                Log.e("PaymentEditFragment", "Selected date: $selectedDate")
             },
             year, month, dayOfMonth
         )
@@ -161,8 +148,6 @@ class PaymentEditFragment : DialogFragment() {
     }
 
     fun insertPayment() {
-        Log.e("PaymentEditFragment", "Inserting new payment")
-
         val titleData = payment_title_EditText.text.toString()
         val date = select_day_TextView.text.toString()
         val amount = amount_EditText.text.toString().toIntOrNull() ?: 0
@@ -186,12 +171,12 @@ class PaymentEditFragment : DialogFragment() {
 
         CoroutineScope(Dispatchers.IO).launch {
             paymentDao.insert(newPayment)
-            Log.e("PaymentEditFragment", "New payment inserted in DB")
 
             // UI 업데이트를 위한 콜백 호출
             withContext(Dispatchers.Main) {
                 dismiss() // 다이얼로그 닫기
-                Log.e("PaymentEditFragment", "Save callback called and dialog dismissed")
+
+                onSaveCallback!!.invoke()
             }
         }
     }
@@ -211,12 +196,12 @@ class PaymentEditFragment : DialogFragment() {
             CoroutineScope(Dispatchers.IO).launch {
                 // Room을 사용하여 데이터 업데이트
                 paymentDao.updatePaymentById(existingPayment.id, titleData, updatedAmount, updatedDate, updatedType)
-                Log.e("PaymentEditFragment", "Payment updated in DB")
 
                 // UI 업데이트를 위한 콜백 호출
                 withContext(Dispatchers.Main) {
                     dismiss() // 다이얼로그 닫기
-                    Log.e("PaymentEditFragment", "Save callback called and dialog dismissed after update")
+
+                    onSaveCallback!!.invoke()
                 }
             }
         }

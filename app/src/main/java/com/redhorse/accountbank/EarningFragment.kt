@@ -94,6 +94,8 @@ class EarningFragment : Fragment() {
             dayData.date.toString(),
             dayData.payments.map { it.toPaymentDTO() } // 필요한 DTO 형태로 변환하여 전달
         )
+
+        dayDetailFragment.SetOnEditDataCallback { updateCalendar() }
         dayDetailFragment.show(childFragmentManager, "DayDetailFragment")
     }
 
@@ -150,6 +152,7 @@ class EarningFragment : Fragment() {
         }
         payment_insert_Button.setOnClickListener{
             val editPaymentDialog = PaymentEditFragment.newInstance(null)
+            editPaymentDialog.setOnSaveCallback { updateCalendar() }
 
             // 수정 모달 표시
             editPaymentDialog.show(parentFragmentManager, "PaymentEditFragment")

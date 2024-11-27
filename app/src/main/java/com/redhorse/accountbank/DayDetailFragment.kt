@@ -19,6 +19,8 @@ import java.time.LocalDate
 
 class DayDetailFragment : DialogFragment() {
 
+    private lateinit var onEditDataCallback: () -> Unit
+
     private var dayData: DayData? = null
 
     companion object {
@@ -30,6 +32,11 @@ class DayDetailFragment : DialogFragment() {
             fragment.arguments = bundle
             return fragment
         }
+    }
+
+    fun SetOnEditDataCallback(callback: () -> Unit) {
+        this.onEditDataCallback = callback
+        Log.e("PaymentEditFragment", "onSaveCallback set")
     }
 
     override fun onCreateView(
@@ -99,7 +106,7 @@ class DayDetailFragment : DialogFragment() {
 
         // 수정 모달 열기
         val editPaymentDialog = PaymentEditFragment.newInstance(payment)
-
+        editPaymentDialog.setOnSaveCallback(onEditDataCallback)
         // 수정 모달 표시
         editPaymentDialog.show(parentFragmentManager, "PaymentEditFragment")
     }
