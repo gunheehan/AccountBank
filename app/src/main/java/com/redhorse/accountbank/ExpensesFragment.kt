@@ -234,7 +234,7 @@ class ExpensesFragment : Fragment() {
                                                 payment.amount,
                                                 payment.date
                                             )
-                                            if (existingCount == 0) {
+                                            if (existingCount == 0 && payment.amount > 0) {
                                                 paymentDao.insert(payment)
                                                 Log.d("SMSReader", "Inserted Payment: $payment")
                                             } else {

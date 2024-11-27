@@ -14,6 +14,9 @@ object PaymentProcessor {
         // 정규식으로 결제 정보 파싱
         val payment = RegexUtils.parsePaymentInfo(message, LocalDate.now().toString())
 
+        if(payment.amount < 1)
+            return;
+
         // 결제 정보를 데이터베이스에 저장
         savePayment(context, payment)
 
