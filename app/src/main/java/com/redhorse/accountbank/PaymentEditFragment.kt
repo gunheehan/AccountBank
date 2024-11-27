@@ -6,10 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.DialogFragment
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
@@ -18,6 +15,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PaymentEditFragment : DialogFragment() {
@@ -97,11 +96,23 @@ class PaymentEditFragment : DialogFragment() {
             // 내역 표시
             Log.e("PaymentEditFragment", "Setting up UI with paymentData: $it")
             payment_title_EditText.setText(it.title)
-            select_day_TextView.setText(it.date)
+            if (isInsertMode)
+            {
+                // 오늘 날짜 가져오기
+                val today = LocalDate.now()
+                val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-dd-MM"))
+
+                select_day_TextView.text = formattedDate
+            }
+            else
+                select_day_TextView.setText(it.date)
             amount_EditText.setText(it.amount.toString())
             val isIncome = if (it.type == "income") true else false
-            if(!isIncome)
+            if (!isIncome)
                 payment_type_Spinner.setSelection(1)
+            else
+                payment_type_Spinner.setSelection(0)
+
         } ?: run {
             Log.e("PaymentEditFragment", "No paymentData available, skipping UI setup")
         }
