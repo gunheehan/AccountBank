@@ -106,16 +106,6 @@ class ExpensesFragment : Fragment() {
         }
     }
 
-    fun jsonTest(json:String) {
-        val jsonObject = JSONObject(json)
-        val layout = jsonObject.getJSONObject("layout")
-        val text = when (layout.getString("widget")) {
-            "LinearLayout" -> parseLinearLayout(layout)
-            "TextView" -> layout.getString("text")
-            else -> ""
-        }
-    }
-
     private fun parseLinearLayout(widget: JSONObject): String {
         val sb = StringBuilder()
         val isVertical = widget.getString("orientation") == "vertical"

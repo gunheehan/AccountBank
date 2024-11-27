@@ -27,17 +27,19 @@
         <!-- RCS 리시버 등록 -->
         <receiver
             android:name=".receiver.RCSReceiver"
-            android:permission="com.samsung.rcs.permission.RCS_APP_PERMISSION"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
-                <category android:name="com.samsung.rcs.framework.instantmessaging.category.ACTION"/>
-                <category android:name="com.samsung.rcs.framework.instantmessaging"/>
-                <action android:name="com.samsung.rcs.framework.instantmessaging.action.RECEIVE_CHAT_INVITATION"/>
-                <action android:name="com.samsung.rcs.framework.instantmessaging.action.RECEIVE_PARTICIPANT_INSERTED"/>
-                <action android:name="com.samsung.rcs.framework.instantmessaging.action.RECEIVE_PARTICIPANT_UPDATED"/>
+                <action android:name="android.intent.action.CONTENT_CHANGED" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".service.RcsMonitorService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
 
         <!-- 푸시 알림 리시버 등록 -->
         <receiver
