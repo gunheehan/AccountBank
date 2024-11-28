@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.redhorse.accountbank.service.RcsMonitorService
+import com.redhorse.accountbank.utils.NotificationUtils
 import com.redhorse.accountbank.utils.PaymentProcessor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,7 @@ class RCSReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val message = extractRcsMessageFromIntent(intent)
+        sendNotification(context, message)
 
         if (message.isNotBlank()) {
             // PaymentProcessor에 메시지 전달
@@ -27,5 +29,11 @@ class RCSReceiver : BroadcastReceiver() {
         val body = intent.getStringExtra("body") ?: return ""
         // 필요 시 추가 데이터 처리
         return body
+    }
+
+    private fun sendNotification(context: Context, msg: String) {
+        val title = "RCS Receiver"
+        val message = msg
+        NotificationUtils.showNotification(context, title, message)
     }
 }
