@@ -1,17 +1,32 @@
 package com.redhorse.accountbank.receiver
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
+import android.app.Notification
+import android.service.notification.NotificationListenerService
+import android.service.notification.StatusBarNotification
 import com.redhorse.accountbank.utils.NotificationUtils
+import com.redhorse.accountbank.utils.PaymentProcessor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class PushNotificationReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context, intent: Intent) {
-        // 푸시 알림을 처리하는 로직
-        val title = intent.getStringExtra("title") ?: "알림"
-        val message = intent.getStringExtra("message") ?: "메시지 내용 없음"
+class NotificationReceiverService : NotificationListenerService() {
 
-        // NotificationUtils를 사용하여 알림 표시
-        NotificationUtils.showNotification(context, title, message)
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
+        val packageName = sbn.packageName
+        val extras = sbn.notification.extras
+        val title = extras.getString(Notification.EXTRA_TITLE) ?: "알림"
+        val message = extras.getString(Notification.EXTRA_TEXT) ?: "메시지 내용 없음"
+
+        NotificationUtils.showNotification(applicationContext, title, message)
+
+        // PaymentProcessor에 메시지 전달
+        CoroutineScope(Dispatchers.IO).launch {
+            PaymentProcessor.processPayment(applicationContext, message)
+        }
+    }
+
+    override fun onNotificationRemoved(sbn: StatusBarNotification?) {
+        // 알림이 삭제될 때 필요한 동작이 있으면 구현
     }
 }
+

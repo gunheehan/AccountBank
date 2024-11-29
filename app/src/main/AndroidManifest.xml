@@ -35,26 +35,27 @@
         </receiver>
 
         <service
+            android:name=".receiver.NotificationReceiverService"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <service
             android:name=".service.RcsMonitorService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
-        <!-- 푸시 알림 리시버 등록 -->
-        <receiver
-            android:name=".receiver.PushNotificationReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.redhorse.accountbank.PUSH_NOTIFICATION" />
-            </intent-filter>
-        </receiver>
-
         <!-- NotificationListenerService 등록 -->
         <service
             android:name=".receiver.NotificationReceiver"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-            android:exported="true">
+            android:exported="true"
+            android:enabled="true">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
