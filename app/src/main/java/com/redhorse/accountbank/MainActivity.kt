@@ -1,15 +1,21 @@
 package com.redhorse.accountbank
 
 import android.Manifest.permission.*
+import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.redhorse.accountbank.receiver.NotificationReceiverService
 
 
 class MainActivity : AppCompatActivity(){
@@ -19,6 +25,7 @@ class MainActivity : AppCompatActivity(){
         setContentView(R.layout.activity_main)
 
         checkNotificationPermission()
+        checkAndRequestNotificationPermission()
 
         val mainboardFragment = MainboardFragment()
         val earningFragment = EarningFragment()
@@ -71,6 +78,33 @@ class MainActivity : AppCompatActivity(){
         }
 
         prefs.edit().putBoolean("isFirstLaunch", false).apply()
+    }
+    private fun checkAndRequestNotificationPermission() {
+        if (!isNotificationPermissionGranted()) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Android 13 이상에서는 POST_NOTIFICATIONS 권한 요청
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
+                    1
+                )
+            } else {
+                // Android 13 미만에서는 Notification Listener 권한 요청
+                val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                startActivity(intent)
+            }
+        }
+    }
+
+    private fun isNotificationPermissionGranted(): Boolean {
+        // Notification Listener 권한이 있는지 확인
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            return notificationManager.isNotificationListenerAccessGranted(ComponentName(application, NotificationReceiverService::class.java))
+        } else {
+            // Notification Listener 권한이 이미 활성화된 앱 목록에 포함되는지 확인
+            return NotificationManagerCompat.getEnabledListenerPackages(applicationContext).contains(applicationContext.packageName)
+        }
     }
 
 }

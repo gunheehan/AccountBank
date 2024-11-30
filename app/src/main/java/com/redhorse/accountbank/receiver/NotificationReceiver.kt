@@ -13,26 +13,23 @@ import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.*
 
 class NotificationReceiver : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        val notification = sbn.notification
-        val extras = notification.extras
+        super.onNotificationPosted(sbn)
         val packageName = sbn.packageName
+        val extras = sbn.notification.extras
+        val title = extras.getString(Notification.EXTRA_TITLE) ?: "알림"
+        val message = extras.getString(Notification.EXTRA_TEXT) ?: "메시지 내용 없음"
 
-        // 알림에서 메시지 추출
-        val message = extractMessageFromNotification(extras)
-        sendNotification(applicationContext, message)
-
-        if (message.isNotBlank()) {
-            // PaymentProcessor에 메시지 전달
+        // 금융 관련 알림인지 확인
+        if (isPaymentRelated(message)) {
             CoroutineScope(Dispatchers.IO).launch {
                 PaymentProcessor.processPayment(applicationContext, message)
             }
         }
-
-        Log.d("NotificationReceiver", "Notification received from $packageName: $message")
     }
 
     private fun extractMessageFromNotification(extras: Bundle): String {
@@ -44,13 +41,8 @@ class NotificationReceiver : NotificationListenerService() {
         return "$title $text".trim()
     }
 
-    override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.d("NotificationReceiver", "Notification removed: ${sbn.packageName}")
-    }
-
-    private fun sendNotification(context: Context, msg: String) {
-        val title = "Notification Receiver"
-        val message = msg
-        NotificationUtils.showNotification(context, title, message)
+    private fun isPaymentRelated(message: String): Boolean {
+        val regex = Regex("결제|입금|출금|송금|승인|일시불")
+        return regex.containsMatchIn(message)
     }
 }
