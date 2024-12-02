@@ -1,5 +1,6 @@
 import android.util.Log
 import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.utils.formatCurrency
 import java.time.LocalDate
 import java.util.regex.Pattern
 

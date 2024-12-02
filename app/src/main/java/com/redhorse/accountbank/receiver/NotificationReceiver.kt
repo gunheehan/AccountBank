@@ -18,8 +18,13 @@ import java.util.*
 class NotificationReceiver : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        super.onNotificationPosted(sbn)
         val packageName = sbn.packageName
+
+        if (packageName == applicationContext.packageName) {
+            Log.d("PaymentLog", "현재 앱(${packageName})에서 발생한 알림은 무시됩니다.")
+            return
+        }
+
         val extras = sbn.notification.extras
         val title = extras.getString(Notification.EXTRA_TITLE) ?: "알림"
         val message = extras.getString(Notification.EXTRA_TEXT) ?: "메시지 내용 없음"
