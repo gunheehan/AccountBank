@@ -13,19 +13,24 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.redhorse.accountbank.receiver.NotificationReceiverService
 
 
 class MainActivity : AppCompatActivity(){
+    private val generalPermissions = arrayOf(
+        android.Manifest.permission.POST_NOTIFICATIONS,
+        android.Manifest.permission.READ_SMS,
+        android.Manifest.permission.RECEIVE_SMS
+    )
+
+    private val REQUEST_GENERAL_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        checkNotificationPermission()
-        checkAndRequestNotificationPermission()
 
         val mainboardFragment = MainboardFragment()
         val earningFragment = EarningFragment()
@@ -48,63 +53,69 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == 100) {  // 권한 요청 코드
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // 권한이 허용되었을 때 처리할 작업
-                // 예: 푸시 알림 보내기
-            } else {
-                // 권한 거부 처리
-                Toast.makeText(this, "푸시 알림 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
     private fun replaceFragment(fragment: Fragment) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.frame_layout, fragment)
             transaction.commit()
     }
 
-    private fun checkNotificationPermission() {
-        val prefs = getSharedPreferences("prefs", Context.MODE_PRIVATE)
-        val isFirstLaunch = prefs.getBoolean("isFirstLaunch", true)
+    override fun onResume() {
+        super.onResume()
+        checkAndRequestGeneralPermissions()
+    }
 
-        if (isFirstLaunch && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS,
-                READ_SMS, RECEIVE_SMS), 1)
+    private fun checkAndRequestGeneralPermissions() {
+        val missingPermissions = generalPermissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }
 
-        prefs.edit().putBoolean("isFirstLaunch", false).apply()
+        if (missingPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(this, missingPermissions.toTypedArray(), REQUEST_GENERAL_PERMISSIONS)
+        } else {
+            checkAndRequestNotificationAccess()
+        }
     }
-    private fun checkAndRequestNotificationPermission() {
-        if (!isNotificationPermissionGranted()) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                // Android 13 이상에서는 POST_NOTIFICATIONS 권한 요청
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                    1
-                )
+
+    private fun checkAndRequestNotificationAccess() {
+        if (!isNotificationListenerPermissionGranted()) {
+            // 알림 접근 권한이 없는 경우 설정 화면으로 이동
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            startActivity(intent)
+            Toast.makeText(
+                this,
+                "알림 접근 권한을 허용해야 앱이 정상 동작합니다.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+    }
+
+    private fun isNotificationListenerPermissionGranted(): Boolean {
+        val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(this)
+        return enabledListeners.contains(packageName)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == REQUEST_GENERAL_PERMISSIONS) {
+            val deniedPermissions = permissions.zip(grantResults.toTypedArray())
+                .filter { it.second != PackageManager.PERMISSION_GRANTED }
+                .map { it.first }
+
+            if (deniedPermissions.isEmpty()) {
+                // 일반 권한 요청이 모두 허용되었으므로 알림 접근 권한 요청 진행
+                checkAndRequestNotificationAccess()
             } else {
-                // Android 13 미만에서는 Notification Listener 권한 요청
-                val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                startActivity(intent)
+                Toast.makeText(
+                    this,
+                    "모든 권한을 허용해야 앱이 정상 동작합니다.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
-
-    private fun isNotificationPermissionGranted(): Boolean {
-        // Notification Listener 권한이 있는지 확인
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            return notificationManager.isNotificationListenerAccessGranted(ComponentName(application, NotificationReceiverService::class.java))
-        } else {
-            // Notification Listener 권한이 이미 활성화된 앱 목록에 포함되는지 확인
-            return NotificationManagerCompat.getEnabledListenerPackages(applicationContext).contains(applicationContext.packageName)
-        }
-    }
-
 }
