@@ -17,14 +17,31 @@
         android:textSize="16sp"
         android:textStyle="bold"/>
 
-    <!-- 결제 타입 (수입/지출) -->
-    <TextView
-        android:id="@+id/typeText"
-        android:layout_width="wrap_content"
+    <!-- 결제 타입과 삭제 버튼을 포함한 행 -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Type"
-        android:textColor="@color/black"
-        android:textSize="14sp"/>
+        android:gravity="start|center_vertical"> <!-- 텍스트는 왼쪽 정렬, 버튼은 오른쪽으로 -->
+
+        <!-- 결제 타입 -->
+        <TextView
+            android:id="@+id/typeText"
+            android:text="Type"
+            android:textColor="@color/black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" /> <!-- 왼쪽에 정렬하고 공간을 차지함 -->
+
+        <!-- 삭제 버튼 -->
+        <Button
+            android:id="@+id/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textSize="10dp"
+            android:text="삭제" />
+    </LinearLayout>
 
     <!-- 결제 금액 -->
     <TextView

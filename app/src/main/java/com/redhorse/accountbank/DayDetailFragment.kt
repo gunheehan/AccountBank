@@ -83,11 +83,14 @@ class DayDetailFragment : DialogFragment() {
             // 결제 목록 표시
             val recyclerView = rootView.findViewById<RecyclerView>(R.id.paymentsRecyclerViews)
             recyclerView.layoutManager = LinearLayoutManager(context)
-            recyclerView.adapter = PaymentAdapter(it.payments, onItemClick = {
-                payment -> showEditPayment(payment)
-            }) // PaymentDTO를 어댑터로 전달
+
+            // PaymentDTO 객체의 목록을 전달합니다. onItemClick으로 클릭 시 showEditPayment 호출
+            recyclerView.adapter = PaymentAdapter(it.payments.toMutableList(), onItemClick = { payment ->
+                showEditPayment(payment)
+            })
         }
     }
+
 
     override fun onStart() {
         super.onStart()

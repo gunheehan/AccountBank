@@ -46,4 +46,11 @@ object PaymentProcessor {
 
         NotificationUtils.showNotification(context, title, message)
     }
+
+    suspend fun deletePaymentFromDB(context: Context, id: Long) {
+        withContext(Dispatchers.IO) {
+            val db = AppDatabase.getDatabase(context)
+                db.paymentDao().deletePaymentById(id)
+        }
+    }
 }
