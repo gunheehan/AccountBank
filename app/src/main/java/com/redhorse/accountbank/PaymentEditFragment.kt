@@ -2,6 +2,7 @@ package com.redhorse.accountbank
 
 import android.app.DatePickerDialog
 import android.os.Bundle
+import android.provider.SyncStateContract.Helpers.insert
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +11,8 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
-import com.redhorse.accountbank.data.PaymentDao
+import com.redhorse.accountbank.data.dao.DynamicTableDao
+import com.redhorse.accountbank.data.dao.StaticTableDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +23,8 @@ import java.util.*
 
 class PaymentEditFragment : DialogFragment() {
 
-    private lateinit var paymentDao: PaymentDao
+    private lateinit var staticTableDao: StaticTableDao
+    private lateinit var dynamicTableDao: DynamicTableDao
 
     private lateinit var onSaveCallback: () -> Unit
     private lateinit var payment_title_EditText : EditText
@@ -44,7 +47,8 @@ class PaymentEditFragment : DialogFragment() {
     ): View? {
 
         val db = AppDatabase.getDatabase(requireContext())
-        paymentDao = db.paymentDao()
+        staticTableDao = db.staticTableDao()
+        dynamicTableDao = db.dynamicTableDao()
 
         arguments?.let {
             paymentData = it.getParcelable("payment") // 전달된 Payment 객체 받기
@@ -170,7 +174,8 @@ class PaymentEditFragment : DialogFragment() {
         Log.e("PaymentEditFragment", "New payment created: $newPayment")
 
         CoroutineScope(Dispatchers.IO).launch {
-            paymentDao.insert(newPayment)
+
+            dynamicTableDao.insertPayment(newPayment)
 
             // UI 업데이트를 위한 콜백 호출
             withContext(Dispatchers.Main) {
@@ -195,7 +200,7 @@ class PaymentEditFragment : DialogFragment() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 // Room을 사용하여 데이터 업데이트
-                paymentDao.updatePaymentById(existingPayment.id, titleData, updatedAmount, updatedDate, updatedType)
+                dynamicTableDao.updatePayment(existingPayment.id, titleData, updatedType, updatedAmount, updatedDate)
 
                 // UI 업데이트를 위한 콜백 호출
                 withContext(Dispatchers.Main) {

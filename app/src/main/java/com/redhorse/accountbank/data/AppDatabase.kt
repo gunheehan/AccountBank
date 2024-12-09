@@ -4,10 +4,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.redhorse.accountbank.data.entity.MonthTable
+import com.redhorse.accountbank.data.entity.YearTable
+import com.redhorse.accountbank.data.dao.StaticTableDao
+import com.redhorse.accountbank.data.dao.DynamicTableDao
+import com.redhorse.accountbank.data.entity.YearMonth
 
-@Database(entities = [Payment::class], version = 1, exportSchema = false)
+@Database(entities = [Payment::class, YearMonth::class, YearTable::class, MonthTable::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun paymentDao(): PaymentDao
+    abstract fun staticTableDao(): StaticTableDao
+    abstract fun dynamicTableDao(): DynamicTableDao
 
     companion object {
         @Volatile

@@ -14,7 +14,8 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
 import com.redhorse.accountbank.data.AppDatabase
-import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.data.entity.MonthTable
+import com.redhorse.accountbank.data.entity.YearTable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,11 +24,9 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -127,26 +126,18 @@ class ExpensesFragment : Fragment() {
     }
 
     fun extractAndFormatDate(dateString: String): String {
-        try {
-            // 현재 년도 가져오기
+        return try {
+            // MM/dd 형식을 `LocalDate`로 변환
             val currentYear = LocalDate.now().year
+            val formatter = DateTimeFormatter.ofPattern("M/d")
+            val parsedDate = LocalDate.parse(dateString, formatter)
 
-            // 날짜 정보 추출: 예시 "11/15 22:03"에서 "11/15"만 추출
-            val datePart = dateString.substringBefore(" ") // "11/15"
-
-            // 월과 일 분리
-            val (month, day) = datePart.split("/").map { it.toInt() }
-
-            // 현재 년도를 추가하여 LocalDate 객체 생성
-            val formattedDate = LocalDate.of(currentYear, month, day)
-
-            // 원하는 포맷으로 변환
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            return formattedDate.format(formatter)
-
-        } catch (e: DateTimeParseException) {
-            e.printStackTrace()
-            return "Invalid Date"
+            // yyyy-MM-dd 형식으로 변환
+            val fullDate = LocalDate.of(currentYear, parsedDate.month, parsedDate.dayOfMonth)
+            fullDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
+        } catch (e: Exception) {
+            Log.e("DateParser", "Error formatting date: ${e.message}")
+            "Invalid Date"
         }
     }
 
@@ -160,21 +151,19 @@ class ExpensesFragment : Fragment() {
 
     suspend fun fetchAndSavePaymentMessages(context: Context) {
         val database = AppDatabase.getDatabase(context)
-        val paymentDao = database.paymentDao()
-        val thirtyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 날짜(오늘부터 이전 DAY)
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        Log.d("RCSReader", "Start load RCS")
+        val staticTableDao = database.staticTableDao()
+        val dynamicTableDao = database.dynamicTableDao()
+        val ninetyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 기준 날짜
         val rcsUri = Uri.parse("content://im/chat")
 
         withContext(Dispatchers.IO) {
             try {
-                // 30일 전의 날짜로 쿼리
                 val cursor = context.contentResolver.query(
                     rcsUri,
-                    null, // 모든 컬럼 선택
-                    "date >= ?", // 조건: 30일 이내
-                    arrayOf(thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
-                    "date DESC" // 최신 메시지부터 정렬
+                    null,
+                    "date >= ?",
+                    arrayOf(ninetyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
+                    "date DESC"
                 )
 
                 cursor?.use {
@@ -229,13 +218,13 @@ class ExpensesFragment : Fragment() {
                                             Log.d("RCSReaderTitle", "Extracted: ${payment.title}")
 
                                             // 중복 데이터 확인
-                                            val existingCount = paymentDao.countPaymentByDetails(
+                                            val existingCount = dynamicTableDao.countPayments(
                                                 payment.title,
                                                 payment.amount,
                                                 payment.date
                                             )
                                             if (existingCount == 0 && payment.amount > 0) {
-                                                paymentDao.insert(payment)
+                                                dynamicTableDao.insertPayment(payment)
                                                 Log.d("SMSReader", "Inserted Payment: $payment")
                                             } else {
                                                 Log.d("SMSReader", "Duplicate Payment Skipped: $payment")
@@ -260,16 +249,6 @@ class ExpensesFragment : Fragment() {
             } catch (e: Exception) {
                 Log.e("__T", "Error fetching RCS messages: ${e.message}")
             }
-        }
-    }
-
-
-
-    private suspend fun savePaymentsToDatabase(context: Context, payments: List<Payment>) {
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            val paymentDao = db.paymentDao()
-            payments.forEach { paymentDao.insert(it) }
         }
     }
 

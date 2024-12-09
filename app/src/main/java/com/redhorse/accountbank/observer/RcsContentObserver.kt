@@ -39,7 +39,7 @@ class RcsContentObserver(
 
                 // 결제 정보를 데이터베이스에 저장
                 val db = AppDatabase.getDatabase(context)
-                db.paymentDao().insert(payment)
+                db.dynamicTableDao().insertPayment(payment)
 
                 Log.d("RcsContentObserver", "결제 정보 저장 완료: $payment")
             }

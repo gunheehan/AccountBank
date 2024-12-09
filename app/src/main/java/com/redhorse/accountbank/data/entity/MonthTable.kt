@@ -1,0 +1,11 @@
+package com.redhorse.accountbank.data.entity
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "month_table")
+data class MonthTable(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val year: Int,
+    val month: Int
+)

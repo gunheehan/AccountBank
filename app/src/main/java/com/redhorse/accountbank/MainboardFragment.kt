@@ -9,7 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.DayData
-import com.redhorse.accountbank.data.PaymentDao
+import com.redhorse.accountbank.data.dao.DynamicTableDao
+import com.redhorse.accountbank.data.dao.StaticTableDao
 import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,12 +36,11 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var paymentDao: PaymentDao
+    private lateinit var staticTableDao: StaticTableDao
+    private lateinit var dynamicTableDao: DynamicTableDao
     private lateinit var cardDay: CustomCardView
     private lateinit var cardEarnings: CustomCardView
     private lateinit var cardRemain: CustomCardView
-    private var currentMonth: YearMonth = YearMonth.now()
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +57,8 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         // Inflate the layout for this fragment
         // DB 초기화
         val db = AppDatabase.getDatabase(requireContext())
-        paymentDao = db.paymentDao()
+        staticTableDao = db.staticTableDao()
+        dynamicTableDao = db.dynamicTableDao()
 
         val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
 
@@ -84,7 +85,10 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private fun SetMainInfo() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val daysInMonth = generateCalendarDataForMonth(currentMonth)
+                val currentDay = LocalDate.now()
+                var Strnow = currentDay.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+                val daysInMonth = generateCalendarDataForMonth(Strnow)
                 withContext(Dispatchers.Main) {
                     SetPayData(daysInMonth)
                 }
@@ -116,31 +120,54 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
     }
 
-    private suspend fun generateCalendarDataForMonth(month: YearMonth): List<DayData> {
-        val startOfMonth = month.atDay(1)
-        val endOfMonth = month.atEndOfMonth()
+    private suspend fun generateCalendarDataForMonth(dayString: String): List<DayData> {
         val daysList = mutableListOf<DayData>()
 
-        // 첫 날의 요일에 맞춰 빈 칸 추가
-        val firstDayOfWeek = startOfMonth.dayOfWeek.value % 7 // 일요일을 0으로 설정
-        for (i in 0 until firstDayOfWeek) {
-            daysList.add(DayData(LocalDate.MIN)) // 빈 아이템 추가
+        withContext(Dispatchers.IO) {
+            dynamicTableDao.createYearMonthTable(dayString)
+        }
+        // "yyyy-MM-dd" 형식에서 YearMonth 생성
+        val month = try {
+            YearMonth.parse(dayString, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        } catch (e: Exception) {
+            Log.e("MainPage", "Invalid date format: $dayString")
+            return daysList
         }
 
-        // 날짜별로 결제 정보를 추가
-        for (day in 1..endOfMonth.dayOfMonth) {
-            val date = month.atDay(day)
-            val payments = withContext(Dispatchers.IO) {
-                paymentDao.getPaymentsForDate(date.toString())
+        val startOfMonth = month.atDay(1)
+        val endOfMonth = month.atEndOfMonth()
+
+        // 월 전체 데이터를 한 번의 쿼리로 로드
+        val allPaymentsForMonth = withContext(Dispatchers.IO) {
+            try {
+                dynamicTableDao.getPaymentsForMonth(dayString) // "yyyy-MM" 형식 사용
+            } catch (e: Exception) {
+                Log.e("MainPage", "Error fetching payments for month: ${e.message}")
+                emptyList()
             }
-
-            val dayData = DayData(
-                date = date,
-                payments = payments?.toMutableList() ?: mutableListOf()
-            )
-
-            daysList.add(dayData)
         }
+
+            Log.d("MainPage", "${allPaymentsForMonth.size} payment Size id 0")
+
+        try {
+            // 데이터를 날짜별로 그룹화
+            val paymentsGroupedByDate = allPaymentsForMonth.groupBy { it.date }
+
+            // 날짜별 DayData 생성
+            for (day in 1..endOfMonth.dayOfMonth) {
+                val date = startOfMonth.plusDays((day - 1).toLong())
+                val paymentsForDay = paymentsGroupedByDate[date.toString()] ?: emptyList()
+
+                val dayData = DayData(
+                    date = date,
+                    payments = paymentsForDay.toMutableList()
+                )
+                daysList.add(dayData)
+            }
+        } catch (e: Exception) {
+            Log.e("MainPage", "Error fetching payments for month: ${e.message}")
+        }
+
 
         return daysList
     }

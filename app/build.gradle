@@ -36,6 +36,9 @@ android {
     viewBinding {
         enabled = true
     }
+    kapt {
+        correctErrorTypes = true
+    }
 }
 def room_version = "2.5.0" // Room 최신 버전
 def coroutine_version = "1.6.0" // Coroutine 최신 버전

@@ -62,7 +62,7 @@ class PaymentAdapter(
             if (position != RecyclerView.NO_POSITION) {
                 payments.removeAt(position)
                 notifyItemRemoved(position)
-                PaymentProcessor.deletePaymentFromDB(itemView.context, payment.id)
+                PaymentProcessor.deletePaymentFromDB(itemView.context, payment)
             }
         }
     }
