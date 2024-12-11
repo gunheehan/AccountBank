@@ -1,5 +1,6 @@
 package com.redhorse.accountbank
 
+import PaymentRepository
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
@@ -13,8 +14,7 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.room.Room
-import com.redhorse.accountbank.data.AppDatabase
-import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -23,7 +23,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -44,6 +43,8 @@ class ExpensesFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
 
+    private lateinit var paymentRepository: PaymentRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -56,6 +57,9 @@ class ExpensesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val dbHelper = AppDatabaseHelper(requireContext())
+        paymentRepository = PaymentRepository(dbHelper)
+
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_expenses, container, false)
         SetButton(view)
@@ -66,7 +70,7 @@ class ExpensesFragment : Fragment() {
     private fun exportDatabase(context: Context) {
         try {
             // Room DB 파일의 기본 경로
-            val dbPath = context.getDatabasePath("app_database.db").absolutePath
+            val dbPath = context.getDatabasePath("payments.db").absolutePath
             val backupPath = File(Environment.getExternalStorageDirectory(), "BackupDatabase.db")
 
             FileInputStream(dbPath).use { input ->
@@ -85,45 +89,19 @@ class ExpensesFragment : Fragment() {
     // 가져오기 버튼 함수
     private fun importDatabase(context: Context) {
         try {
-            val dbPath = context.getDatabasePath("app_database.db").absolutePath
+            val dbPath = context.getDatabasePath("payments.db").absolutePath
             val backupPath = File(Environment.getExternalStorageDirectory(), "BackupDatabase.db")
 
             FileInputStream(backupPath).use { input ->
                 FileOutputStream(dbPath).use { output ->
                     input.copyTo(output)
                     Toast.makeText(context, "DB가 성공적으로 가져와졌습니다.", Toast.LENGTH_SHORT).show()
-
-                    // Room DB 인스턴스 갱신
-                    Room.databaseBuilder(
-                        context.applicationContext,
-                        AppDatabase::class.java, "app_database.db"
-                    ).build()
                 }
             }
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(context, "DB 가져오기 실패: ${e.message}", Toast.LENGTH_LONG).show()
         }
-    }
-
-    private fun parseLinearLayout(widget: JSONObject): String {
-        val sb = StringBuilder()
-        val isVertical = widget.getString("orientation") == "vertical"
-        val children = widget.getJSONArray("children")
-        for(i in 0 until children.length()) {
-            val widget = children.getJSONObject(i)
-            val widgetName = widget.getString("widget")
-            if (widgetName == "LinearLayout") {
-                val text = parseLinearLayout(widget)
-                sb.append(text)
-                if (isVertical) sb.append("\n")
-            } else if (widgetName == "TextView") {
-                val text = widget.getString("text")
-                sb.append(text)
-                if (isVertical) sb.append("\n")
-            }
-        }
-        return sb.toString()
     }
 
     fun extractAndFormatDate(dateString: String): String {
@@ -159,8 +137,6 @@ class ExpensesFragment : Fragment() {
     }
 
     suspend fun fetchAndSavePaymentMessages(context: Context) {
-        val database = AppDatabase.getDatabase(context)
-        val paymentDao = database.paymentDao()
         val thirtyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 날짜(오늘부터 이전 DAY)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         Log.d("RCSReader", "Start load RCS")
@@ -228,14 +204,8 @@ class ExpensesFragment : Fragment() {
                                             Log.d("RCSReaderTitle", "Extracted Date: ${formattedDate.toString()}")
                                             Log.d("RCSReaderTitle", "Extracted: ${payment.title}")
 
-                                            // 중복 데이터 확인
-                                            val existingCount = paymentDao.countPaymentByDetails(
-                                                payment.title,
-                                                payment.amount,
-                                                payment.date
-                                            )
-                                            if (existingCount == 0 && payment.amount > 0) {
-                                                paymentDao.insert(payment)
+                                            if (payment.amount > 0) {
+                                                paymentRepository.insertOrCreateTableAndInsert(payment)
                                                 Log.d("SMSReader", "Inserted Payment: $payment")
                                             } else {
                                                 Log.d("SMSReader", "Duplicate Payment Skipped: $payment")
@@ -260,16 +230,6 @@ class ExpensesFragment : Fragment() {
             } catch (e: Exception) {
                 Log.e("__T", "Error fetching RCS messages: ${e.message}")
             }
-        }
-    }
-
-
-
-    private suspend fun savePaymentsToDatabase(context: Context, payments: List<Payment>) {
-        withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            val paymentDao = db.paymentDao()
-            payments.forEach { paymentDao.insert(it) }
         }
     }
 

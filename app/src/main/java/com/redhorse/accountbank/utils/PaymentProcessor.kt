@@ -1,9 +1,10 @@
 package com.redhorse.accountbank.utils
 
+import PaymentRepository
 import RegexUtils
 import android.content.Context
-import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -22,20 +23,15 @@ object PaymentProcessor {
     }
 
     private suspend fun savePayment(context: Context, payment: Payment) {
+        if(payment.amount <= 0)
+            return;
         withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-            // 중복 데이터 확인
-            val existingCount = db.paymentDao().countPaymentByDetails(
-                payment.title,
-                payment.amount,
-                payment.date
-            )
-            if (existingCount == 0 && payment.amount > 0) {
-                // 결제 정보를 데이터베이스에 저장
-                db.paymentDao().insert(payment)
-                // 알림 표시
-                sendNotification(context, payment)
-            }
+
+            val dbHelper = AppDatabaseHelper(context)
+            val paymentRepository = PaymentRepository(dbHelper)
+            paymentRepository.insertOrCreateTableAndInsert(payment)
+
+            sendNotification(context, payment)
         }
     }
 
@@ -47,10 +43,11 @@ object PaymentProcessor {
         NotificationUtils.showNotification(context, title, message)
     }
 
-    suspend fun deletePaymentFromDB(context: Context, id: Long) {
+    suspend fun deletePaymentFromDB(context: Context, date: String, id: Long) {
         withContext(Dispatchers.IO) {
-            val db = AppDatabase.getDatabase(context)
-                db.paymentDao().deletePaymentById(id)
+            val dbHelper = AppDatabaseHelper(context)
+            val paymentRepository = PaymentRepository(dbHelper)
+            paymentRepository.deletePaymentById(date, id)
         }
     }
 }

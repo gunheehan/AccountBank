@@ -1,11 +1,12 @@
 package com.redhorse.accountbank.observer
 
+import PaymentRepository
 import android.content.Context
 import android.database.ContentObserver
 import android.net.Uri
 import android.os.Handler
 import android.util.Log
-import com.redhorse.accountbank.data.AppDatabase
+import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,8 +39,9 @@ class RcsContentObserver(
                 val payment = RegexUtils.parsePaymentInfo(message, LocalDate.now().toString())
 
                 // 결제 정보를 데이터베이스에 저장
-                val db = AppDatabase.getDatabase(context)
-                db.paymentDao().insert(payment)
+                val dbHelper = AppDatabaseHelper(context)
+                val paymentRepository = PaymentRepository(dbHelper)
+                paymentRepository.insertOrCreateTableAndInsert(payment)
 
                 Log.d("RcsContentObserver", "결제 정보 저장 완료: $payment")
             }

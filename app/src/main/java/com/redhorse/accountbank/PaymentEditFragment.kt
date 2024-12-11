@@ -1,5 +1,6 @@
 package com.redhorse.accountbank
 
+import PaymentRepository
 import android.app.DatePickerDialog
 import android.os.Bundle
 import android.util.Log
@@ -8,9 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
-import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.Payment
-import com.redhorse.accountbank.data.PaymentDao
+import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,7 +21,7 @@ import java.util.*
 
 class PaymentEditFragment : DialogFragment() {
 
-    private lateinit var paymentDao: PaymentDao
+    private lateinit var paymentRepository: PaymentRepository
 
     private lateinit var onSaveCallback: () -> Unit
     private lateinit var payment_title_EditText : EditText
@@ -43,8 +43,8 @@ class PaymentEditFragment : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        val db = AppDatabase.getDatabase(requireContext())
-        paymentDao = db.paymentDao()
+        val dbHelper = AppDatabaseHelper(requireContext())
+        paymentRepository = PaymentRepository(dbHelper)
 
         arguments?.let {
             paymentData = it.getParcelable("payment") // 전달된 Payment 객체 받기
@@ -170,7 +170,7 @@ class PaymentEditFragment : DialogFragment() {
         Log.e("PaymentEditFragment", "New payment created: $newPayment")
 
         CoroutineScope(Dispatchers.IO).launch {
-            paymentDao.insert(newPayment)
+            paymentRepository.insertOrCreateTableAndInsert(newPayment)
 
             // UI 업데이트를 위한 콜백 호출
             withContext(Dispatchers.Main) {
@@ -193,9 +193,11 @@ class PaymentEditFragment : DialogFragment() {
             // "수입"을 "income", "지출"을 "expense"로 변환
             updatedType = if (updatedType == "수입") "income" else "expense"
 
+            val payment = Payment(existingPayment.id, titleData, updatedType, updatedAmount, updatedDate)
+
             CoroutineScope(Dispatchers.IO).launch {
                 // Room을 사용하여 데이터 업데이트
-                paymentDao.updatePaymentById(existingPayment.id, titleData, updatedAmount, updatedDate, updatedType)
+                paymentRepository.updatePaymentById(existingPayment.id, payment)
 
                 // UI 업데이트를 위한 콜백 호출
                 withContext(Dispatchers.Main) {

@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 @Entity(tableName = "payments")
 @Parcelize
 data class Payment(
-    @PrimaryKey(autoGenerate = true)  val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
     val type: String, // "income" 또는 "expense"
     val amount: Int,

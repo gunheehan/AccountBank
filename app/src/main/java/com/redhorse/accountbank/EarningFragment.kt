@@ -1,7 +1,7 @@
 package com.redhorse.accountbank
 
 import DayDetailFragment
-import RegexUtils.parsePaymentInfo
+import PaymentRepository
 import android.content.Context
 import com.redhorse.accountbank.adapter.CalendarAdapter
 import android.os.Bundle
@@ -12,16 +12,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.DayData
 import com.redhorse.accountbank.data.Payment
-import com.redhorse.accountbank.data.PaymentDao
+import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.databinding.ActivityMainBinding
 import com.redhorse.accountbank.utils.formatCurrency
-import com.redhorse.accountbank.utils.NotificationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -46,7 +43,7 @@ class EarningFragment : Fragment() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var paymentDao: PaymentDao
+    private lateinit var paymentRepository: PaymentRepository
 
     private lateinit var calendarRecyclerView: RecyclerView
     private lateinit var yearMonthTextView: TextView
@@ -71,9 +68,8 @@ class EarningFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // 데이터베이스 초기화 및 DAO 가져오기
-        val db = AppDatabase.getDatabase(requireContext())
-        paymentDao = db.paymentDao()
+        val dbHelper = AppDatabaseHelper(requireContext())
+        paymentRepository = PaymentRepository(dbHelper)
 
         val view = inflater.inflate(R.layout.fragment_earning, container, false)
         setupViews(view)
@@ -171,30 +167,35 @@ class EarningFragment : Fragment() {
             daysList.add(DayData(LocalDate.MIN)) // 빈 아이템 추가
         }
 
+        // 해당 월의 모든 결제 정보 비동기적으로 가져오기
+        val allPaymentsDTO = paymentRepository.getAllPaymentsByMonth(month.toString()) // 비동기적으로 데이터를 가져옵니다.
+
         // 날짜별로 결제 정보를 추가
         for (day in 1.rangeTo(endOfMonth.dayOfMonth)) {
             val date = month.atDay(day)
 
-            // PaymentDTO 리스트 가져오기
-            val paymentsDTO = paymentDao.getPaymentsForDate(date.toString()) // List<PaymentDTO>
+            Log.d("Earning", "Day : ${date.toString()}")
 
-            // PaymentDTO를 Payment로 변환하여 사용
-            val payments = paymentsDTO?.map { it.toPayment() }?.toMutableList() ?: mutableListOf()
+            // 해당 날짜에 맞는 결제 정보만 필터링
+            val paymentsForDay = allPaymentsDTO.filter { it.date == date.toString() }
+
+            // 날짜에 관계없이 항상 DayData 추가 (결제 데이터가 없더라도)
+            val payments = if (paymentsForDay.isNotEmpty()) {
+                paymentsForDay.map { it.toPayment() }.toMutableList()
+            } else {
+                mutableListOf()  // 결제 데이터가 없으면 빈 리스트로 설정
+            }
 
             val dayData = DayData(
                 date = date,
                 payments = payments
             )
 
-
             daysList.add(dayData)
         }
 
         return daysList
     }
-
-
-
 
     fun processPaymentMessage(context: Context, message: String) {
         val payment = parsePaymentInfo(message) // 메시지 파싱
@@ -210,12 +211,7 @@ class EarningFragment : Fragment() {
     }
 
     private suspend fun savePaymentAndNotify(context: Context, payment: Payment) {
-        val db = AppDatabase.getDatabase(context)
-        db.paymentDao().insert(payment)
-
-        val title = payment.title
-        val message = "결제 금액: ${formatCurrency(payment.amount)}원, 타입: ${payment.type}"
-        NotificationUtils.showNotification(context, title, message)
+        paymentRepository.insertOrCreateTableAndInsert(payment)
     }
 
 

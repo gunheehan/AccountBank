@@ -4,17 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.telephony.SmsMessage
-import android.util.Log
-import android.widget.Toast
-import com.redhorse.accountbank.data.AppDatabase
-import com.redhorse.accountbank.data.Payment
-import com.redhorse.accountbank.utils.NotificationUtils
 import com.redhorse.accountbank.utils.PaymentProcessor
-import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 class SmsReceiver : BroadcastReceiver() {
 

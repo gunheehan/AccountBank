@@ -1,5 +1,6 @@
 package com.redhorse.accountbank
 
+import PaymentRepository
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -7,9 +8,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.redhorse.accountbank.data.AppDatabase
 import com.redhorse.accountbank.data.DayData
-import com.redhorse.accountbank.data.PaymentDao
+import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -35,7 +36,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private var param1: String? = null
     private var param2: String? = null
 
-    private lateinit var paymentDao: PaymentDao
+    private lateinit var paymentRepository: PaymentRepository
     private lateinit var cardDay: CustomCardView
     private lateinit var cardEarnings: CustomCardView
     private lateinit var cardRemain: CustomCardView
@@ -56,8 +57,8 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     ): View? {
         // Inflate the layout for this fragment
         // DB 초기화
-        val db = AppDatabase.getDatabase(requireContext())
-        paymentDao = db.paymentDao()
+        val dbHelper = AppDatabaseHelper(requireContext())
+        paymentRepository = PaymentRepository(dbHelper)
 
         val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
 
@@ -94,13 +95,17 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
     }
 
-    private fun SetPayData(newDays: List<DayData>) {
+    private fun SetPayData(newDays: List<Payment>) {
         var totalIncome = 0
         var totalExpense = 0
 
         for (day in newDays) {
-            totalIncome += day.getTotalIncome()
-            totalExpense += day.getTotalExpense()
+            if(day.type.equals("income")) {
+                totalIncome += day.amount
+            }
+            else{
+                totalExpense += day.amount
+            }
         }
 
         val formattedIncome = formatCurrency(totalIncome) + " 원"
@@ -116,33 +121,12 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
     }
 
-    private suspend fun generateCalendarDataForMonth(month: YearMonth): List<DayData> {
-        val startOfMonth = month.atDay(1)
-        val endOfMonth = month.atEndOfMonth()
-        val daysList = mutableListOf<DayData>()
-
-        // 첫 날의 요일에 맞춰 빈 칸 추가
-        val firstDayOfWeek = startOfMonth.dayOfWeek.value % 7 // 일요일을 0으로 설정
-        for (i in 0 until firstDayOfWeek) {
-            daysList.add(DayData(LocalDate.MIN)) // 빈 아이템 추가
+    private suspend fun generateCalendarDataForMonth(month: YearMonth): List<Payment> {
+        val payments = withContext(Dispatchers.IO) {
+            paymentRepository.getAllPaymentsByMonth(month.atDay(1).toString())
         }
 
-        // 날짜별로 결제 정보를 추가
-        for (day in 1..endOfMonth.dayOfMonth) {
-            val date = month.atDay(day)
-            val payments = withContext(Dispatchers.IO) {
-                paymentDao.getPaymentsForDate(date.toString())
-            }
-
-            val dayData = DayData(
-                date = date,
-                payments = payments?.toMutableList() ?: mutableListOf()
-            )
-
-            daysList.add(dayData)
-        }
-
-        return daysList
+        return payments
     }
 
     fun getTodayDateFormatted(): String {
