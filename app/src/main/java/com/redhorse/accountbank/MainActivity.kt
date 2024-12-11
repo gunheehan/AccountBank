@@ -21,10 +21,10 @@ import com.redhorse.accountbank.receiver.NotificationReceiverService
 
 class MainActivity : AppCompatActivity(){
     private val generalPermissions = arrayOf(
-        android.Manifest.permission.POST_NOTIFICATIONS,
-        android.Manifest.permission.READ_SMS,
-        android.Manifest.permission.RECEIVE_SMS
-    )
+        POST_NOTIFICATIONS,
+        READ_SMS,
+        RECEIVE_SMS,
+        )
 
     private val REQUEST_GENERAL_PERMISSIONS = 1
 

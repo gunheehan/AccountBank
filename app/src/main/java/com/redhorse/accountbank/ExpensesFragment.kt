@@ -1,19 +1,20 @@
 package com.redhorse.accountbank
 
 import PaymentRepository
+import RegexUtils
 import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.room.Room
+import com.google.android.material.snackbar.Snackbar
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,10 +24,12 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import java.nio.channels.FileChannel
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -69,20 +72,59 @@ class ExpensesFragment : Fragment() {
     // 내보내기 버튼 함수
     private fun exportDatabase(context: Context) {
         try {
-            // Room DB 파일의 기본 경로
-            val dbPath = context.getDatabasePath("payments.db").absolutePath
-            val backupPath = File(Environment.getExternalStorageDirectory(), "BackupDatabase.db")
-
-            FileInputStream(dbPath).use { input ->
-                FileOutputStream(backupPath).use { output ->
-                    input.copyTo(output)
-                    Toast.makeText(context, "DB가 성공적으로 내보내졌습니다.", Toast.LENGTH_SHORT).show()
-                }
-            }
+            createBackupFile(context)
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(context, "DB 내보내기 실패: ${e.message}", Toast.LENGTH_LONG).show()
             Log.d("DBError", "${e.message}")
+        }
+    }
+
+    private fun createBackupFile(context: Context) {
+        try {
+            // 현재 데이터베이스 경로
+            val currentDB = context.getDatabasePath("payments_db")
+
+            // 백업 파일 경로: 외부 저장소의 Download 폴더
+            val backupDB = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "payments_db_backup")
+
+            // 파일 스트림 및 채널 사용
+            val src = FileInputStream(currentDB).channel
+            val dst = FileOutputStream(backupDB).channel
+            dst.transferFrom(src, 0, src.size())
+            src.close()
+            dst.close()
+
+            // 백업 성공 메시지
+            Toast.makeText(context, "Backup successful", Toast.LENGTH_LONG).show()
+
+        } catch (e: Exception) {
+            // 오류 처리
+            Toast.makeText(context, "Backup failed: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+    @Throws(IOException::class)
+    private fun backupEachFile(context: Context, from: String, to: String) {
+        val sd = Environment.getExternalStorageDirectory()
+        val data = Environment.getDataDirectory()
+        if (sd.canWrite()) {
+            val currentDB = File(data, from)
+            val backupDB = File(sd, to)
+            val src: FileChannel = FileInputStream(currentDB).channel
+            val dst: FileChannel = FileOutputStream(backupDB).channel
+            dst.transferFrom(src, 0, src.size())
+            src.close()
+            dst.close()
+            Toast.makeText(context, "success", Toast.LENGTH_LONG)
+                .show()
+        } else {
+            Toast.makeText(
+                context,
+                "cancel backup",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
