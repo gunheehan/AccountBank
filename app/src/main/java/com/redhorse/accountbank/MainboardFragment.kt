@@ -1,6 +1,7 @@
 package com.redhorse.accountbank
 
 import PaymentRepository
+import SavePaymentRepository
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.redhorse.accountbank.data.DayData
+import android.widget.Toast
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.utils.formatCurrency
@@ -95,27 +96,32 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
     }
 
-    private fun SetPayData(newDays: List<Payment>) {
+    private fun SetPayData(newDays: List<   Payment>) {
         var totalIncome = 0
         var totalExpense = 0
+        var totalSave = 0
 
         for (day in newDays) {
             if(day.type.equals("income")) {
                 totalIncome += day.amount
             }
-            else{
+            else if(day.type.equals("expense")){
                 totalExpense += day.amount
+            }
+            else{
+                totalSave += day.amount
             }
         }
 
         val formattedIncome = formatCurrency(totalIncome) + " 원"
         val formattedExpense = formatCurrency(totalExpense) + " 원"
+        val formattedSave = formatCurrency(totalSave) + " 원"
 
 
         if (::cardEarnings.isInitialized) {
             cardEarnings.addTitle("총 수입: $formattedIncome")
             cardEarnings.addTitle("총 지출: $formattedExpense")
-            cardEarnings.addTitle("적금 : 2,000,000 원")
+            cardEarnings.addTitle("적금 : $formattedSave")
         } else {
             Log.e("SetPayData", "cardEarnings is not initialized.")
         }

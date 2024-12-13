@@ -3,7 +3,6 @@ package com.redhorse.accountbank
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import android.provider.CalendarContract.Colors
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -90,5 +89,79 @@ class CustomCardView @JvmOverloads constructor(
             ).apply { bottomMargin = 16 }
         }
         container.addView(imageView)
+    }
+
+    fun addImageAndButton(
+        imageResId: Int,
+        buttonText: String,
+        onClickAction: () -> Unit
+    ) {
+        // 부모 컨테이너에서 마지막으로 추가된 View를 확인
+        val lastChild = container.getChildAt(container.childCount - 1)
+
+        if (lastChild is TextView) {
+            // 타이틀이 TextView일 경우, 해당 View를 포함하는 LinearLayout 생성
+            val rowLayout = LinearLayout(context).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = Gravity.CENTER_VERTICAL // 세로 중앙 정렬
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    bottomMargin = 16
+                }
+            }
+
+            // 기존 타이틀 제거
+            container.removeView(lastChild)
+
+            // 타이틀을 새로운 레이아웃에 추가
+            rowLayout.addView(lastChild.apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    1f // 남은 공간 채우기
+                )
+            })
+
+            // 이미지 추가
+            val imageView = ImageView(context).apply {
+                setImageResource(imageResId)
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    marginEnd = 16 // 이미지와 버튼 사이 간격
+                }
+            }
+            rowLayout.addView(imageView)
+
+            // 버튼 추가
+            val button = TextView(context).apply {
+                if(buttonText.isEmpty()){
+                    width = 60
+                    height = 60
+                }
+                else{
+                    text = buttonText
+                }
+                textSize = 14f
+                setTextColor(Color.WHITE)
+                setBackgroundColor(Color.BLUE) // 버튼 배경색
+                gravity = Gravity.CENTER
+                setPadding(16, 8, 16, 8) // 버튼 패딩
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                setOnClickListener { onClickAction() }
+            }
+            rowLayout.addView(button)
+
+            // 새로 만든 행 레이아웃을 컨테이너에 추가
+            container.addView(rowLayout, 0) // 기존 순서를 유지하려면 적절히 추가
+        } else {
+            throw IllegalStateException("addTitle을 먼저 호출해야 합니다.")
+        }
     }
 }

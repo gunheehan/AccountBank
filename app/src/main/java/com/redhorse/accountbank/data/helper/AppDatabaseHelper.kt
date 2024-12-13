@@ -12,10 +12,7 @@ class AppDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
 
         // YearMonth 테이블
         const val TABLE_YEAR_MONTH = "YearMonth"
-        const val COLUMN_ID = "id"
-        const val COLUMN_YEAR = "year"
-        const val COLUMN_MONTH = "month"
-        const val COLUMN_TABLE_NAME = "table_name"
+        const val TABLE_SAVE_PAYMENT = "SavePayment"
     }
 
     override fun onCreate(db: SQLiteDatabase) {
@@ -32,11 +29,24 @@ class AppDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
             CREATE TABLE IF NOT EXISTS $tableName (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
-                type TEXT NOT NULL CHECK(type IN ('income', 'expense')),
+                type TEXT NOT NULL CHECK(type IN ('income', 'expense', 'save')),
                 amount INTEGER NOT NULL,
                 date TEXT NOT NULL,
                 UNIQUE(date, title) ON CONFLICT IGNORE
             );
+        """.trimIndent())
+    }
+
+    fun createSavePaymentTable(){
+        writableDatabase.execSQL("""
+            CREATE TABLE IF NOT EXISTS $TABLE_SAVE_PAYMENT(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                title TEXT NOT NULL,
+                type TEXT NOT NULL CHECK(type IN ('income', 'expense', 'save')),
+                amount INTEGER NOT NULL,
+                date TEXT NOT NULL,
+                UNIQUE(title, amount, date) ON CONFLICT IGNORE
+            )
         """.trimIndent())
     }
 }
