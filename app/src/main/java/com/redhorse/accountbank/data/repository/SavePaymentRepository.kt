@@ -113,6 +113,44 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
         payments // 결과 반환
     }
 
+    suspend fun getPaymentsByType(type: String): List<Payment> = withContext(Dispatchers.IO) {
+        val db = dbHelper.readableDatabase
+
+        // 테이블 존재 여부 확인
+        if (!isTableExists(db)) {
+            return@withContext emptyList()
+        }
+
+        // 입력받은 type을 이용해 SQL 쿼리 수정
+        val query = "SELECT * FROM $TABLE_SAVE_PAYMENT WHERE type = ?"
+        val cursor = db.rawQuery(query, arrayOf(type))
+        val payments = mutableListOf<Payment>()
+
+        try {
+            // 커서에서 데이터 읽기
+            while (cursor.moveToNext()) {
+                payments.add(
+                    Payment(
+                        id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+                        title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                        type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                        amount = cursor.getInt(cursor.getColumnIndexOrThrow("amount")),
+                        date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("GetPaymentsByType", e.toString())
+            e.printStackTrace()
+        } finally {
+            // 커서 닫기
+            cursor.close()
+        }
+
+        payments // 결과 반환
+    }
+
+
     // 테이블 존재 여부 확인
     private fun isTableExists(db: SQLiteDatabase): Boolean {
         val query = """

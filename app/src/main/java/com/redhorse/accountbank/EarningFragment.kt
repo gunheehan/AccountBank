@@ -1,6 +1,6 @@
 package com.redhorse.accountbank
 
-import DayDetailFragment
+import com.redhorse.accountbank.modal.DayDetailFragment
 import PaymentRepository
 import android.content.Context
 import com.redhorse.accountbank.adapter.CalendarAdapter
@@ -18,6 +18,7 @@ import com.redhorse.accountbank.data.DayData
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.databinding.ActivityMainBinding
+import com.redhorse.accountbank.modal.PaymentEditFragment
 import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -93,7 +94,7 @@ class EarningFragment : Fragment() {
         )
 
         dayDetailFragment.SetOnEditDataCallback { updateCalendar() }
-        dayDetailFragment.show(childFragmentManager, "DayDetailFragment")
+        dayDetailFragment.show(childFragmentManager, "com.redhorse.accountbank.modal.DayDetailFragment")
     }
 
     private fun setupViews(view: View) {

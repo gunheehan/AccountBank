@@ -1,3 +1,5 @@
+package com.redhorse.accountbank.modal
+
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -9,7 +11,6 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.redhorse.accountbank.PaymentEditFragment
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.adapter.PaymentAdapter
 import com.redhorse.accountbank.data.DayData

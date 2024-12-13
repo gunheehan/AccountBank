@@ -11,8 +11,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.item.CustomCardView
+import com.redhorse.accountbank.modal.PaymentEditFragment
+import com.redhorse.accountbank.modal.RegularlyModal
+import com.redhorse.accountbank.utils.formatCurrency
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -29,7 +37,7 @@ private const val ARG_PARAM2 = "param2"
 class FixedInformationFragment : Fragment() {
     private lateinit var paymentRepository: PaymentRepository
     private lateinit var savepaymentRepository: SavePaymentRepository
-
+    private lateinit var rootView :View
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -44,13 +52,15 @@ class FixedInformationFragment : Fragment() {
         paymentRepository = PaymentRepository(dbHelper)
         savepaymentRepository = SavePaymentRepository(dbHelper)
 
-        val view = inflater.inflate(R.layout.fragment_fixed_information, container, false)
-        val info_title = view.findViewById<CustomCardView>(R.id.fixed_info_title)
+        rootView = inflater.inflate(R.layout.fragment_fixed_information, container, false)
+        val info_title = rootView.findViewById<CustomCardView>(R.id.fixed_info_title)
         info_title.addTitle("매달 입/출금 되는 정보를 입력해두면 간편하게 사용할 수 있어요!")
         info_title.addDescription("입력한 데이터는 매달 1일 자동으로 입력이 됩니다.", Color.DKGRAY)
 
-        SetExpensesCard(view)
-        return view
+        SetExpensesCard(rootView)
+        SetEarningCard(rootView)
+        SetSaveCard(rootView)
+        return rootView
     }
 
     private fun SetExpensesCard(view: View){
@@ -59,21 +69,87 @@ class FixedInformationFragment : Fragment() {
         info_expenses.addImageAndButton(imageResId = R.drawable.rounded_button,
             buttonText = "",
             onClickAction = {
-                Toast.makeText(context, "버튼이 클릭되었습니다!", Toast.LENGTH_SHORT).show()
+                OnClickOpenModal()
             })
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                var paymentsList = savepaymentRepository.getPaymentsByType("expense")
 
-        val regularlyInfoItem = RegularlyInfoItem(requireContext())
-        regularlyInfoItem.setData("넷플릭스 구독", "₩9,500", "매월 25일 결제")
+                for (payment in paymentsList){
+                    val regularlyInfoItem = RegularlyInfoItem(requireContext())
+                    val formattedamount = formatCurrency(payment.amount) + " 원"
+                    regularlyInfoItem.setData(payment.title, formattedamount, "매월 ${payment.date}일")
 
-// 예를 들어 CustomCardView에 추가
-        info_expenses.Container.addView(regularlyInfoItem)
+                    info_expenses.Container.addView(regularlyInfoItem)
+                }
+            }
+        }
     }
 
-    private fun OnClickOpenModal()
-    {
+    private fun SetEarningCard(view: View){
+        val info_expenses = view.findViewById<CustomCardView>(R.id.fixed_info_earning)
+        info_expenses.addTitle("정기 수입 금액")
+        info_expenses.addImageAndButton(imageResId = R.drawable.rounded_button,
+            buttonText = "",
+            onClickAction = {
+                OnClickOpenModal()
+            })
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                var paymentsList = savepaymentRepository.getPaymentsByType("income")
 
+                for (payment in paymentsList){
+                    val regularlyInfoItem = RegularlyInfoItem(requireContext())
+                    val formattedamount = formatCurrency(payment.amount) + " 원"
+                    regularlyInfoItem.setData(payment.title, formattedamount, "매월 ${payment.date}일")
+
+                    info_expenses.Container.addView(regularlyInfoItem)
+                }
+            }
+        }
     }
 
+    private fun SetSaveCard(view: View){
+        val info_expenses = view.findViewById<CustomCardView>(R.id.fixed_info_save)
+        info_expenses.addTitle("정기 적금 금액")
+        info_expenses.addImageAndButton(imageResId = R.drawable.rounded_button,
+            buttonText = "",
+            onClickAction = {
+                OnClickOpenModal()
+            })
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                var paymentsList = savepaymentRepository.getPaymentsByType("save")
+
+                for (payment in paymentsList){
+                    val regularlyInfoItem = RegularlyInfoItem(requireContext())
+                    val formattedamount = formatCurrency(payment.amount) + " 원"
+                    regularlyInfoItem.setData(payment.title, formattedamount, "매월 ${payment.date}일")
+
+                    info_expenses.Container.addView(regularlyInfoItem)
+                }
+            }
+        }
+    }
+
+    private fun OnClickOpenModal() {
+        val regularlyModal = RegularlyModal.newInstance { payment ->
+            // 이곳에서 Payment 객체를 처리
+            InsertNewPayment(payment)
+        }
+        // 수정 모달 표시
+        regularlyModal.show(parentFragmentManager, "RegularlyModal")
+    }
+
+    private fun InsertNewPayment(payment: Payment) {
+        CoroutineScope(Dispatchers.IO).launch {
+            withContext(Dispatchers.Main) {
+                savepaymentRepository.insertOrCreateTableAndInsert(payment)
+                payment.date = formatToFullDate(payment.date.toInt())
+                paymentRepository.insertOrCreateTableAndInsert(payment)
+            }
+        }
+    }
 
     fun formatToFullDate(day: Int): String {
         // 현재 날짜 가져오기

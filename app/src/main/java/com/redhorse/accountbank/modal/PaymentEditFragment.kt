@@ -1,4 +1,4 @@
-package com.redhorse.accountbank
+package com.redhorse.accountbank.modal
 
 import PaymentRepository
 import android.app.DatePickerDialog
@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
+import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.CoroutineScope

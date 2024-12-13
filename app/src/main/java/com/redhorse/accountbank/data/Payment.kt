@@ -13,7 +13,7 @@ data class Payment(
     val title: String,
     val type: String, // "income" 또는 "expense"
     val amount: Int,
-    val date: String // "YYYY-MM-DD" 형식의 날짜
+    var date: String // "YYYY-MM-DD" 형식의 날짜
 ) : Parcelable {
     fun toPayment(): Payment {
         return Payment(
