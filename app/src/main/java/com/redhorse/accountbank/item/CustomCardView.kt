@@ -1,4 +1,4 @@
-package com.redhorse.accountbank
+package com.redhorse.accountbank.item
 
 import android.content.Context
 import android.graphics.Color
@@ -11,6 +11,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.cardview.widget.CardView
+import androidx.core.view.get
+import com.redhorse.accountbank.R
 
 class CustomCardView @JvmOverloads constructor(
     context: Context,
@@ -19,6 +21,8 @@ class CustomCardView @JvmOverloads constructor(
 ) : CardView(context, attrs, defStyleAttr) {
 
     private val container: LinearLayout
+    val Container: LinearLayout
+        get() = container
 
     init {
         LayoutInflater.from(context).inflate(R.layout.custom_card_view, this, true)

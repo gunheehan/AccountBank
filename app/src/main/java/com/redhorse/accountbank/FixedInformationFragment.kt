@@ -1,6 +1,7 @@
 package com.redhorse.accountbank
 
 import PaymentRepository
+import RegularlyInfoItem
 import SavePaymentRepository
 import android.annotation.SuppressLint
 import android.graphics.Color
@@ -11,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
+import com.redhorse.accountbank.item.CustomCardView
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -59,6 +61,12 @@ class FixedInformationFragment : Fragment() {
             onClickAction = {
                 Toast.makeText(context, "버튼이 클릭되었습니다!", Toast.LENGTH_SHORT).show()
             })
+
+        val regularlyInfoItem = RegularlyInfoItem(requireContext())
+        regularlyInfoItem.setData("넷플릭스 구독", "₩9,500", "매월 25일 결제")
+
+// 예를 들어 CustomCardView에 추가
+        info_expenses.Container.addView(regularlyInfoItem)
     }
 
     private fun OnClickOpenModal()

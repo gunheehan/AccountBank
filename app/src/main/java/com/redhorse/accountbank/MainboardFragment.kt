@@ -1,7 +1,6 @@
 package com.redhorse.accountbank
 
 import PaymentRepository
-import SavePaymentRepository
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -9,9 +8,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
+import com.redhorse.accountbank.item.CustomCardView
 import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
