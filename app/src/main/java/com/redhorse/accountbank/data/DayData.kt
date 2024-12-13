@@ -15,5 +15,9 @@ data class DayData(
     fun getTotalExpense(): Int {
         return payments.filter { it.type == "expense" }.sumOf { it.amount }
     }
+
+    fun getTotalSave(): Int{
+        return payments.filter { it.type == "save" }.sumOf { it.amount }
+    }
 }
 

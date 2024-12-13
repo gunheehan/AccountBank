@@ -108,7 +108,7 @@
                 android:id="@+id/calendarTotalEarning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#4CAF50"
+                android:textColor="@color/purple_700"
                 android:text="총 수입: "
                 android:textSize="18sp"
                 android:layout_weight="1"/>
@@ -128,7 +128,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:paddingBottom="20px">
 
             <TextView
                 android:id="@+id/calendarTotalExpenses"
@@ -138,7 +139,21 @@
                 android:text="총 지출:"
                 android:textSize="18sp"
                 android:layout_weight="1"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
+            <TextView
+                android:id="@+id/calendarTotalSave"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#4CAF50"
+                android:text="총 적금:"
+                android:textSize="18sp"
+                android:layout_weight="1"/>
         </LinearLayout>
     </LinearLayout>
 

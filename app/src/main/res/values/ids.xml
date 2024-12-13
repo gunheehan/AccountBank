@@ -5,6 +5,7 @@
     <item name="incomeText" type="id" />
     <item name="expenseText" type="id" />
     <item name="payment_Input_btn" type="id" />
+    <item name="saveText" type="id" />
 
     <style name="DayOfWeekStyle">
             <item name="android:layout_width">0dp</item>

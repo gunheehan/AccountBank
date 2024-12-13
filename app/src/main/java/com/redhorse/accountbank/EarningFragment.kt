@@ -51,6 +51,7 @@ class EarningFragment : Fragment() {
     private lateinit var nextMonthButton: Button
     private lateinit var calendarTotalEarningText : TextView
     private lateinit var calendarTotalExpenseText : TextView
+    private lateinit var calendarTotalSave : TextView
     private lateinit var payment_insert_Button: Button
 
     private var currentMonth: YearMonth = YearMonth.now()
@@ -102,6 +103,7 @@ class EarningFragment : Fragment() {
         nextMonthButton = view.findViewById(R.id.nextMonthButton)
         calendarTotalEarningText = view.findViewById(R.id.calendarTotalEarning)
         calendarTotalExpenseText = view.findViewById(R.id.calendarTotalExpenses)
+        calendarTotalSave = view.findViewById(R.id.calendarTotalSave)
         payment_insert_Button = view.findViewById(R.id.payment_insert_btn)
     }
 
@@ -124,15 +126,19 @@ class EarningFragment : Fragment() {
                 (calendarRecyclerView.adapter as CalendarAdapter).updateDays(daysInMonth)
                 var totalIncome = 0
                 var totalExpense = 0
+                var totalSave = 0
                 daysInMonth.forEach { dayData ->
                     totalIncome += dayData.getTotalIncome()
                     totalExpense += dayData.getTotalExpense()
+                    totalSave += dayData.getTotalSave()
                 }
 
                 val formattedIncome = formatCurrency(totalIncome) + " 원"
                 val formattedExpense = formatCurrency(totalExpense) + " 원"
+                val formattedSave = formatCurrency(totalSave) + " 원"
                 calendarTotalEarningText.text = "총 수입: ${formattedIncome}"
                 calendarTotalExpenseText.text = "총 지출: ${formattedExpense}"
+                calendarTotalSave.text = "총 적금 ${formattedSave}"
             }
         }
     }

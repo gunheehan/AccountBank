@@ -153,10 +153,8 @@ class PaymentEditFragment : DialogFragment() {
         val amount = amount_EditText.text.toString().toIntOrNull() ?: 0
         var type = payment_type_Spinner.selectedItem.toString()
 
-        if(type.equals("수입"))
-            type = "income"
-        else
-            type = "expense"
+        type = if (type == "수입") "income" else if(type == "지출") "expense" else "save"
+
 
         // 새 Payment 객체 생성
         val newPayment = Payment(
@@ -191,7 +189,7 @@ class PaymentEditFragment : DialogFragment() {
             var updatedType = payment_type_Spinner.selectedItem.toString()
 
             // "수입"을 "income", "지출"을 "expense"로 변환
-            updatedType = if (updatedType == "수입") "income" else "expense"
+            updatedType = if (updatedType == "수입") "income" else if(updatedDate == "지출") "expense" else "save"
 
             val payment = Payment(existingPayment.id, titleData, updatedType, updatedAmount, updatedDate)
 

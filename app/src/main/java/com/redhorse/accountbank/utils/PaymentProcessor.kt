@@ -37,7 +37,7 @@ object PaymentProcessor {
 
     private fun sendNotification(context: Context, payment: Payment) {
         val title = payment.title
-        val detail = if (payment.type == "expense") "지출" else "수입"
+        val detail = if (payment.type == "expense") "지출" else if(payment.type == "income") "수입" else "적금"
         val message = "${detail}: ${formatCurrency(payment.amount)}원"
 
         NotificationUtils.showNotification(context, title, message)

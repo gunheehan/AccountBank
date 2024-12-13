@@ -16,12 +16,14 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
         val dayText: TextView = itemView.findViewById(R.id.dayText)
         val incomeText: TextView = itemView.findViewById(R.id.incomeText)
         val expenseText: TextView = itemView.findViewById(R.id.expenseText)
+        val saveText: TextView = itemView.findViewById(R.id.saveText)
 
         fun bind(dayData: DayData) {
             if (dayData.date == LocalDate.MIN) {
                 dayText.text = ""
                 incomeText.visibility = View.GONE
                 expenseText.visibility = View.GONE
+                saveText.visibility = View.GONE
             } else {
                 // 날짜와 수입, 지출 표시
                 dayText.text = dayData.date.dayOfMonth.toString()
@@ -37,13 +39,20 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
                 } else {
                     "0"
                 }
+                saveText.text = if (dayData.getTotalSave() > 0) {
+                    "${formatCurrency(dayData.getTotalSave())}" // 포맷팅된 지출 표시
+                } else {
+                    "0"
+                }
 
                 incomeText.visibility = View.VISIBLE
                 expenseText.visibility = View.VISIBLE
+                saveText.visibility = View.VISIBLE
 
                 // 글자 크기 조정
                 adjustTextSize(incomeText)
                 adjustTextSize(expenseText)
+                adjustTextSize(saveText)
 
                 // 클릭 리스너 설정
                 itemView.setOnClickListener{
@@ -55,7 +64,7 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
         private fun adjustTextSize(textView: TextView) {
             // 글자 크기를 줄여야 할 경우
             if (textView.visibility == View.VISIBLE && textView.text.length > 6) { // 예시: 6자 이상일 경우
-                textView.textSize = 10f // 글자 크기 조정
+                textView.textSize = 8f // 글자 크기 조정
             }
         }
     }
