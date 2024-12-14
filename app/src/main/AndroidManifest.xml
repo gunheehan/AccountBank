@@ -80,4 +80,5 @@
     <uses-permission android:name="com.samsung.rcs.im.READ_PERMISSION"/>
     <uses-permission android:name="com.samsung.rcs.permission.RCS_APP_PERMISSION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
 </manifest>

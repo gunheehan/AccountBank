@@ -25,14 +25,13 @@ class MainActivity : AppCompatActivity(){
         POST_NOTIFICATIONS,
         READ_SMS,
         RECEIVE_SMS,
+        USE_EXACT_ALARM
         )
 
     private val REQUEST_GENERAL_PERMISSIONS = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
-
         setContentView(R.layout.activity_main)
 
         val mainboardFragment = MainboardFragment()
@@ -54,6 +53,7 @@ class MainActivity : AppCompatActivity(){
             }
             true
         }
+        MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
     }
 
     private fun replaceFragment(fragment: Fragment) {
