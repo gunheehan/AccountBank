@@ -34,6 +34,18 @@
             </intent-filter>
         </receiver>
 
+        <!-- 정기 데이터 등록-->
+        <receiver
+            android:name=".alarm.MonthlyAlarmReceiver"
+            android:exported="true" />
+
+        <!-- 부팅시 정기 데이터 알림 재등록 -->
+        <receiver android:name=".alarm.BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".receiver.NotificationReceiver"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"

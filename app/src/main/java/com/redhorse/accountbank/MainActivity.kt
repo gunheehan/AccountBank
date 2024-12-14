@@ -16,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.redhorse.accountbank.alarm.MonthlyAlarmScheduler
 import com.redhorse.accountbank.receiver.NotificationReceiverService
 
 
@@ -30,6 +31,8 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
+
         setContentView(R.layout.activity_main)
 
         val mainboardFragment = MainboardFragment()
