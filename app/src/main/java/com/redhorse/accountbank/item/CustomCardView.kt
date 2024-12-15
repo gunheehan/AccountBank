@@ -6,10 +6,7 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import androidx.cardview.widget.CardView
 import androidx.core.view.get
 import com.redhorse.accountbank.R
@@ -97,7 +94,6 @@ class CustomCardView @JvmOverloads constructor(
 
     fun addImageAndButton(
         imageResId: Int,
-        buttonText: String,
         onClickAction: () -> Unit
     ) {
         // 부모 컨테이너에서 마지막으로 추가된 View를 확인
@@ -132,35 +128,14 @@ class CustomCardView @JvmOverloads constructor(
             val imageView = ImageView(context).apply {
                 setImageResource(imageResId)
                 layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
+                    65, 65
                 ).apply {
                     marginEnd = 16 // 이미지와 버튼 사이 간격
                 }
-            }
-            rowLayout.addView(imageView)
 
-            // 버튼 추가
-            val button = TextView(context).apply {
-                if(buttonText.isEmpty()){
-                    width = 60
-                    height = 60
-                }
-                else{
-                    text = buttonText
-                }
-                textSize = 14f
-                setTextColor(Color.WHITE)
-                setBackgroundColor(Color.BLUE) // 버튼 배경색
-                gravity = Gravity.CENTER
-                setPadding(16, 8, 16, 8) // 버튼 패딩
-                layoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                )
                 setOnClickListener { onClickAction() }
             }
-            rowLayout.addView(button)
+            rowLayout.addView(imageView)
 
             // 새로 만든 행 레이아웃을 컨테이너에 추가
             container.addView(rowLayout, 0) // 기존 순서를 유지하려면 적절히 추가
@@ -168,4 +143,5 @@ class CustomCardView @JvmOverloads constructor(
             throw IllegalStateException("addTitle을 먼저 호출해야 합니다.")
         }
     }
+
 }

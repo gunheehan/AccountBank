@@ -75,8 +75,7 @@ class FixedInformationFragment : Fragment() {
 
     private fun SetExpensesCard(dataView: CustomCardView, title: String, type: String) {
         dataView.addTitle(title)
-        dataView.addImageAndButton(imageResId = R.drawable.rounded_button,
-            buttonText = "",
+        dataView.addImageAndButton(imageResId = R.drawable.icon_plus,
             onClickAction = {
                 OnClickOpenModal()
             })
