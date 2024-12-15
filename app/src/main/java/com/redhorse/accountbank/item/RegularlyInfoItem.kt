@@ -1,10 +1,15 @@
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.redhorse.accountbank.R
+import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.utils.formatCurrency
 
 class RegularlyInfoItem @JvmOverloads constructor(
     context: Context,
@@ -14,6 +19,8 @@ class RegularlyInfoItem @JvmOverloads constructor(
     private val titleView: TextView
     private val amountView: TextView
     private val descriptionView: TextView
+    private val editButton: ImageView
+    private val deleteButton: ImageView
 
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_regularly_info_item, this, true)
@@ -24,11 +31,25 @@ class RegularlyInfoItem @JvmOverloads constructor(
         titleView = findViewById(R.id.titleView)
         amountView = findViewById(R.id.amountView)
         descriptionView = findViewById(R.id.descriptionView)
+        editButton = findViewById(R.id.editIcon)
+        deleteButton = findViewById(R.id.deleteIcon)
     }
 
-    fun setData(title: String, amount: String, description: String) {
-        titleView.text = title
-        amountView.text = amount
-        descriptionView.text = description
+    fun setData(payment: Payment,
+                onClickEdit: (Payment) -> Unit,
+                onClickDelete: (Payment) -> Unit) {
+
+        Log.d("FixedUI","SetData")
+        titleView.text = payment.title
+        amountView.text = formatCurrency(payment.amount) + " 원"
+        descriptionView.text = "매월 ${payment.date}일"
+
+        editButton.setOnClickListener(){
+            onClickEdit.invoke(payment)
+        }
+
+        deleteButton.setOnClickListener(){
+            onClickDelete.invoke(payment)
+        }
     }
 }

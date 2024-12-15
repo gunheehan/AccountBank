@@ -25,7 +25,6 @@ class MainActivity : AppCompatActivity(){
         POST_NOTIFICATIONS,
         READ_SMS,
         RECEIVE_SMS,
-        USE_EXACT_ALARM
         )
 
     private val REQUEST_GENERAL_PERMISSIONS = 1
@@ -53,7 +52,6 @@ class MainActivity : AppCompatActivity(){
             }
             true
         }
-        MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
     }
 
     private fun replaceFragment(fragment: Fragment) {
@@ -89,6 +87,10 @@ class MainActivity : AppCompatActivity(){
                 "알림 접근 권한을 허용해야 앱이 정상 동작합니다.",
                 Toast.LENGTH_LONG
             ).show()
+        }
+        else
+        {
+            MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
         }
     }
 

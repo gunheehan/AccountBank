@@ -1,34 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="8dp">
+    android:padding="10dp"
+    android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/titleView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_weight="1"
+        android:gravity="center"
         android:textColor="#000000"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:minEms="4" />
 
     <TextView
         android:id="@+id/amountView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_weight="1"
         android:gravity="center"
         android:textColor="#000000"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:minEms="10" />
 
     <TextView
         android:id="@+id/descriptionView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="40dp"
         android:layout_weight="1"
-        android:gravity="end"
+        android:gravity="center"
         android:textColor="#808080"
         android:textSize="14sp" />
+
+    <!-- 수정 아이콘 -->
+    <ImageView
+        android:id="@+id/editIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/icon_edit"
+    android:contentDescription="Edit Icon" />
+
+    <!-- 삭제 아이콘 -->
+    <ImageView
+        android:id="@+id/deleteIcon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginLeft="10dp"
+        android:src="@drawable/icon_delete"
+    android:contentDescription="Delete Icon" />
 </LinearLayout>

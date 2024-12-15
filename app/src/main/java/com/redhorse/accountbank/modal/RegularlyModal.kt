@@ -12,8 +12,8 @@ import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.Payment
 
 class RegularlyModal : DialogFragment(){
-
-    private lateinit var oninsertDataCallback: (Payment) -> Unit
+    private lateinit var onSaveDataCallback: (Payment) -> Unit
+    var editpayment : Payment? = null
 
     private lateinit var title : TextView
     private lateinit var day : TextView
@@ -23,9 +23,11 @@ class RegularlyModal : DialogFragment(){
 
     companion object {
         // 새로운 인스턴스를 만들 때 Payment 객체가 null일 수 있으므로 null 처리 추가
-        fun newInstance(callback: (Payment) -> Unit): RegularlyModal {
+        fun newInstance(editData: Payment?, callback: (Payment) -> Unit): RegularlyModal {
             val fragment = RegularlyModal()
-            fragment.oninsertDataCallback = callback
+
+            fragment.editpayment = editData
+            fragment.onSaveDataCallback = callback
             return fragment
         }
     }
@@ -50,14 +52,37 @@ class RegularlyModal : DialogFragment(){
         type.setSelection(0)
 
         saveButton = view.findViewById(R.id.modal_regularly_insert_btn)
-
+        saveButton.text = "저장"
         saveButton.setOnClickListener(){
             OnClickSave()
         }
+
+        if(editpayment != null)
+        {
+            SetUpdateData()
+        }
+    }
+
+    private fun SetUpdateData() {
+        title.text = editpayment!!.title
+        day.text = editpayment!!.date
+        amount.text = editpayment!!.amount.toString()
+        if (editpayment?.type.equals("income")) {
+            type.setSelection(0)
+        } else if (editpayment!!.type.equals("expense")) {
+            type.setSelection(1)
+        }else{
+            type.setSelection(2)
+        }
+        saveButton.text = "수정"
     }
 
     private fun OnClickSave()
     {
+        var id = 0L
+        if(editpayment != null)
+            id = editpayment!!.id
+
         val titleData = title.text.toString()
         val date = day.text.toString()
         val amount = amount.text.toString().toIntOrNull() ?: 0
@@ -67,14 +92,14 @@ class RegularlyModal : DialogFragment(){
 
         // 새 Payment 객체 생성
         val newPayment = Payment(
-            id = 0, // Room에서 자동 생성되므로 0으로 설정
+            id = id,
             title = titleData,
             type = type,
             amount = amount,
             date = date
         )
 
-        oninsertDataCallback.invoke(newPayment)
+        onSaveDataCallback.invoke(newPayment)
 
         dismiss() // 다이얼로그 닫기
     }

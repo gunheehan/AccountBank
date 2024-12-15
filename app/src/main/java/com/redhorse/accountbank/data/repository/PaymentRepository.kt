@@ -82,6 +82,29 @@ class PaymentRepository(private val dbHelper: AppDatabaseHelper) {
         return db.delete(tableName, "id = ?", arrayOf(id.toString()))
     }
 
+    // 특정 title, amount, date가 동일한 Payment 조회
+    fun getPaymentByTitleAmountDate(title: String, amount: Int, date: String): Payment? {
+        val tableName = getTableName(date)
+
+        val db = dbHelper.readableDatabase
+        val query = "SELECT * FROM $tableName WHERE title = ? AND amount = ? AND date = ? LIMIT 1"
+        val cursor = db.rawQuery(query, arrayOf(title, amount.toString(), date))
+
+        var payment: Payment? = null
+
+        if (cursor.moveToFirst()) {
+            payment = Payment(
+                id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
+                title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
+                type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                amount = cursor.getInt(cursor.getColumnIndexOrThrow("amount")),
+                date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
+            )
+        }
+        cursor.close()
+        return payment
+    }
+
     // 특정 테이블의 모든 Payment 가져오기
     suspend fun getAllPaymentsByMonth(date: String): List<Payment> = withContext(Dispatchers.IO) {
         Log.d("GetAll","1")

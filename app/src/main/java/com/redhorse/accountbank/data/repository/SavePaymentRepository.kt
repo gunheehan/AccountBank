@@ -40,7 +40,7 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
     }
 
     // 특정 ID의 Payment 가져오기
-    fun getPaymentById(date: String, id: Int): Payment? {
+    fun getPaymentById(date: String, id: Long): Payment? {
         val db = dbHelper.readableDatabase
         val query = "SELECT * FROM $TABLE_SAVE_PAYMENT WHERE id = ?"
         val cursor = db.rawQuery(query, arrayOf(id.toString()))
