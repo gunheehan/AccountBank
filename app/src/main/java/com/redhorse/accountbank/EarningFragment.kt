@@ -94,7 +94,7 @@ class EarningFragment : Fragment() {
         )
 
         dayDetailFragment.SetOnEditDataCallback { updateCalendar() }
-        dayDetailFragment.show(childFragmentManager, "com.redhorse.accountbank.modal.DayDetailFragment")
+        dayDetailFragment.show(parentFragmentManager, "DayDetailFragment")
     }
 
     private fun setupViews(view: View) {
