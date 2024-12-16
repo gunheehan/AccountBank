@@ -142,12 +142,12 @@ class PaymentEditFragment : DialogFragment() {
             else
                 select_day_TextView.setText(it.date)
             amount_EditText.setText(it.amount.toString())
-            val isIncome = if (it.type == "expense") "지출" else if(it.type == "income") "수입" else "적금"
+            val isIncome = if (it.type == "지출") "expense" else if(it.type == "수입") "income" else "save"
 
-            if (isIncome.equals("expense"))
-                payment_type_Spinner.setSelection(1)
-            else if(isIncome.equals("income"))
+            if (isIncome.equals("income"))
                 payment_type_Spinner.setSelection(0)
+            else if(isIncome.equals("expense"))
+                payment_type_Spinner.setSelection(1)
             else
                 payment_type_Spinner.setSelection(2)
 
@@ -236,10 +236,11 @@ class PaymentEditFragment : DialogFragment() {
             val updatedAmount = amount_EditText.text.toString().toIntOrNull() ?: 0
             var updatedType = payment_type_Spinner.selectedItem.toString()
             val updatedSubType = payment_subtype_Spinner.selectedItemPosition
+            Log.d("CheckDB", updatedSubType.toString())
 
             // "수입"을 "income", "지출"을 "expense"로 변환
             updatedType = if (updatedType == "수입") "income" else if(updatedDate == "지출") "expense" else "save"
-
+Log.d("CheckDB", updatedType)
             val payment = Payment(existingPayment.id, titleData, updatedType, updatedSubType, updatedAmount, updatedDate)
 
             CoroutineScope(Dispatchers.IO).launch {

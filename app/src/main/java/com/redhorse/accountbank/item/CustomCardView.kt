@@ -55,6 +55,43 @@ class CustomCardView @JvmOverloads constructor(
         container.addView(subtitleView)
     }
 
+    fun addSubtitle(leftContent: String, rightContent: String) {
+        val subtitleLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = 16 }
+        }
+
+        val leftTextView = TextView(context).apply {
+            text = leftContent
+            textSize = 15f
+            setTextColor(Color.BLACK)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { weight = 1f }
+        }
+
+        val rightTextView = TextView(context).apply {
+            text = rightContent
+            textSize = 15f
+            setTextColor(Color.BLACK)
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { gravity = Gravity.END }
+        }
+
+        // 서브타이틀 레이아웃에 텍스트뷰 추가
+        subtitleLayout.addView(leftTextView)
+        subtitleLayout.addView(rightTextView)
+
+        // 컨테이너에 서브타이틀 레이아웃 추가
+        container.addView(subtitleLayout)
+    }
+
     fun addDescription(content: String, color: Int = Color.BLACK) {
         val subtitleView = TextView(context).apply {
             text = content

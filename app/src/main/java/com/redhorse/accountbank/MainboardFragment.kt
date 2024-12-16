@@ -40,6 +40,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private lateinit var cardDay: CustomCardView
     private lateinit var cardEarnings: CustomCardView
     private lateinit var cardRemain: CustomCardView
+    private lateinit var cardPaymentRatio: CustomCardView
     private var currentMonth: YearMonth = YearMonth.now()
 
 
@@ -63,9 +64,10 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
 
         // CustomCardView 초기화
-        cardDay = view.findViewById<CustomCardView>(R.id.card_day)
-        cardEarnings = view.findViewById<CustomCardView>(R.id.card_earnings)
-        cardRemain = view.findViewById<CustomCardView>(R.id.card_remain)
+        cardDay = view.findViewById(R.id.card_day)
+        cardEarnings = view.findViewById(R.id.card_earnings)
+        cardRemain = view.findViewById(R.id.card_remain)
+        cardPaymentRatio = view.findViewById(R.id.card_payment_ratio)
 
         // 카드에 내용 추가
         val todayFormatted = getTodayDateFormatted()
@@ -78,7 +80,6 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         cardRemain.addSubtitle("아직 여유가 있군요 :)")
 
         SetMainInfo()
-
         return view
     }
 
@@ -88,6 +89,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
                 val daysInMonth = generateCalendarDataForMonth(currentMonth)
                 withContext(Dispatchers.Main) {
                     SetPayData(daysInMonth)
+                    SetPaymentRatio(daysInMonth)
                 }
             } catch (e: Exception) {
                 Log.e("SetMainInfo", "Error: ${e.message}")
@@ -95,7 +97,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
     }
 
-    private fun SetPayData(newDays: List<   Payment>) {
+    private fun SetPayData(newDays: List<Payment>) {
         var totalIncome = 0
         var totalExpense = 0
         var totalSave = 0
@@ -124,6 +126,36 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         } else {
             Log.e("SetPayData", "cardEarnings is not initialized.")
         }
+    }
+
+    private fun SetPaymentRatio(newDays: List<Payment>)
+    {
+        cardPaymentRatio.addTitle("소비 분포도")
+
+        var totalFood = 0
+        var totalSnack = 0
+        var totalTransfort = 0
+        var totalLife = 0
+        var totalOther = 0
+
+        for(payment in newDays)
+        {
+            if(!payment.type.equals("expense"))
+                continue;
+
+            when(payment.subtype){
+                0->totalFood += payment.amount
+                1->totalSnack += payment.amount
+                2->totalTransfort += payment.amount
+                3->totalLife += payment.amount
+                4->totalOther += payment.amount
+            }
+        }
+        cardPaymentRatio.addSubtitle("식비 : ${formatCurrency(totalFood)}원", "0%")
+        cardPaymentRatio.addSubtitle("간식 : ${formatCurrency(totalSnack)}원", "0%")
+        cardPaymentRatio.addSubtitle("여가 : ${formatCurrency(totalTransfort)}원", "0%")
+        cardPaymentRatio.addSubtitle("교통 : ${formatCurrency(totalLife)}원", "0%")
+        cardPaymentRatio.addSubtitle("기타 : ${formatCurrency(totalOther)}원", "0%")
     }
 
     private suspend fun generateCalendarDataForMonth(month: YearMonth): List<Payment> {

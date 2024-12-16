@@ -111,17 +111,13 @@ class PaymentRepository(private val dbHelper: AppDatabaseHelper) {
 
     // 특정 테이블의 모든 Payment 가져오기
     suspend fun getAllPaymentsByMonth(date: String): List<Payment> = withContext(Dispatchers.IO) {
-        Log.d("GetAll","1")
         val tableName = getTableName(date)
         val db = dbHelper.readableDatabase
-        Log.d("GetAll","2")
 
         // 테이블 존재 여부 확인
         if (!isTableExists(db, tableName)) {
-            Log.d("GetAll","3")
             return@withContext emptyList() // 테이블이 없으면 빈 리스트 반환
         }
-        Log.d("GetAll","4")
 
         val query = "SELECT * FROM $tableName"
         val cursor = db.rawQuery(query, null)
@@ -142,7 +138,6 @@ class PaymentRepository(private val dbHelper: AppDatabaseHelper) {
                 )
             }
         } catch (e: Exception) {
-            Log.d("GetAll",e.toString())
             e.printStackTrace()
         } finally {
             // 커서 닫기
