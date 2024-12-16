@@ -7,7 +7,8 @@ import kotlinx.parcelize.Parcelize
 data class PaymentDTO(
     val id: Long,
     val title: String,
-    val type: String, // "income" 또는 "expense"
+    val type: String,
+    val subtype: Int,
     val amount: Int,
     val date: String
 ) : Parcelable

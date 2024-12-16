@@ -35,7 +35,7 @@ class MonthlyAlarmReceiver : BroadcastReceiver() {
         val monthDB = PaymentRepository(db)
         for(newpayment in regularlyData)
         {
-            val payment = Payment(0,newpayment.title,newpayment.type,newpayment.amount,formatToFullDate(context, newpayment.date.toInt()))
+            val payment = Payment(0,newpayment.title,newpayment.type,newpayment.subtype, newpayment.amount,formatToFullDate(context, newpayment.date.toInt()))
             monthDB.insertOrCreateTableAndInsert(payment)
         }
     }

@@ -30,6 +30,7 @@ class AppDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 type TEXT NOT NULL CHECK(type IN ('income', 'expense', 'save')),
+                subtype INTEGER NOT NULL,
                 amount INTEGER NOT NULL,
                 date TEXT NOT NULL,
                 UNIQUE(date, title) ON CONFLICT IGNORE
@@ -43,6 +44,7 @@ class AppDatabaseHelper(context: Context) : SQLiteOpenHelper(context, DATABASE_N
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 type TEXT NOT NULL CHECK(type IN ('income', 'expense', 'save')),
+                subtype INTEGER NOT NULL,
                 amount INTEGER NOT NULL,
                 date TEXT NOT NULL,
                 UNIQUE(title, amount, date) ON CONFLICT IGNORE

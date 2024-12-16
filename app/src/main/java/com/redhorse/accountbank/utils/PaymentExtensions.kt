@@ -8,6 +8,7 @@ fun PaymentDTO.toPayment(): Payment {
         id = this.id,
         title = this.title,
         type = this.type,
+        subtype = this.subtype,
         amount = this.amount,
         date = this.date
     )

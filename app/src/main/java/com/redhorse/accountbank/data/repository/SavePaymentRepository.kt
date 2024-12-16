@@ -23,6 +23,7 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
             val contentValues = ContentValues().apply {
                 put("title", payment.title)
                 put("type", payment.type)
+                put("subtype", payment.subtype)
                 put("amount", payment.amount)
                 put("date", payment.date)
             }
@@ -50,6 +51,7 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
                 id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
                 title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
                 type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                subtype = cursor.getInt(cursor.getColumnIndexOrThrow("subtype")),
                 amount = cursor.getInt(cursor.getColumnIndexOrThrow("amount")),
                 date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
             )
@@ -64,6 +66,7 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
         val contentValues = ContentValues().apply {
             put("title", payment.title)
             put("type", payment.type)
+            put("subtype", payment.subtype)
             put("amount", payment.amount)
             put("date", payment.date)
         }
@@ -97,6 +100,7 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
                         id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
                         title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
                         type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                        subtype = cursor.getInt(cursor.getColumnIndexOrThrow("subtype")),
                         amount = cursor.getInt(cursor.getColumnIndexOrThrow("amount")),
                         date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
                     )
@@ -134,6 +138,7 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
                         id = cursor.getLong(cursor.getColumnIndexOrThrow("id")),
                         title = cursor.getString(cursor.getColumnIndexOrThrow("title")),
                         type = cursor.getString(cursor.getColumnIndexOrThrow("type")),
+                        subtype = cursor.getInt(cursor.getColumnIndexOrThrow("subtype")),
                         amount = cursor.getInt(cursor.getColumnIndexOrThrow("amount")),
                         date = cursor.getString(cursor.getColumnIndexOrThrow("date"))
                     )

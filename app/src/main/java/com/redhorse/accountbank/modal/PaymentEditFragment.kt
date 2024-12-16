@@ -19,6 +19,8 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import com.redhorse.accountbank.adapter.CustomSpinnerAdapter
+
 
 class PaymentEditFragment : DialogFragment() {
 
@@ -30,6 +32,7 @@ class PaymentEditFragment : DialogFragment() {
     private lateinit var select_day_Button : Button
     private lateinit var amount_EditText : EditText
     private lateinit var payment_type_Spinner : Spinner
+    private lateinit var payment_subtype_Spinner : Spinner
     private lateinit var insert_Button : Button
 
     private var isInsertMode : Boolean = false
@@ -59,6 +62,28 @@ class PaymentEditFragment : DialogFragment() {
         amount_EditText = rootView.findViewById(R.id.payment_amount_edit)
         payment_type_Spinner = rootView.findViewById(R.id.payment_type_spinner)
         insert_Button = rootView.findViewById(R.id.payment_insert_btn)
+        payment_subtype_Spinner = rootView.findViewById(R.id.payment_subtype_spinner)
+
+
+        val paymentTypes = resources.getStringArray(R.array.payment_types)
+        val paymentTypeList = paymentTypes.toList()
+        val adapter = CustomSpinnerAdapter(requireContext(), paymentTypeList)
+        payment_type_Spinner.adapter = adapter
+
+        payment_type_Spinner.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parentView: AdapterView<*>,
+                selectedItemView: View?,
+                position: Int,
+                id: Long
+            ) {
+                updateSubtypeSpinner(position)
+            }
+
+            override fun onNothingSelected(parentView: AdapterView<*>) {
+                // 아무것도 선택되지 않았을 때의 처리
+            }
+        })
 
         // 날짜 버튼 초기화 추가
         select_day_Button = rootView.findViewById(R.id.payment_select_day_btn)
@@ -85,6 +110,23 @@ class PaymentEditFragment : DialogFragment() {
         return rootView
     }
 
+    fun updateSubtypeSpinner(paymentTypePosition: Int) {
+        var paymentTypes = resources.getStringArray(R.array.income_subtypes).toList()
+
+        when(paymentTypePosition){
+            0-> paymentTypes = resources.getStringArray(R.array.income_subtypes).toList()
+            1-> paymentTypes = resources.getStringArray(R.array.expense_subtypes).toList()
+            2-> paymentTypes = resources.getStringArray(R.array.save_subtypes).toList()
+        }
+
+        // payment_subtype_Spinner에 새롭게 선택된 subtype 리스트 설정
+        val subtypeAdapter = CustomSpinnerAdapter(requireContext(), paymentTypes)
+        payment_subtype_Spinner.adapter = subtypeAdapter
+
+        // 기본값은 항상 "기타"로 설정
+        payment_subtype_Spinner.setSelection(paymentTypes.indexOf("기타"))
+    }
+
     private fun setupUI(rootView: View) {
         paymentData?.let {
             // 내역 표시
@@ -100,11 +142,16 @@ class PaymentEditFragment : DialogFragment() {
             else
                 select_day_TextView.setText(it.date)
             amount_EditText.setText(it.amount.toString())
-            val isIncome = if (it.type == "income") true else false
-            if (!isIncome)
+            val isIncome = if (it.type == "expense") "지출" else if(it.type == "income") "수입" else "적금"
+
+            if (isIncome.equals("expense"))
                 payment_type_Spinner.setSelection(1)
-            else
+            else if(isIncome.equals("income"))
                 payment_type_Spinner.setSelection(0)
+            else
+                payment_type_Spinner.setSelection(2)
+
+            payment_subtype_Spinner.setSelection(it.subtype)
 
         } ?: run {
         }
@@ -153,15 +200,15 @@ class PaymentEditFragment : DialogFragment() {
         val date = select_day_TextView.text.toString()
         val amount = amount_EditText.text.toString().toIntOrNull() ?: 0
         var type = payment_type_Spinner.selectedItem.toString()
-
         type = if (type == "수입") "income" else if(type == "지출") "expense" else "save"
-
+        var subtype = payment_subtype_Spinner.selectedItemPosition
 
         // 새 Payment 객체 생성
         val newPayment = Payment(
             id = 0, // Room에서 자동 생성되므로 0으로 설정
             title = titleData,
             type = type,
+            subtype = subtype,
             amount = amount,
             date = date
         )
@@ -188,11 +235,12 @@ class PaymentEditFragment : DialogFragment() {
             val updatedDate = select_day_TextView.text.toString()
             val updatedAmount = amount_EditText.text.toString().toIntOrNull() ?: 0
             var updatedType = payment_type_Spinner.selectedItem.toString()
+            val updatedSubType = payment_subtype_Spinner.selectedItemPosition
 
             // "수입"을 "income", "지출"을 "expense"로 변환
             updatedType = if (updatedType == "수입") "income" else if(updatedDate == "지출") "expense" else "save"
 
-            val payment = Payment(existingPayment.id, titleData, updatedType, updatedAmount, updatedDate)
+            val payment = Payment(existingPayment.id, titleData, updatedType, updatedSubType, updatedAmount, updatedDate)
 
             CoroutineScope(Dispatchers.IO).launch {
                 // Room을 사용하여 데이터 업데이트

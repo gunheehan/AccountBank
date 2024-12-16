@@ -11,7 +11,8 @@ import kotlinx.parcelize.Parcelize
 data class Payment(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val title: String,
-    val type: String, // "income" 또는 "expense"
+    val type: String,
+    val subtype: Int,
     val amount: Int,
     var date: String // "YYYY-MM-DD" 형식의 날짜
 ) : Parcelable {
@@ -20,6 +21,7 @@ data class Payment(
             id = this.id,
             title = this.title,
             type = this.type,
+            subtype = this.subtype,
             amount = this.amount,
             date = this.date
         )
@@ -29,6 +31,7 @@ data class Payment(
             id = this.id,
             title = this.title,
             type = this.type,
+            subtype = this.subtype,
             amount = this.amount,
             date = this.date
         )

@@ -15,7 +15,10 @@
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:gravity="center"
-        android:paddingBottom="20dp"/>
+        android:paddingBottom="20dp"
+        android:textColor="#000000"
+        android:ellipsize="end"
+        android:singleLine="true"/>
 
     <!-- 버튼을 수평으로 배치 -->
     <LinearLayout
@@ -33,6 +36,9 @@
             android:layout_weight="1"
             android:layout_margin="20px"
             android:text="예"
+            android:textSize="12sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:textColor="@android:color/white"
             android:background="@drawable/rounded_button" />
 
@@ -44,6 +50,9 @@
             android:layout_weight="1"
             android:layout_margin="20px"
             android:text="아니오"
+            android:textSize="12sp"
+            android:ellipsize="end"
+            android:singleLine="true"
             android:textColor="@android:color/white"
             android:background="@drawable/rounded_button" />
     </LinearLayout>

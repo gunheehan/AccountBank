@@ -139,7 +139,7 @@ class EarningFragment : Fragment() {
                 val formattedSave = formatCurrency(totalSave) + " 원"
                 calendarTotalEarningText.text = "총 수입: ${formattedIncome}"
                 calendarTotalExpenseText.text = "총 지출: ${formattedExpense}"
-                calendarTotalSave.text = "총 적금 ${formattedSave}"
+                calendarTotalSave.text = "총 적금: ${formattedSave}"
             }
         }
     }
@@ -202,19 +202,6 @@ class EarningFragment : Fragment() {
         }
 
         return daysList
-    }
-
-    fun processPaymentMessage(context: Context, message: String) {
-        val payment = parsePaymentInfo(message) // 메시지 파싱
-        CoroutineScope(Dispatchers.IO).launch {
-            savePaymentAndNotify(context, payment) // DB에 저장하고 알림 표시
-        }
-    }
-
-    private fun parsePaymentInfo(message: String): Payment {
-        // 메시지를 파싱하여 Payment 객체를 생성하는 로직을 구현하세요
-        // 예: 제목, 타입, 금액 등을 추출하여 Payment 객체 반환
-        return Payment(title = "예제 제목", type = "income", amount = 10000, date = "2024-11-04")
     }
 
     private suspend fun savePaymentAndNotify(context: Context, payment: Payment) {

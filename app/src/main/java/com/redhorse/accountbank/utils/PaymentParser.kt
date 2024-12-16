@@ -9,7 +9,7 @@ object PaymentParser {
         val matchResult = paymentPattern.find(message)
         return if (matchResult != null) {
             val amount = matchResult.groupValues[1].toIntOrNull() ?: 0
-            Payment(title = "결제 내역", type = "expense", amount = amount, date = getCurrentDate())
+            Payment(title = "결제 내역", type = "expense", subtype = 0, amount = amount, date = getCurrentDate())
         } else {
             null
         }

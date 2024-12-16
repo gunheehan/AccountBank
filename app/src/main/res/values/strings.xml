@@ -7,4 +7,20 @@
         <item>지출</item>
         <item>적금</item>
     </string-array>
+        <string-array name="income_subtypes">
+            <item>기타</item>
+        </string-array>
+
+        <string-array name="save_subtypes">
+            <item>기타</item>
+        </string-array>
+
+        <string-array name="expense_subtypes">
+            <item>식비</item>
+            <item>간식</item>
+            <item>교통</item>
+            <item>여가</item>
+            <item>기타</item>
+        </string-array>
+
 </resources>

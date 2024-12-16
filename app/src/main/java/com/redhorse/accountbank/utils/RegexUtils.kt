@@ -28,23 +28,62 @@ object RegexUtils {
         return merchantLine?.trim() ?: "미식별"
     }
 
-    // 결제 관련 메시지 여부 확인 (결제, 일시불, 카드, 승인 등을 포함한 메시지 확인)
-    fun isPaymentMessage(text: String): Boolean {
-        val paymentKeywords = listOf("결제", "일시불", "송금", "승인")
-        return paymentKeywords.any { text.contains(it) }
+    fun isPaymentMessage(text: String): Boolean{
+        var paymentKeywords = listOf("결제", "일시불", "송금", "승인")
+        if(paymentKeywords.any { text.contains(it) })
+            return true
+        return false
     }
+
+    // 결제 관련 메시지 여부 확인 (결제, 일시불, 카드, 승인 등을 포함한 메시지 확인)
+    fun paymentMessageType(text: String): String {
+        var paymentKeywords = listOf("결제", "일시불", "송금", "승인")
+        if(paymentKeywords.any { text.contains(it) })
+            return "expense"
+
+        paymentKeywords = listOf("입금, 환금, 취소")
+        if(paymentKeywords.any { text.contains(it) })
+            return "income"
+
+        paymentKeywords = listOf("기일출금")
+        if(paymentKeywords.any { text.contains(it) })
+            return "save"
+
+        return "expense"
+    }
+
+    fun paymentMessageSubType(text: String, type: String): Int{
+        if(!type.equals("expense"))
+            return 0
+
+        var paymentKeywords = listOf("음식점", "고기", "국밥", "food", "치킨", "버거", "피자", "배달")
+        if(paymentKeywords.any { text.contains(it) })
+            return 0
+
+        paymentKeywords = listOf("GS", "CU", "편의점", "커피", "카페", "빵")
+        if(paymentKeywords.any { text.contains(it) })
+            return 1
+
+        paymentKeywords = listOf("KTX", "고속버스", "교통", "주유", "주차")
+        if(paymentKeywords.any { text.contains(it) })
+            return 2
+
+        paymentKeywords = listOf("체육", "영화", "극장", "CGV", "메가박스","롯데시네마","당구","볼링","클럽")
+        if(paymentKeywords.any { text.contains(it) })
+            return 3
+
+        return 4
+    }
+
+
 
     // 메시지에서 결제 정보를 추출하여 Payment 객체를 반환
     fun parsePaymentInfo(message: String, date: String): Payment {
         val title = extractMerchant(message) ?: "미식별"
         val amountString = extractAmount(message) ?: "0" // 금액이 없는 경우 기본값 0
         val amount = amountString.toIntOrNull() ?: 0
-        val type = if (isPaymentMessage(message)) {
-            "expense"
-        } else {
-            "income"
-        }
-
-        return Payment(title = title, type = type, amount = amount, date = date)
+        val type = paymentMessageType(message)
+        val subtype = paymentMessageSubType(message, type)
+        return Payment(title = title, type = type, subtype = subtype, amount = amount, date = date)
     }
 }

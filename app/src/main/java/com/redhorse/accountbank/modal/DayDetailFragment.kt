@@ -58,6 +58,7 @@ class DayDetailFragment : DialogFragment() {
                         id = paymentDTO.id,
                         title = paymentDTO.title,
                         type = paymentDTO.type,
+                        subtype = paymentDTO.subtype,
                         amount = paymentDTO.amount,
                         date = paymentDTO.date
                     )
