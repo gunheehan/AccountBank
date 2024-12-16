@@ -144,14 +144,18 @@ class PaymentEditFragment : DialogFragment() {
             amount_EditText.setText(it.amount.toString())
             val isIncome = if (it.type == "지출") "expense" else if(it.type == "수입") "income" else "save"
 
-            if (isIncome.equals("income"))
+            if (it.type.equals("income")){
                 payment_type_Spinner.setSelection(0)
-            else if(isIncome.equals("expense"))
+                updateSubtypeSpinner(0)
+            }
+            else if(it.type.equals("expense")){
                 payment_type_Spinner.setSelection(1)
-            else
-                payment_type_Spinner.setSelection(2)
-
-            payment_subtype_Spinner.setSelection(it.subtype)
+                updateSubtypeSpinner(1)
+            }
+            else{
+            payment_type_Spinner.setSelection(2)
+            updateSubtypeSpinner(2)
+        }
 
         } ?: run {
         }
@@ -213,8 +217,6 @@ class PaymentEditFragment : DialogFragment() {
             date = date
         )
 
-        Log.e("PaymentEditFragment", "New payment created: $newPayment")
-
         CoroutineScope(Dispatchers.IO).launch {
             paymentRepository.insertOrCreateTableAndInsert(newPayment)
 
@@ -229,18 +231,16 @@ class PaymentEditFragment : DialogFragment() {
 
     fun updatePayment() {
         paymentData?.let { existingPayment ->
-            Log.e("PaymentEditFragment", "Updating payment: $existingPayment")
 
             val titleData = payment_title_EditText.text.toString()
             val updatedDate = select_day_TextView.text.toString()
             val updatedAmount = amount_EditText.text.toString().toIntOrNull() ?: 0
             var updatedType = payment_type_Spinner.selectedItem.toString()
             val updatedSubType = payment_subtype_Spinner.selectedItemPosition
-            Log.d("CheckDB", updatedSubType.toString())
 
             // "수입"을 "income", "지출"을 "expense"로 변환
-            updatedType = if (updatedType == "수입") "income" else if(updatedDate == "지출") "expense" else "save"
-Log.d("CheckDB", updatedType)
+            updatedType = if (updatedType == "수입") "income" else if(updatedType == "지출") "expense" else "save"
+
             val payment = Payment(existingPayment.id, titleData, updatedType, updatedSubType, updatedAmount, updatedDate)
 
             CoroutineScope(Dispatchers.IO).launch {

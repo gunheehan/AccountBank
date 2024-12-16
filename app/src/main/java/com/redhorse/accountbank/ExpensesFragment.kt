@@ -181,7 +181,6 @@ class ExpensesFragment : Fragment() {
     suspend fun fetchAndSavePaymentMessages(context: Context) {
         val thirtyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 날짜(오늘부터 이전 DAY)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        Log.d("RCSReader", "Start load RCS")
         val rcsUri = Uri.parse("content://im/chat")
 
         withContext(Dispatchers.IO) {
@@ -199,7 +198,6 @@ class ExpensesFragment : Fragment() {
                     val messageCount = it.count
 
                     if (messageCount == 0) {
-                        Log.d("RCSReader", "No messages found.")
                         return@use
                     }
 
@@ -219,12 +217,10 @@ class ExpensesFragment : Fragment() {
                             }
 
                             // 메시지 데이터 로그 출력
-                            Log.d("RCSReader", "Message Data: $messageData")
                             messages.add(messageData)
 
                             // body 내용 처리
                             val body = messageData["body"]
-                            Log.d("RCSReader", "RCS Message Body: $body")
 
                             if (body != null) {
                                 try {
@@ -235,20 +231,14 @@ class ExpensesFragment : Fragment() {
                                     val textWidget = firstChild.getJSONArray("children").getJSONObject(0)
                                     val text = textWidget.getString("text")
 
-                                    Log.d("RCSReader", "Extracted Text: $text")
-
                                     val formattedDate = parseMessageBody(text)
-                                    Log.d("RCSReader", "Extracted Date: ${formattedDate.toString()}")
 
                                     if (RegexUtils.isPaymentMessage(text)) {
                                         try {
                                             val payment = RegexUtils.parsePaymentInfo(text, formattedDate.toString())
-                                            Log.d("RCSReaderTitle", "Extracted Date: ${formattedDate.toString()}")
-                                            Log.d("RCSReaderTitle", "Extracted: ${payment.title}")
 
                                             if (payment.amount > 0) {
                                                 paymentRepository.insertOrCreateTableAndInsert(payment)
-                                                Log.d("SMSReader", "Inserted Payment: $payment")
                                             } else {
                                                 Log.d("SMSReader", "Duplicate Payment Skipped: $payment")
                                             }

@@ -56,11 +56,11 @@ object RegexUtils {
         if(!type.equals("expense"))
             return 0
 
-        var paymentKeywords = listOf("음식점", "고기", "국밥", "food", "치킨", "버거", "피자", "배달")
+        var paymentKeywords = listOf("음식점", "고기", "국밥", "food", "치킨", "버거", "피자", "배달","형제")
         if(paymentKeywords.any { text.contains(it) })
             return 0
 
-        paymentKeywords = listOf("GS", "CU", "편의점", "커피", "카페", "빵")
+        paymentKeywords = listOf("GS", "CU", "편의점", "커피", "카페", "빵", "씨유", "세븐일레븐", "배스킨라빈스")
         if(paymentKeywords.any { text.contains(it) })
             return 1
 
@@ -74,8 +74,6 @@ object RegexUtils {
 
         return 4
     }
-
-
 
     // 메시지에서 결제 정보를 추출하여 Payment 객체를 반환
     fun parsePaymentInfo(message: String, date: String): Payment {
