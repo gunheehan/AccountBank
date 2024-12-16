@@ -20,7 +20,7 @@ object NotificationUtils {
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.rounded_corners) // 알림 아이콘
+            .setSmallIcon(R.drawable.icon_main) // 알림 아이콘
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
