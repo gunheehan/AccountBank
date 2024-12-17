@@ -3,8 +3,6 @@ package com.redhorse.accountbank.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import com.redhorse.accountbank.service.RcsMonitorService
 import com.redhorse.accountbank.utils.NotificationUtils
 import com.redhorse.accountbank.utils.PaymentProcessor
 import kotlinx.coroutines.CoroutineScope
