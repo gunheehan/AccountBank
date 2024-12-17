@@ -10,6 +10,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Window
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
@@ -30,6 +31,9 @@ class MainActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        getSupportActionBar()?.hide()
 
         setContentView(R.layout.activity_main)
 

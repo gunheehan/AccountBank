@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:elevation="4dp">
+
+        <!-- Title Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="메인 데이터를 세팅해주세요"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_marginBottom="8dp"
+            android:layout_gravity="center"/>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"
+            android:layout_marginBottom="16dp" />
+
+        <!-- D-Day Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="D-Day"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:layout_marginBottom="12dp"
+            android:elevation="2dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="이름"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/modal_maininfo_DDay_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minWidth="120px"
+                android:layout_marginStart="16dp"
+                android:textSize="14sp"
+                android:hint="예: 월급날"
+                android:background="@drawable/rounded_edittext"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:minEms="8" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일자"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                android:layout_marginStart="16dp" />
+
+            <EditText
+                android:id="@+id/modal_maininfo_DDay_day"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minWidth="40px"
+                android:layout_marginStart="16dp"
+                android:textSize="14sp"
+                android:hint="예: 10"
+                android:background="@drawable/rounded_edittext"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <!-- 목표금액 Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="소비 목표금액"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            android:layout_marginBottom="12dp"
+            android:elevation="2dp"
+            android:background="@android:color/white">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="목표금액"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/modal_maininfo_targetAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="16dp"
+                android:textSize="14sp"
+                android:hint="예: 500,000"
+                android:background="@drawable/rounded_edittext"
+                android:textColor="@android:color/black"
+                android:gravity="center_vertical"
+                android:inputType="number" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_marginBottom="12dp"
+            android:elevation="2dp"
+            android:background="@android:color/white"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/modal_maininfo_saveButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="저 장"
+                android:layout_gravity="center"
+                />
+
+            <Space
+                android:layout_width="20dp"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/modal_maininfo_closeButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="닫 기"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

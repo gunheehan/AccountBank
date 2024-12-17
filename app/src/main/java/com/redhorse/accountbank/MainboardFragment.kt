@@ -1,6 +1,7 @@
 package com.redhorse.accountbank
 
 import PaymentRepository
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -8,9 +9,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import androidx.room.Update
+import com.redhorse.accountbank.data.AppInfo
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
+import com.redhorse.accountbank.data.helper.AppinfoHelper
 import com.redhorse.accountbank.item.CustomCardView
+import com.redhorse.accountbank.modal.MainInfoModal
+import com.redhorse.accountbank.modal.RegularlyModal
 import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +48,13 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private lateinit var cardEarnings: CustomCardView
     private lateinit var cardRemain: CustomCardView
     private lateinit var cardPaymentRatio: CustomCardView
+    private lateinit var fixedButton: Button
     private var currentMonth: YearMonth = YearMonth.now()
+    private lateinit var appinfoHelper: AppinfoHelper
+
+    private var totalIncome: Int = 0
+    private var totalExpense: Int = 0
+    private var totalSave: Int = 0
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +73,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         // DB 초기화
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
+        appinfoHelper = AppinfoHelper(requireContext())
 
         val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
 
@@ -68,19 +82,56 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         cardEarnings = view.findViewById(R.id.card_earnings)
         cardRemain = view.findViewById(R.id.card_remain)
         cardPaymentRatio = view.findViewById(R.id.card_payment_ratio)
+        fixedButton = view.findViewById(R.id.fixed_button)
 
-        // 카드에 내용 추가
-        val todayFormatted = getTodayDateFormatted()
-        val daysToSalary = calculateDaysToSalary()
+        fixedButton.setOnClickListener() {
+            showMainInfoModal()
+        }
 
-        cardDay.addTitle("오늘은 $todayFormatted 입니다.")
-        cardDay.addDescription(daysToSalary, Color.RED)
-
-        cardRemain.addTitle("소비 가능 금액 : 950,000 원")
-        cardRemain.addSubtitle("아직 여유가 있군요 :)")
-
+        SetMainCard()
         SetMainInfo()
         return view
+    }
+
+    private fun showMainInfoModal() {
+        val mainInfoModal = MainInfoModal.newInstance(appinfoHelper) {
+            UpdateMainInfo()
+        }
+        // 수정 모달 표시
+        mainInfoModal.show(parentFragmentManager, "MainInfoModal")
+    }
+
+    private fun UpdateMainInfo() {
+        SetMainCard()
+        SetRemainCard()
+    }
+
+    private fun SetMainCard() {
+        cardDay.clear()
+
+        val todayFormatted = getTodayDateFormatted()
+        cardDay.addTitle("오늘은 $todayFormatted 입니다.")
+
+        val dday_title = appinfoHelper.getString(AppInfo.STRING_D_DAY_TITLE, "")
+        val dday = appinfoHelper.getInt(AppInfo.INT_D_DAY_DAY, 0)
+
+        if (dday_title.isNotEmpty() && dday != 0) {
+            val daysToSalary = calculateDaysToSalary(dday)
+            cardDay.addDescription("$dday_title $daysToSalary 일", Color.RED)
+        }
+    }
+
+    private fun SetRemainCard() {
+        cardRemain.clear()
+
+        val targetAmount = appinfoHelper.getInt(AppInfo.INT_EXPENSE_TARGET, 0)
+
+        if (targetAmount == 0) {
+            cardRemain.addSubtitle("하단 버튼으로 데이터를 설정 후 사용해주세요")
+        } else {
+            cardRemain.addTitle("소비 설정 금액 : ${formatCurrency(targetAmount)} 원")
+            cardRemain.addSubtitle("소비 가능 금액 : ${formatCurrency(targetAmount - totalExpense)} 원")
+        }
     }
 
     private fun SetMainInfo() {
@@ -98,9 +149,9 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     }
 
     private fun SetPayData(newDays: List<Payment>) {
-        var totalIncome = 0
-        var totalExpense = 0
-        var totalSave = 0
+        totalIncome = 0
+        totalExpense = 0
+        totalSave = 0
 
         for (day in newDays) {
             if(day.type.equals("income")) {
@@ -123,6 +174,8 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
             cardEarnings.addTitle("총 수입: $formattedIncome")
             cardEarnings.addTitle("총 지출: $formattedExpense")
             cardEarnings.addTitle("적금 : $formattedSave")
+
+            SetRemainCard()
         } else {
             Log.e("SetPayData", "cardEarnings is not initialized.")
         }
@@ -151,11 +204,11 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
                 4->totalOther += payment.amount
             }
         }
-        cardPaymentRatio.addSubtitle("식비 : ${formatCurrency(totalFood)}원", "0%")
-        cardPaymentRatio.addSubtitle("간식 : ${formatCurrency(totalSnack)}원", "0%")
-        cardPaymentRatio.addSubtitle("여가 : ${formatCurrency(totalTransfort)}원", "0%")
-        cardPaymentRatio.addSubtitle("교통 : ${formatCurrency(totalLife)}원", "0%")
-        cardPaymentRatio.addSubtitle("기타 : ${formatCurrency(totalOther)}원", "0%")
+        cardPaymentRatio.addSubtitle("식비 : ${formatCurrency(totalFood)}원", "${calculatePercentage(totalFood)}%")
+        cardPaymentRatio.addSubtitle("간식 : ${formatCurrency(totalSnack)}원", "${calculatePercentage(totalSnack)}%")
+        cardPaymentRatio.addSubtitle("여가 : ${formatCurrency(totalTransfort)}원", "${calculatePercentage(totalTransfort)}%")
+        cardPaymentRatio.addSubtitle("교통 : ${formatCurrency(totalLife)}원", "${calculatePercentage(totalLife)}%")
+        cardPaymentRatio.addSubtitle("기타 : ${formatCurrency(totalOther)}원", "${calculatePercentage(totalOther)}%")
     }
 
     private suspend fun generateCalendarDataForMonth(month: YearMonth): List<Payment> {
@@ -172,9 +225,9 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         return today.format(formatter)
     }
 
-    fun calculateDaysToSalary(): String {
+    fun calculateDaysToSalary(day: Int): String {
         val today = LocalDate.now()
-        val salaryDay = today.withDayOfMonth(25) // 이번 달의 25일
+        val salaryDay = today.withDayOfMonth(day) // 이번 달의 25일
 
         // 월급날이 이미 지난 경우 다음 달 25일로 설정
         val targetDate = if (today.isAfter(salaryDay)) {
@@ -184,7 +237,16 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
 
         val daysLeft = ChronoUnit.DAYS.between(today, targetDate)
-        return "월급날 D-$daysLeft"
+        return daysLeft.toString()
+    }
+
+    private fun calculatePercentage(expenseTotla: Int): Int {
+        return if (totalExpense == 0) {
+            0
+        } else {
+            val percentage = (expenseTotla * 100) / totalExpense
+            percentage
+        }
     }
 
 

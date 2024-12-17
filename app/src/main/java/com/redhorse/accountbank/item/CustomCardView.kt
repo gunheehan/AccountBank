@@ -47,6 +47,7 @@ class CustomCardView @JvmOverloads constructor(
         val subtitleView = TextView(context).apply {
             text = content
             textSize = 15f
+            setTextColor(Color.BLACK)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -180,5 +181,7 @@ class CustomCardView @JvmOverloads constructor(
             throw IllegalStateException("addTitle을 먼저 호출해야 합니다.")
         }
     }
-
+    fun clear() {
+        container.removeAllViews()  // 컨테이너에 있는 모든 뷰 제거
+    }
 }

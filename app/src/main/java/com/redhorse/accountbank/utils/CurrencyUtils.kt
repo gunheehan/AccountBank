@@ -1,9 +1,10 @@
 package com.redhorse.accountbank.utils
 
+import java.text.DecimalFormat
 import java.text.NumberFormat
 import java.util.Locale
 
 fun formatCurrency(amount: Int): String {
-    val numberFormat = NumberFormat.getCurrencyInstance(Locale.KOREA)
-    return numberFormat.format(amount)
+    val decimalFormat = DecimalFormat("#,###")
+    return decimalFormat.format(amount)
 }
