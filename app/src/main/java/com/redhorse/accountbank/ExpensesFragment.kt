@@ -1,5 +1,6 @@
 package com.redhorse.accountbank
 
+import DatabaseIOController
 import PaymentRepository
 import RegexUtils
 import android.content.Context
@@ -50,6 +51,7 @@ class ExpensesFragment : Fragment() {
     private var param2: String? = null
 
     private lateinit var paymentRepository: PaymentRepository
+    private lateinit var databaseIOController: DatabaseIOController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +67,7 @@ class ExpensesFragment : Fragment() {
     ): View? {
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
+        databaseIOController = DatabaseIOController(dbHelper)
 
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_expenses, container, false)
@@ -75,22 +78,12 @@ class ExpensesFragment : Fragment() {
     // 내보내기 버튼 함수
     private fun exportDatabase(context: Context) {
         GlobalScope.launch(Dispatchers.Main) {
-            paymentRepository.exportDatabaseToDownloads(context)
+            databaseIOController.exportDatabases(context)
         }
     }
 
     // 가져오기 버튼 함수
     private fun importDatabase() {
-//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-//            addCategory(Intent.CATEGORY_OPENABLE)
-//            type = "*/*"
-//
-//            // 다운로드 폴더 열기 (API 26 이상)
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//                putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse("content://com.android.providers.downloads.documents/root/downloads"))
-//            }
-//        }
-//        filePickerLauncher.launch(arrayOf("text/csv"))
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "*/*"
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -103,10 +96,10 @@ class ExpensesFragment : Fragment() {
     private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
             if (uris != null && uris.isNotEmpty()) {
                 CoroutineScope(Dispatchers.IO).launch {
-                    paymentRepository.importDatabases(
+                    databaseIOController.importDatabases(
                         context = requireContext(),
                         uris = uris
-                    ) // 여러 파일의 URI를 처리
+                    )
                 }
             } else {
                 Toast.makeText(requireContext(), "파일을 선택하지 않았습니다.", Toast.LENGTH_SHORT).show()
