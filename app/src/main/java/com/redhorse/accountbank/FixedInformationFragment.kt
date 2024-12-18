@@ -39,7 +39,10 @@ private const val ARG_PARAM2 = "param2"
 class FixedInformationFragment : Fragment() {
     private lateinit var paymentRepository: PaymentRepository
     private lateinit var savepaymentRepository: SavePaymentRepository
-    private lateinit var rootView :View
+    private lateinit var expensesCardView: CustomCardView
+    private lateinit var incomeCardView: CustomCardView
+    private lateinit var saveCardView: CustomCardView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -55,19 +58,19 @@ class FixedInformationFragment : Fragment() {
         paymentRepository = PaymentRepository(dbHelper)
         savepaymentRepository = SavePaymentRepository(dbHelper)
 
-        rootView = inflater.inflate(R.layout.fragment_fixed_information, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_fixed_information, container, false)
         val info_title = rootView.findViewById<CustomCardView>(R.id.fixed_info_title)
         info_title.addTitle("매달 입/출금 되는 정보를 입력해두면 간편하게 사용할 수 있어요!")
         info_title.addDescription("입력한 데이터는 매달 1일 자동으로 입력이 됩니다.", Color.DKGRAY)
         Log.d("FixedUI","Start Loaded")
 
-        val expensesCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_expenses)
+        expensesCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_expenses)
         SetExpensesCard(expensesCardView, "정기 지출 금액","expense")
 
-        val earningCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_earning)
-        SetExpensesCard(earningCardView, "정기 수입 금액","income")
+        incomeCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_earning)
+        SetExpensesCard(incomeCardView, "정기 수입 금액","income")
 
-        val saveCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_save)
+        saveCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_save)
         SetExpensesCard(saveCardView, "정기 적금 금액","save")
 
         return rootView
@@ -119,6 +122,11 @@ class FixedInformationFragment : Fragment() {
             onYesClick = { CoroutineScope(Dispatchers.IO).launch {
                 withContext(Dispatchers.Main) {
                     savepaymentRepository.deletePaymentById(payment.date, payment.id)
+                    when (payment.type) {
+                        "expense" -> updateContainer(expensesCardView, payment.type)
+                        "income" -> updateContainer(incomeCardView, payment.type)
+                        "save" -> updateContainer(saveCardView, payment.type)
+                    }
                 }
             }  },
             onNoClick = { null }
@@ -142,6 +150,11 @@ class FixedInformationFragment : Fragment() {
                 savepaymentRepository.insertOrCreateTableAndInsert(payment)
                 payment.date = formatToFullDate(payment.date.toInt())
                 paymentRepository.insertOrCreateTableAndInsert(payment)
+                when (payment.type) {
+                    "expense" -> updateContainer(expensesCardView, payment.type)
+                    "income" -> updateContainer(incomeCardView, payment.type)
+                    "save" -> updateContainer(saveCardView, payment.type)
+                }
             }
         }
     }
@@ -149,17 +162,31 @@ class FixedInformationFragment : Fragment() {
     private fun UpdatePayment(payment: Payment){
         CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.Main) {
-                // 이전 정기 데이터 load
-                val prePayment = savepaymentRepository.getPaymentById(payment.date, payment.id)
-
                 // 정기 데이터 업데이트
                 savepaymentRepository.updatePaymentById(payment.id, payment)
 
                 // 신규 데이터 추가
                 payment.date = formatToFullDate(payment.date.toInt())
                 paymentRepository.insertOrCreateTableAndInsert(payment)
+                when (payment.type) {
+                    "expense" -> updateContainer(expensesCardView, payment.type)
+                    "income" -> updateContainer(incomeCardView, payment.type)
+                    "save" -> updateContainer(saveCardView, payment.type)
+                }
             }
         }
+    }
+
+    private fun updateContainer(view: CustomCardView, type: String){
+        view.Container.removeAllViews()
+        val title = when (type) {
+            "expense" -> "정기 지출 금액"
+            "income" -> "정기 수입 금액"
+            "save" -> "정기 적금 금액"
+            else -> "정기 지출 금액"
+        }
+
+        SetExpensesCard(view, title,type)
     }
 
     fun formatToFullDate(day: Int): String {
