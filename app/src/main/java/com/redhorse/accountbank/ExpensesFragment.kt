@@ -3,22 +3,25 @@ package com.redhorse.accountbank
 import PaymentRepository
 import RegexUtils
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContentProviderCompat
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.io.File
 import java.io.FileInputStream
@@ -71,79 +74,43 @@ class ExpensesFragment : Fragment() {
 
     // 내보내기 버튼 함수
     private fun exportDatabase(context: Context) {
-        try {
-            createBackupFile(context)
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(context, "DB 내보내기 실패: ${e.message}", Toast.LENGTH_LONG).show()
-            Log.d("DBError", "${e.message}")
-        }
-    }
-
-    private fun createBackupFile(context: Context) {
-        try {
-            // 현재 데이터베이스 경로
-            val currentDB = context.getDatabasePath("payments_db")
-
-            // 백업 파일 경로: 외부 저장소의 Download 폴더
-            val backupDB = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "payments_db_backup")
-
-            // 파일 스트림 및 채널 사용
-            val src = FileInputStream(currentDB).channel
-            val dst = FileOutputStream(backupDB).channel
-            dst.transferFrom(src, 0, src.size())
-            src.close()
-            dst.close()
-
-            // 백업 성공 메시지
-            Toast.makeText(context, "Backup successful", Toast.LENGTH_LONG).show()
-
-        } catch (e: Exception) {
-            // 오류 처리
-            Toast.makeText(context, "Backup failed: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
-
-
-    @Throws(IOException::class)
-    private fun backupEachFile(context: Context, from: String, to: String) {
-        val sd = Environment.getExternalStorageDirectory()
-        val data = Environment.getDataDirectory()
-        if (sd.canWrite()) {
-            val currentDB = File(data, from)
-            val backupDB = File(sd, to)
-            val src: FileChannel = FileInputStream(currentDB).channel
-            val dst: FileChannel = FileOutputStream(backupDB).channel
-            dst.transferFrom(src, 0, src.size())
-            src.close()
-            dst.close()
-            Toast.makeText(context, "success", Toast.LENGTH_LONG)
-                .show()
-        } else {
-            Toast.makeText(
-                context,
-                "cancel backup",
-                Toast.LENGTH_LONG
-            ).show()
+        GlobalScope.launch(Dispatchers.Main) {
+            paymentRepository.exportDatabaseToDownloads(context)
         }
     }
 
     // 가져오기 버튼 함수
-    private fun importDatabase(context: Context) {
-        try {
-            val dbPath = context.getDatabasePath("payments.db").absolutePath
-            val backupPath = File(Environment.getExternalStorageDirectory(), "BackupDatabase.db")
+    private fun importDatabase() {
+//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+//            addCategory(Intent.CATEGORY_OPENABLE)
+//            type = "*/*"
+//
+//            // 다운로드 폴더 열기 (API 26 이상)
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                putExtra(DocumentsContract.EXTRA_INITIAL_URI, Uri.parse("content://com.android.providers.downloads.documents/root/downloads"))
+//            }
+//        }
+//        filePickerLauncher.launch(arrayOf("text/csv"))
+        val intent = Intent(Intent.ACTION_GET_CONTENT)
+        intent.type = "*/*"
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        try{
+            filePickerLauncher.launch(arrayOf("*/*"))
+        }catch (e: Exception){
 
-            FileInputStream(backupPath).use { input ->
-                FileOutputStream(dbPath).use { output ->
-                    input.copyTo(output)
-                    Toast.makeText(context, "DB가 성공적으로 가져와졌습니다.", Toast.LENGTH_SHORT).show()
-                }
-            }
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(context, "DB 가져오기 실패: ${e.message}", Toast.LENGTH_LONG).show()
         }
+    }
+    private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            if (uris != null && uris.isNotEmpty()) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    paymentRepository.importDatabases(
+                        context = requireContext(),
+                        uris = uris
+                    ) // 여러 파일의 URI를 처리
+                }
+            } else {
+                Toast.makeText(requireContext(), "파일을 선택하지 않았습니다.", Toast.LENGTH_SHORT).show()
+            }
     }
 
     fun extractAndFormatDate(dateString: String): String {
@@ -274,7 +241,7 @@ class ExpensesFragment : Fragment() {
 
         val importButton = view.findViewById<Button>(R.id.import_btn)
         importButton.setOnClickListener {
-            importDatabase(requireContext())
+            importDatabase()
         }
 
         val patchButton = view.findViewById<Button>(R.id.patch_btn)
