@@ -32,9 +32,8 @@ class CustomCardView @JvmOverloads constructor(
     fun addTitle(content: String) {
         val titleView = TextView(context).apply {
             text = content
-            textSize = 20f
+            textSize = 16f
             setTextColor(Color.BLACK)
-            setTypeface(typeface, Typeface.BOLD)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -46,7 +45,7 @@ class CustomCardView @JvmOverloads constructor(
     fun addSubtitle(content: String) {
         val subtitleView = TextView(context).apply {
             text = content
-            textSize = 15f
+            textSize = 13f
             setTextColor(Color.BLACK)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
@@ -67,7 +66,7 @@ class CustomCardView @JvmOverloads constructor(
 
         val leftTextView = TextView(context).apply {
             text = leftContent
-            textSize = 15f
+            textSize = 13f
             setTextColor(Color.BLACK)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -77,7 +76,7 @@ class CustomCardView @JvmOverloads constructor(
 
         val rightTextView = TextView(context).apply {
             text = rightContent
-            textSize = 15f
+            textSize = 13f
             setTextColor(Color.BLACK)
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -96,9 +95,8 @@ class CustomCardView @JvmOverloads constructor(
     fun addDescription(content: String, color: Int = Color.BLACK) {
         val subtitleView = TextView(context).apply {
             text = content
-            textSize = 15f
+            textSize = 12f
             setTextColor(color)
-            gravity = Gravity.END // 오른쪽 정렬
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT

@@ -7,4 +7,17 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="main_bg">#E1E1E1</color>
+    <color name="main_text">#3C3C3C</color>
+    <color name="button_bg">#4F6D7A</color>
+    <color name="button_text">#FFFFFF</color>
+    <color name="modal_bg">#FFFFFF</color>
+    <color name="modal_text">#3C3C3C</color>
+    <color name="modal_button_bg">#4F6D7A</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_text">#333333</color>
+    <color name="income_text">#7A9A92</color>
+    <color name="expense_text">#E76F6F</color>
+    <color name="save_text">#B1966E</color>
 </resources>

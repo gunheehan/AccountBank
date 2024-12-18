@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="8dp"
-    android:layout_marginBottom="8dp"
-    android:background="?android:attr/selectableItemBackground">
+    android:layout_marginBottom="8dp">
 
     <!-- 결제 제목 -->
     <TextView
@@ -13,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Payment Title"
-        android:textColor="@color/black"
+        android:textColor="@color/modal_text"
         android:textSize="16sp"
         android:textStyle="bold"/>
 
@@ -28,7 +27,15 @@
         <TextView
             android:id="@+id/typeText"
             android:text="Type"
-            android:textColor="@color/black"
+            android:textColor="@color/modal_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" /> <!-- 왼쪽에 정렬하고 공간을 차지함 -->
+
+        <TextView
+            android:id="@+id/subtypeText"
+            android:text="subType"
+            android:textColor="@color/modal_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1" /> <!-- 왼쪽에 정렬하고 공간을 차지함 -->
@@ -40,7 +47,9 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:textSize="10dp"
-            android:text="삭제" />
+            android:text="삭제"
+            android:textColor="@color/modal_text"
+            android:background="@drawable/rounded_modal_button"/>
     </LinearLayout>
 
     <!-- 결제 금액 -->
@@ -49,6 +58,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Amount"
-        android:textColor="@color/black"
+        android:textColor="@color/modal_text"
         android:textSize="14sp"/>
 </LinearLayout>

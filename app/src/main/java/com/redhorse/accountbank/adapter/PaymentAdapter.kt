@@ -28,12 +28,14 @@ class PaymentAdapter(
     inner class PaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.titleText)
         val typeText: TextView = itemView.findViewById(R.id.typeText)
+        val subtypeText: TextView = itemView.findViewById(R.id.subtypeText)
         val amountText: TextView = itemView.findViewById(R.id.amountText)
         val deleteButton: Button = itemView.findViewById(R.id.deleteButton)
 
         fun bind(payment: Payment) {
             titleText.text = payment.title
-            typeText.text = payment.type
+            typeText.text = getPaymentType(payment.type)
+            subtypeText.text = getPaymentSubType(payment.subtype)
             amountText.text = "${formatCurrency(payment.amount)}" // 포맷된 금액 표시
 
             itemView.setOnClickListener {
@@ -64,6 +66,30 @@ class PaymentAdapter(
                 notifyItemRemoved(position)
                 PaymentProcessor.deletePaymentFromDB(itemView.context, payment.date, payment.id)
             }
+        }
+
+        private fun getPaymentType(type: String): String {
+            val typename = when(type) {
+                "income" -> "수입"
+                "expense" -> "지출"
+                "save" -> "적금"
+                else -> "기타"
+            }
+
+            return typename
+        }
+
+        private fun getPaymentSubType(type: Int): String{
+            val typename = when(type){
+                0 -> "식비"
+                1 -> "간식"
+                2 -> "여가"
+                3 -> "교통"
+                4 -> "기타"
+                else -> "기타"
+            }
+
+            return typename
         }
     }
 

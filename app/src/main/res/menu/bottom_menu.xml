@@ -20,9 +20,9 @@
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_camera"
         android:title="FixedSetting" />
-    <item
-        android:id="@+id/yearItem"
-        android:enabled="true"
-        android:icon="@android:drawable/ic_menu_call"
-        android:title="Year" />
+<!--    <item-->
+<!--        android:id="@+id/yearItem"-->
+<!--        android:enabled="true"-->
+<!--        android:icon="@android:drawable/ic_menu_call"-->
+<!--        android:title="Year" />-->
 </menu>

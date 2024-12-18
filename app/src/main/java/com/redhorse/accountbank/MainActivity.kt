@@ -52,7 +52,7 @@ class MainActivity : AppCompatActivity(){
                 R.id.earningItem -> replaceFragment(earningFragment)
                 R.id.expensesItem -> replaceFragment(expensesFragment)
                 R.id.fixedsettingItem -> replaceFragment(fixedInformationFragment)
-                R.id.yearItem -> replaceFragment(yearFragment)
+                //R.id.yearItem -> replaceFragment(yearFragment)
             }
             true
         }

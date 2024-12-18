@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="10sp"
-        android:textColor="@color/purple_700"
+        android:textColor="@color/income_text"
         android:visibility="gone" /> <!-- 기본적으로 숨김 -->
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="10sp"
-        android:textColor="@android:color/holo_red_dark"
+        android:textColor="@color/expense_text"
         android:visibility="gone" /> <!-- 기본적으로 숨김 -->
 
     <TextView
@@ -35,6 +35,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="10sp"
-        android:textColor="#4CAF50"
+        android:textColor="@color/save_text"
         android:visibility="gone" /> <!-- 기본적으로 숨김 -->
 </LinearLayout>

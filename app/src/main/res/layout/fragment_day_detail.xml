@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="@android:color/white"
+    android:background="@color/modal_bg"
     android:gravity="center">
 
     <!-- 날짜 표시 -->
@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Date"
-        android:textColor="@color/black"
+        android:textColor="@color/modal_text"
         android:textSize="18sp"
         android:textStyle="bold"
         android:layout_gravity="center"/>
@@ -35,6 +35,8 @@
         android:id="@+id/closeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Close"
-        android:layout_marginTop="16dp"/>
+        android:text="닫 기"
+        android:textColor="@color/modal_text"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/rounded_modal_button"/>
 </LinearLayout>

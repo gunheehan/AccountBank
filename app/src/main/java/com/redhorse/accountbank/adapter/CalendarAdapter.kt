@@ -32,17 +32,17 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
                 incomeText.text = if (dayData.getTotalIncome() > 0) {
                     "${formatCurrency(dayData.getTotalIncome())}" // 포맷팅된 수입 표시
                 } else {
-                    "0"
+                    ""
                 }
                 expenseText.text = if (dayData.getTotalExpense() > 0) {
                     "${formatCurrency(dayData.getTotalExpense())}" // 포맷팅된 지출 표시
                 } else {
-                    "0"
+                    ""
                 }
                 saveText.text = if (dayData.getTotalSave() > 0) {
                     "${formatCurrency(dayData.getTotalSave())}" // 포맷팅된 지출 표시
                 } else {
-                    "0"
+                    ""
                 }
 
                 incomeText.visibility = View.VISIBLE

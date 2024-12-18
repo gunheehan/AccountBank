@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.room.Update
 import com.redhorse.accountbank.data.AppInfo
 import com.redhorse.accountbank.data.Payment
@@ -48,10 +49,15 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private lateinit var cardEarnings: CustomCardView
     private lateinit var cardRemain: CustomCardView
     private lateinit var cardPaymentRatio: CustomCardView
+    private lateinit var currentDayText: TextView
+    private lateinit var premonthButton: Button
+    private lateinit var nextmonthButton: Button
     private lateinit var fixedButton: Button
-    private var currentMonth: YearMonth = YearMonth.now()
     private lateinit var appinfoHelper: AppinfoHelper
 
+
+    private var currentYear: Int = 0
+    private var currentMonth: Int = 0
     private var totalIncome: Int = 0
     private var totalExpense: Int = 0
     private var totalSave: Int = 0
@@ -74,6 +80,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
         appinfoHelper = AppinfoHelper(requireContext())
+        initializeDate()
 
         val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
 
@@ -82,7 +89,18 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         cardEarnings = view.findViewById(R.id.card_earnings)
         cardRemain = view.findViewById(R.id.card_remain)
         cardPaymentRatio = view.findViewById(R.id.card_payment_ratio)
+        currentDayText = view.findViewById(R.id.mainboard_day_text)
+        premonthButton = view.findViewById(R.id.mainboard_day_leftButton)
+        nextmonthButton = view.findViewById(R.id.mainboard_day_rightButton)
         fixedButton = view.findViewById(R.id.fixed_button)
+
+        premonthButton.setOnClickListener(){
+            onPreviousMonthButtonClicked()
+        }
+
+        nextmonthButton.setOnClickListener(){
+            onNextMonthButtonClicked()
+        }
 
         fixedButton.setOnClickListener() {
             showMainInfoModal()
@@ -91,6 +109,40 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         SetMainCard()
         SetMainInfo()
         return view
+    }
+
+    fun initializeDate() {
+        val currentDate = LocalDate.now()
+        currentYear = currentDate.year
+        currentMonth = currentDate.monthValue
+    }
+    fun updateDateUI() {
+        val formattedDate = "${currentYear}년 ${currentMonth}월"
+        currentDayText.text = formattedDate // TextView에 날짜 표시
+    }
+
+    fun onPreviousMonthButtonClicked() {
+        if (currentMonth == 1) {
+            currentMonth = 12
+            currentYear -= 1
+        } else {
+            currentMonth -= 1
+        }
+        updateDateUI()
+        UpdateMainInfo()
+        SetMainInfo()
+    }
+
+    fun onNextMonthButtonClicked() {
+        if (currentMonth == 12) {
+            currentMonth = 1
+            currentYear += 1
+        } else {
+            currentMonth += 1
+        }
+        updateDateUI()
+        UpdateMainInfo()
+        SetMainInfo()
     }
 
     private fun showMainInfoModal() {
@@ -117,7 +169,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
 
         if (dday_title.isNotEmpty() && dday != 0) {
             val daysToSalary = calculateDaysToSalary(dday)
-            cardDay.addDescription("$dday_title $daysToSalary 일", Color.RED)
+            cardDay.addDescription("$dday_title - $daysToSalary 일", Color.DKGRAY)
         }
     }
 
@@ -137,7 +189,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     private fun SetMainInfo() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val daysInMonth = generateCalendarDataForMonth(currentMonth)
+                val daysInMonth = generateCalendarDataForMonth()
                 withContext(Dispatchers.Main) {
                     SetPayData(daysInMonth)
                     SetPaymentRatio(daysInMonth)
@@ -149,6 +201,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
     }
 
     private fun SetPayData(newDays: List<Payment>) {
+        cardEarnings.Container.removeAllViews()
         totalIncome = 0
         totalExpense = 0
         totalSave = 0
@@ -183,6 +236,8 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
 
     private fun SetPaymentRatio(newDays: List<Payment>)
     {
+        cardPaymentRatio.Container.removeAllViews()
+
         cardPaymentRatio.addTitle("소비 분포도")
 
         var totalFood = 0
@@ -206,14 +261,15 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         }
         cardPaymentRatio.addSubtitle("식비 : ${formatCurrency(totalFood)}원", "${calculatePercentage(totalFood)}%")
         cardPaymentRatio.addSubtitle("간식 : ${formatCurrency(totalSnack)}원", "${calculatePercentage(totalSnack)}%")
-        cardPaymentRatio.addSubtitle("여가 : ${formatCurrency(totalTransfort)}원", "${calculatePercentage(totalTransfort)}%")
-        cardPaymentRatio.addSubtitle("교통 : ${formatCurrency(totalLife)}원", "${calculatePercentage(totalLife)}%")
+        cardPaymentRatio.addSubtitle("여가 : ${formatCurrency(totalLife)}원", "${calculatePercentage(totalLife)}%")
+        cardPaymentRatio.addSubtitle("교통 : ${formatCurrency(totalTransfort)}원", "${calculatePercentage(totalTransfort)}%")
         cardPaymentRatio.addSubtitle("기타 : ${formatCurrency(totalOther)}원", "${calculatePercentage(totalOther)}%")
     }
 
-    private suspend fun generateCalendarDataForMonth(month: YearMonth): List<Payment> {
+    private suspend fun generateCalendarDataForMonth(): List<Payment> {
         val payments = withContext(Dispatchers.IO) {
-            paymentRepository.getAllPaymentsByMonth(month.atDay(1).toString())
+            val dayformat = "$currentYear-$currentMonth-1"
+            paymentRepository.getAllPaymentsByMonth(dayformat)
         }
 
         return payments

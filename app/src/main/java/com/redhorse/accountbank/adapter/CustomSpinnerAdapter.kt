@@ -1,6 +1,7 @@
 package com.redhorse.accountbank.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,8 +25,8 @@ class CustomSpinnerAdapter(
         val view = convertView ?: LayoutInflater.from(context).inflate(android.R.layout.simple_spinner_item, parent, false)
         val textView: TextView = view.findViewById(android.R.id.text1)
         textView.text = dataList[position]
-        textView.setTextColor(context.resources.getColor(android.R.color.black)) // 원하는 색으로 설정
-        view.setBackgroundColor(context.resources.getColor(android.R.color.white)) // 배경색을 흰색으로 설정
+        textView.setTextColor(Color.parseColor("#3C3C3C"))
+        view.setBackgroundColor(Color.parseColor("#FFFFFF")) // 배경색을 흰색으로 설정
         return view
     }
 
@@ -34,8 +35,8 @@ class CustomSpinnerAdapter(
         val view = convertView ?: LayoutInflater.from(context).inflate(android.R.layout.simple_spinner_dropdown_item, parent, false)
         val textView: TextView = view.findViewById(android.R.id.text1)
         textView.text = dataList[position]
-        textView.setTextColor(context.resources.getColor(android.R.color.black)) // 원하는 색으로 설정
-        view.setBackgroundColor(context.resources.getColor(android.R.color.white)) // 배경색을 흰색으로 설정
+        textView.setTextColor(Color.parseColor("#3C3C3C"))
+        view.setBackgroundColor(Color.parseColor("#FFFFFF"))
         return view
     }
 }
