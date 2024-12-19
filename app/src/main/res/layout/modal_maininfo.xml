@@ -12,8 +12,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="16dp"
-        android:elevation="4dp"
-        android:background="@color/modal_bg">
+        android:background="@drawable/rounded_modal_bg">
 
         <!-- Title Section -->
         <TextView
@@ -153,7 +152,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="저 장"
-                android:textColor="@color/button_text"
+                android:textColor="@color/modal_button_text"
                 android:layout_gravity="center"
                 android:background="@drawable/rounded_modal_button"
                 />
@@ -167,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="닫 기"
-                android:textColor="@color/button_text"
+                android:textColor="@color/modal_button_text"
                 android:layout_gravity="center"
                 android:background="@drawable/rounded_modal_button"
                 />

@@ -2,6 +2,7 @@ package com.redhorse.accountbank.modal
 
 import PaymentRepository
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -37,6 +38,12 @@ class PaymentEditFragment : DialogFragment() {
 
     private var isInsertMode : Boolean = false
     private var paymentData: Payment? = null
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

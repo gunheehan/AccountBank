@@ -6,7 +6,7 @@
     android:padding="20dp"
     android:gravity="center"
     android:layout_gravity="center"
-    android:background="@color/modal_bg">
+    android:background="@drawable/rounded_modal_bg">
 
     <!-- 제목 -->
     <TextView

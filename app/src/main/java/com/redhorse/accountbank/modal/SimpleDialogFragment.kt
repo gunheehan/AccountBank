@@ -1,6 +1,7 @@
 package com.redhorse.accountbank.modal
 
 import android.annotation.SuppressLint
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,6 +26,12 @@ class SimpleDialogFragment : DialogFragment() {
             fragment.onNoClickListener = onNoClick
             return fragment
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
     }
 
     // Dialog의 레이아웃과 버튼 클릭 리스너를 설정

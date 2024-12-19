@@ -1,5 +1,6 @@
 package com.redhorse.accountbank.modal
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,6 +34,12 @@ class RegularlyModal : DialogFragment(){
             fragment.onSaveDataCallback = callback
             return fragment
         }
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState)
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        return dialog
     }
 
     override fun onCreateView(
