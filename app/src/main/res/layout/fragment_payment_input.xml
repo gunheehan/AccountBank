@@ -99,7 +99,7 @@
                 android:layout_marginStart="16dp"
                 android:text="선택"
                 android:textSize="12sp"
-                android:textColor="@color/modal_text"
+                android:textColor="@color/modal_button_text"
                 android:background="@drawable/rounded_modal_button"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"

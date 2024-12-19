@@ -36,10 +36,10 @@
             android:layout_weight="1"
             android:layout_margin="20px"
             android:text="예"
+            android:textColor="@color/modal_text"
             android:textSize="12sp"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@color/modal_text"
             android:background="@drawable/rounded_modal_button" />
 
         <!-- 아니오 버튼 -->
@@ -51,9 +51,9 @@
             android:layout_margin="20px"
             android:text="아니오"
             android:textSize="12sp"
+            android:textColor="@color/modal_text"
             android:ellipsize="end"
             android:singleLine="true"
-            android:textColor="@color/modal_text"
             android:background="@drawable/rounded_modal_button" />
     </LinearLayout>
 

@@ -16,8 +16,8 @@
             android:id="@+id/prevMonthButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_button"
-            android:text="이전 월"/>
+            android:background="@color/calender_button"
+            android:text="이전 월" />
 
         <TextView
             android:id="@+id/yearMonthTextView"
@@ -27,13 +27,14 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="12월"
-            android:textSize="20sp" />
+            android:textSize="20sp"
+            android:textColor="@color/calender_text"/>
 
         <Button
             android:id="@+id/nextMonthButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/rounded_button"
+            android:background="@color/calender_button"
             android:text="다음 월"/>
     </LinearLayout>
 
@@ -41,7 +42,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingTop="20dp">
+        android:paddingTop="20dp"
+        >
 
         <!-- 요일 텍스트 뷰 -->
         <TextView
@@ -49,49 +51,56 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="일"/>
+            android:text="일"
+            android:textColor="@color/calender_text"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="월"/>
+            android:text="월"
+            android:textColor="@color/calender_text"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="화"/>
+            android:text="화"
+            android:textColor="@color/calender_text"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="수"/>
+            android:text="수"
+            android:textColor="@color/calender_text"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="목"/>
+            android:text="목"
+            android:textColor="@color/calender_text"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="금"/>
+            android:text="금"
+            android:textColor="@color/calender_text"/>
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="토"/>
+            android:text="토"
+            android:textColor="@color/calender_text"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -116,7 +125,7 @@
                 android:id="@+id/calendarTotalEarning"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/purple_700"
+                android:textColor="@color/income_text"
                 android:text="총 수입: "
                 android:textSize="18sp"
                 android:layout_weight="1"/>
@@ -143,7 +152,7 @@
                 android:id="@+id/calendarTotalExpenses"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#F44336"
+                android:textColor="@color/expense_text"
                 android:text="총 지출:"
                 android:textSize="18sp"
                 android:layout_weight="1"/>
@@ -158,7 +167,7 @@
                 android:id="@+id/calendarTotalSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#4CAF50"
+                android:textColor="@color/save_text"
                 android:text="총 적금:"
                 android:textSize="18sp"
                 android:layout_weight="1"/>

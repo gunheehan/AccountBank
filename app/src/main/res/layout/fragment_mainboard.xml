@@ -36,7 +36,7 @@
                     android:id="@+id/mainboard_day_leftButton"
                     android:layout_width="30dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/rounded_button" />
+                    android:background="@color/main_button" />
 
                 <TextView
                     android:id="@+id/mainboard_day_text"
@@ -46,13 +46,14 @@
                     android:paddingRight="10dp"
                     android:text="2024년 12월"
                     android:textSize="15dp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    android:textColor="@color/main_text"/>
 
                 <Button
                     android:id="@+id/mainboard_day_rightButton"
                     android:layout_width="30dp"
                     android:layout_height="match_parent"
-                    android:background="@drawable/rounded_button" />
+                    android:background="@color/main_button" />
             </LinearLayout>
 
             <com.redhorse.accountbank.item.CustomCardView
@@ -81,7 +82,7 @@
         android:id="@+id/fixed_button"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/icon_edit"
+        android:background="@color/modal_button_bg"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp" />
 </FrameLayout>
