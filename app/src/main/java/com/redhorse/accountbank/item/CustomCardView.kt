@@ -8,6 +8,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.get
@@ -42,7 +43,7 @@ class CustomCardView @JvmOverloads constructor(
         val titleView = TextView(context).apply {
             text = content
             textSize = 16f
-            setTextColor(Color.BLACK)
+            setTextColor(ContextCompat.getColor(context, R.color.card_text))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -55,7 +56,7 @@ class CustomCardView @JvmOverloads constructor(
         val subtitleView = TextView(context).apply {
             text = content
             textSize = 13f
-            setTextColor(Color.BLACK)
+            setTextColor(ContextCompat.getColor(context, R.color.card_text))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -76,7 +77,7 @@ class CustomCardView @JvmOverloads constructor(
         val leftTextView = TextView(context).apply {
             text = leftContent
             textSize = 13f
-            setTextColor(Color.BLACK)
+            setTextColor(ContextCompat.getColor(context, R.color.card_text))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -86,7 +87,7 @@ class CustomCardView @JvmOverloads constructor(
         val rightTextView = TextView(context).apply {
             text = rightContent
             textSize = 13f
-            setTextColor(Color.BLACK)
+            setTextColor(ContextCompat.getColor(context, R.color.card_text))
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -101,7 +102,7 @@ class CustomCardView @JvmOverloads constructor(
         container.addView(subtitleLayout)
     }
 
-    fun addDescription(content: String, color: Int = Color.BLACK) {
+    fun addDescription(content: String, color: Int = ContextCompat.getColor(context, R.color.card_text)) {
         val subtitleView = TextView(context).apply {
             text = content
             textSize = 12f
@@ -188,6 +189,80 @@ class CustomCardView @JvmOverloads constructor(
             throw IllegalStateException("addTitle을 먼저 호출해야 합니다.")
         }
     }
+
+    fun addTextWithToggle(
+        text: String,
+        toggleInitialState: Boolean,
+        onToggleValueChange: (Boolean) -> Unit
+    ) {
+        addRowWithTextAndAction(text) { rowLayout ->
+            val toggleSwitch = SwitchCompat(context).apply {
+                isChecked = toggleInitialState
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply { marginEnd = 16 }
+                setOnCheckedChangeListener { _, isChecked ->
+                    onToggleValueChange(isChecked)
+                }
+            }
+            rowLayout.addView(toggleSwitch)
+        }
+    }
+
+    // Text와 Button 추가
+    fun addTextWithButton(
+        text: String,
+        imageResId: Int,
+        onClickAction: () -> Unit
+    ) {
+        addRowWithTextAndAction(text) { rowLayout ->
+            val imageView = ImageView(context).apply {
+                setImageResource(imageResId)
+                layoutParams = LinearLayout.LayoutParams(
+                    65, 65
+                ).apply { marginEnd = 16 }
+                setOnClickListener {
+                    onClickAction()
+                }
+            }
+            rowLayout.addView(imageView)
+        }
+    }
+
+    // 텍스트와 동작 뷰를 포함하는 행을 추가
+    private fun addRowWithTextAndAction(
+        text: String,
+        actionViewAdder: (LinearLayout) -> Unit
+    ) {
+        val rowLayout = LinearLayout(context).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply { bottomMargin = 16 }
+        }
+
+        // 텍스트 추가
+        val textView = TextView(context).apply {
+            this.text = text
+            setTextColor(ContextCompat.getColor(context, R.color.card_text))
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f // 남은 공간 채우기
+            )
+        }
+        rowLayout.addView(textView)
+
+        // 동작 뷰 추가
+        actionViewAdder(rowLayout)
+
+        // 새로 만든 행 레이아웃을 컨테이너에 추가 (마지막에 추가)
+        container.addView(rowLayout)
+    }
+
     fun clear() {
         container.removeAllViews()  // 컨테이너에 있는 모든 뷰 제거
     }

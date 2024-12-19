@@ -29,4 +29,20 @@ object NotificationUtils {
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
     }
+
+    fun updateNotificationChannelImportance(context: Context, enabled: Boolean) {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val importance = if (enabled) NotificationManager.IMPORTANCE_DEFAULT
+            else NotificationManager.IMPORTANCE_NONE
+
+            val channel = notificationManager.getNotificationChannel(CHANNEL_ID)
+            if (channel != null) {
+                channel.importance = importance
+                notificationManager.createNotificationChannel(channel)
+            }
+        }
+    }
 }

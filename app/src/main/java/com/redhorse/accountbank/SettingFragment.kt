@@ -12,11 +12,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
+import com.redhorse.accountbank.item.CustomCardView
+import com.redhorse.accountbank.utils.NotificationUtils
+import com.redhorse.accountbank.utils.PermissionUtils
 import kotlinx.coroutines.*
 import org.json.JSONObject
 import java.time.LocalDate
@@ -24,31 +29,15 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [SettingFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SettingFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     private lateinit var paymentRepository: PaymentRepository
     private lateinit var databaseIOController: DatabaseIOController
+    private lateinit var notification_card: CustomCardView
+    private var isNotificationGranted: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -61,19 +50,89 @@ class SettingFragment : Fragment() {
 
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_setting, container, false)
-        SetButton(view)
+
+        notification_card = view.findViewById<CustomCardView>(R.id.set_notification_card)
+        val dbms_card = view.findViewById<CustomCardView>(R.id.set_DBMS_card)
+
+        setNotificationCard(notification_card)
+        SetDBMSCard(dbms_card)
+
+        val versionTextView = view.findViewById<TextView>(R.id.set_version_text)
+        val versionName = BuildConfig.VERSION_NAME
+        versionTextView.text = "버전: $versionName"
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        setNotificationCard(notification_card)
+    }
+
+    private fun setNotificationCard(cardView: CustomCardView){
+        cardView.Container.removeAllViews()
+
+        isNotificationGranted = PermissionUtils.isPushNotificationPermissionGranted(requireActivity())
+        Log.d("SettingPage","${isNotificationGranted}")
+        cardView.addTitle("알림 설정")
+        cardView.addTextWithToggle(
+            text = "푸시 알림",
+            toggleInitialState = isNotificationGranted,
+            onToggleValueChange = { isChecked ->
+                onValueChangeNotification(isChecked)
+            }
+        )
+    }
+
+    private fun onValueChangeNotification(isOn: Boolean){
+        if(isOn) {
+            PermissionUtils.requestPushNotificationPermission(requireActivity(),1)
+        }
+        else{
+            PermissionUtils.disablePushNotifications(requireActivity())
+        }
+    }
+
+    private fun SetDBMSCard(cardView: CustomCardView){
+        cardView.addTitle("데이터 관리")
+        cardView.addTextWithButton(
+            text = "데이터 내보내기",
+            imageResId = R.drawable.icon_export,
+            onClickAction = {
+                exportDatabase()
+            }
+        )
+        cardView.addTextWithButton(
+            text = "데이터 가져오기",
+            imageResId = R.drawable.icon_import,
+            onClickAction = {
+                importDatabase()
+            }
+        )
+        cardView.addTextWithButton(
+            text = "메시지 읽어오기(90일)",
+            imageResId = R.drawable.icon_file_import,
+            onClickAction = {
+                lifecycleScope.launch {
+                    fetchAndSavePaymentMessages()
+                }
+            })
+    }
+
     // 내보내기 버튼 함수
-    private fun exportDatabase(context: Context) {
+    private fun exportDatabase() {
+        if(!PermissionUtils.checkAndRequestSmsPermissions(requireActivity()))
+            return;
+
         GlobalScope.launch(Dispatchers.Main) {
-            databaseIOController.exportDatabases(context)
+            databaseIOController.exportDatabases(requireContext())
         }
     }
 
     // 가져오기 버튼 함수
     private fun importDatabase() {
+        if(!PermissionUtils.checkAndRequestSmsPermissions(requireActivity()))
+            return;
+
         val intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.type = "*/*"
         intent.addCategory(Intent.CATEGORY_OPENABLE)
@@ -128,7 +187,7 @@ class SettingFragment : Fragment() {
         return matchResult?.value?.let { extractAndFormatDate(it) }
     }
 
-    suspend fun fetchAndSavePaymentMessages(context: Context) {
+    suspend fun fetchAndSavePaymentMessages() {
         val thirtyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 날짜(오늘부터 이전 DAY)
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val rcsUri = Uri.parse("content://im/chat")
@@ -136,7 +195,7 @@ class SettingFragment : Fragment() {
         withContext(Dispatchers.IO) {
             try {
                 // 30일 전의 날짜로 쿼리
-                val cursor = context.contentResolver.query(
+                val cursor = requireContext().contentResolver.query(
                     rcsUri,
                     null, // 모든 컬럼 선택
                     "date >= ?", // 조건: 30일 이내
@@ -213,45 +272,5 @@ class SettingFragment : Fragment() {
                 Log.e("__T", "Error fetching RCS messages: ${e.message}")
             }
         }
-    }
-
-    // 버튼 설정 함수
-    private fun SetButton(view: View) {
-        val exportButton = view.findViewById<Button>(R.id.export_btn)
-        exportButton.setOnClickListener {
-            exportDatabase(requireContext())
-        }
-
-        val importButton = view.findViewById<Button>(R.id.import_btn)
-        importButton.setOnClickListener {
-            importDatabase()
-        }
-
-        val patchButton = view.findViewById<Button>(R.id.patch_btn)
-        patchButton.setOnClickListener {
-            lifecycleScope.launch {
-                fetchAndSavePaymentMessages(requireContext())
-            }
-        }
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment ExpensesFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            SettingFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

@@ -1,5 +1,6 @@
 package com.redhorse.accountbank.utils
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,6 +11,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationManagerCompat
 import android.Manifest.permission.*
+import android.net.Uri
+import android.os.Build
 
 class PermissionUtils {
 
@@ -31,6 +34,74 @@ class PermissionUtils {
                     "알림 접근 권한을 허용해야 앱이 정상 동작합니다.",
                     Toast.LENGTH_LONG
                 ).show()
+            }
+        }
+        fun isPushNotificationPermissionGranted(activity: Activity): Boolean {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Android 13 이상: POST_NOTIFICATIONS 권한 확인
+                ContextCompat.checkSelfPermission(
+                    activity,
+                    POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            } else {
+                // Android 13 미만: NotificationManagerCompat로 알림 상태 확인
+                NotificationManagerCompat.from(activity).areNotificationsEnabled()
+            }
+        }
+
+        fun requestPushNotificationPermission(activity: Activity, requestCode: Int) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    requestCode
+                )
+            } else {
+                // Android 13 미만에서는 권한 요청 필요 없음. 사용자 설정 안내만 추가 가능.
+                Toast.makeText(
+                    activity,
+                    "설정에서 알림 권한을 활성화해주세요.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+                }
+                activity.startActivity(intent)
+            }
+        }
+
+        fun disablePushNotifications(activity: Activity) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                // Android 13 이상: 권한 설정 화면으로 이동
+                val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                    putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+                }
+                activity.startActivity(intent)
+            } else {
+                // Android 12 이하 처리 (아래 참조)
+                disablePushNotificationsForOlderVersions(activity)
+            }
+        }
+
+        fun disablePushNotificationsForOlderVersions(activity: Activity) {
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+            }
+            activity.startActivity(intent)
+        }
+
+        fun checkAndRequestSmsPermissions(activity: Activity): Boolean {
+            // READ_SMS 권한 상태 확인
+            if (ContextCompat.checkSelfPermission(activity, READ_SMS) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(activity, RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", activity.packageName, null)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                activity.startActivity(intent)
+                return false
+            } else {
+                return true
             }
         }
 
@@ -72,6 +143,7 @@ class PermissionUtils {
             builder.setTitle("권한 요청")
             builder.setMessage("이 앱은 결제 알림 및 SMS 정보를 자동으로 기록하려면 알림과 SMS 권한이 필요합니다.")
             builder.setPositiveButton("허용") { _, _ ->
+                // 알림 권한을 먼저 요청
                 requestNotificationPermission(activity)
             }
             builder.setNegativeButton("취소") { dialog, _ -> dialog.dismiss() }
