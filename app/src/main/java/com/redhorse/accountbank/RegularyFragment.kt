@@ -15,10 +15,8 @@ import android.widget.Toast
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.item.CustomCardView
-import com.redhorse.accountbank.modal.PaymentEditFragment
 import com.redhorse.accountbank.modal.RegularlyModal
 import com.redhorse.accountbank.modal.SimpleDialogFragment
-import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,10 +31,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [FixedInformationFragment.newInstance] factory method to
+ * Use the [RegularyFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class FixedInformationFragment : Fragment() {
+class RegularyFragment : Fragment() {
     private lateinit var paymentRepository: PaymentRepository
     private lateinit var savepaymentRepository: SavePaymentRepository
     private lateinit var expensesCardView: CustomCardView
@@ -58,7 +56,7 @@ class FixedInformationFragment : Fragment() {
         paymentRepository = PaymentRepository(dbHelper)
         savepaymentRepository = SavePaymentRepository(dbHelper)
 
-        val rootView = inflater.inflate(R.layout.fragment_fixed_information, container, false)
+        val rootView = inflater.inflate(R.layout.fragment_regulary, container, false)
         val info_title = rootView.findViewById<CustomCardView>(R.id.fixed_info_title)
         info_title.addTitle("매달 입/출금 되는 정보를 입력해두면 간편하게 사용할 수 있어요!")
         info_title.addDescription("입력한 데이터는 매달 1일 자동으로 입력이 됩니다.", Color.DKGRAY)

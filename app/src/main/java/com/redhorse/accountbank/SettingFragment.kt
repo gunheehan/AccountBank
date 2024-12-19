@@ -6,10 +6,7 @@ import RegexUtils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
-import android.provider.DocumentsContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,18 +14,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContentProviderCompat
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import kotlinx.coroutines.*
 import org.json.JSONObject
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.io.IOException
-import java.nio.channels.FileChannel
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -42,10 +32,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [ExpensesFragment.newInstance] factory method to
+ * Use the [SettingFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ExpensesFragment : Fragment() {
+class SettingFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -70,7 +60,7 @@ class ExpensesFragment : Fragment() {
         databaseIOController = DatabaseIOController(dbHelper)
 
         // Inflate the layout for this fragment
-        val view = inflater.inflate(R.layout.fragment_expenses, container, false)
+        val view = inflater.inflate(R.layout.fragment_setting, container, false)
         SetButton(view)
         return view
     }
@@ -257,7 +247,7 @@ class ExpensesFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            ExpensesFragment().apply {
+            SettingFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

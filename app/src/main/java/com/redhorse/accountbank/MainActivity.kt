@@ -1,12 +1,8 @@
 package com.redhorse.accountbank
 
 import android.Manifest.permission.*
-import android.app.NotificationManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
@@ -37,21 +33,21 @@ class MainActivity : AppCompatActivity(){
 
         setContentView(R.layout.activity_main)
 
-        val mainboardFragment = MainboardFragment()
-        val earningFragment = EarningFragment()
-        val expensesFragment = ExpensesFragment()
-        val fixedInformationFragment = FixedInformationFragment()
+        val reportFragment = ReportFragment()
+        val calenderFragment = CalenderFragment()
+        val settingFragment = SettingFragment()
+        val fixedInformationFragment = RegularyFragment()
         val yearFragment = YearFragment()
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavi)
-        replaceFragment(mainboardFragment)
+        replaceFragment(reportFragment)
 
         bottomNavigationView.setOnItemSelectedListener {
             when(it.itemId){
-                R.id.mainItem -> replaceFragment(mainboardFragment)
-                R.id.earningItem -> replaceFragment(earningFragment)
-                R.id.expensesItem -> replaceFragment(expensesFragment)
-                R.id.fixedsettingItem -> replaceFragment(fixedInformationFragment)
+                R.id.reportItem -> replaceFragment(reportFragment)
+                R.id.calenderitem -> replaceFragment(calenderFragment)
+                R.id.regularyItem -> replaceFragment(fixedInformationFragment)
+                R.id.settingitem -> replaceFragment(settingFragment)
                 //R.id.yearItem -> replaceFragment(yearFragment)
             }
             true

@@ -34,10 +34,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [EarningFragment.newInstance] factory method to
+ * Use the [CalenderFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class EarningFragment : Fragment() {
+class CalenderFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -73,7 +73,7 @@ class EarningFragment : Fragment() {
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
 
-        val view = inflater.inflate(R.layout.fragment_earning, container, false)
+        val view = inflater.inflate(R.layout.fragment_calender, container, false)
         setupViews(view)
         setupRecyclerView()
         updateCalendar()
@@ -221,7 +221,7 @@ class EarningFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            EarningFragment().apply {
+            CalenderFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

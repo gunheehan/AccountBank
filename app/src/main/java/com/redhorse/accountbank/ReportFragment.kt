@@ -1,7 +1,6 @@
 package com.redhorse.accountbank
 
 import PaymentRepository
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
@@ -11,21 +10,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.room.Update
 import com.redhorse.accountbank.data.AppInfo
 import com.redhorse.accountbank.data.Payment
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.data.helper.AppinfoHelper
 import com.redhorse.accountbank.item.CustomCardView
 import com.redhorse.accountbank.modal.MainInfoModal
-import com.redhorse.accountbank.modal.RegularlyModal
 import com.redhorse.accountbank.utils.formatCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
@@ -36,10 +32,10 @@ private const val ARG_PARAM2 = "param2"
 
 /**
  * A simple [Fragment] subclass.
- * Use the [MainboardFragment.newInstance] factory method to
+ * Use the [ReportFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
+class ReportFragment : Fragment(R.layout.fragment_report) {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -82,7 +78,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         appinfoHelper = AppinfoHelper(requireContext())
         initializeDate()
 
-        val view = inflater.inflate(R.layout.fragment_mainboard, container, false)
+        val view = inflater.inflate(R.layout.fragment_report, container, false)
 
         // CustomCardView 초기화
         cardDay = view.findViewById(R.id.card_day)
@@ -318,7 +314,7 @@ class MainboardFragment : Fragment(R.layout.fragment_mainboard) {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(param1: String, param2: String) =
-            MainboardFragment().apply {
+            ReportFragment().apply {
                 arguments = Bundle().apply {
                     putString(ARG_PARAM1, param1)
                     putString(ARG_PARAM2, param2)

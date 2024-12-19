@@ -24,8 +24,8 @@
     <color name="modal_bg">#FFFFFF</color>
     <color name="modal_bg_line">#D5D5D5</color>
     <color name="modal_text">#5D4631</color>
-    <color name="modal_button_bg">#4F6D7A</color>
-    <color name="modal_button_text">#FFFFFF</color>
+    <color name="modal_button_bg">#8C9A92</color>
+    <color name="modal_button_text">#5D4631</color>
 
     <!-- 캘린더 -->
     <color name="calender_text">#5D4631</color>

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/mainItem"
+        android:id="@+id/reportItem"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_search"
-        android:title="Main" />
+        android:title="Report" />
     <item
-        android:id="@+id/earningItem"
+        android:id="@+id/calenderitem"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_camera"
-        android:title="Earning" />
+        android:title="Calender" />
     <item
-        android:id="@+id/expensesItem"
+        android:id="@+id/regularyItem"
+        android:enabled="true"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="Regulary" />
+    <item
+        android:id="@+id/settingitem"
         android:enabled="true"
         android:icon="@android:drawable/ic_menu_call"
-        android:title="Expenses" />
-    <item
-        android:id="@+id/fixedsettingItem"
-        android:enabled="true"
-        android:icon="@android:drawable/ic_menu_camera"
-        android:title="FixedSetting" />
+        android:title="Setting" />
 <!--    <item-->
 <!--        android:id="@+id/yearItem"-->
 <!--        android:enabled="true"-->
