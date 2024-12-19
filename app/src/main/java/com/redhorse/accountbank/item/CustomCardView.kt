@@ -2,12 +2,14 @@ package com.redhorse.accountbank.item
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.widget.*
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
 import androidx.core.view.get
 import com.redhorse.accountbank.R
 
@@ -24,9 +26,16 @@ class CustomCardView @JvmOverloads constructor(
     init {
         LayoutInflater.from(context).inflate(R.layout.custom_card_view, this, true)
         container = findViewById(R.id.card_container)
-        setCardBackgroundColor(context.getColor(android.R.color.transparent)) // 투명 배경
-        radius = 20f // 라운드 코너 설정
-        elevation = 8f // 그림자 효과
+// 배경을 투명하게 설정
+        setCardBackgroundColor(context.getColor(android.R.color.transparent))
+        // CardView의 모서리를 둥글게 설정
+        radius = 20f
+
+        // CardView의 그림자 효과 제거 (필요한 경우 조정)
+        elevation = 0f
+
+        // backgroundTintMode 설정 (필요한 경우)
+        backgroundTintMode = null
     }
 
     fun addTitle(content: String) {

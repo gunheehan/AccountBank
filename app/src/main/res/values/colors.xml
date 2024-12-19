@@ -16,6 +16,7 @@
     <color name="modal_text">#3C3C3C</color>
     <color name="modal_button_bg">#4F6D7A</color>
     <color name="card_bg">#FFFFFF</color>
+    <color name="card_bg_line">#D5D5D5</color>
     <color name="card_text">#333333</color>
     <color name="income_text">#7A9A92</color>
     <color name="expense_text">#E76F6F</color>
