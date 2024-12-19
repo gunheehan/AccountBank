@@ -63,7 +63,7 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
 
         private fun adjustTextSize(textView: TextView) {
             // 글자 크기를 줄여야 할 경우
-            if (textView.visibility == View.VISIBLE && textView.text.length > 6) { // 예시: 6자 이상일 경우
+            if (textView.visibility == View.VISIBLE && textView.text.length > 5) { // 예시: 6자 이상일 경우
                 textView.textSize = 8f // 글자 크기 조정
             }
         }

@@ -3,33 +3,35 @@ package com.redhorse.accountbank
 import android.Manifest.permission.*
 import android.content.Intent
 import android.content.pm.PackageManager
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Settings
+import android.util.Log
 import android.view.Window
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.redhorse.accountbank.alarm.MonthlyAlarmScheduler
+import com.redhorse.accountbank.utils.PermissionUtils
 
+class MainActivity : AppCompatActivity() {
 
-class MainActivity : AppCompatActivity(){
     private val generalPermissions = arrayOf(
         POST_NOTIFICATIONS,
         READ_SMS,
-        RECEIVE_SMS,
-        )
+        RECEIVE_SMS
+    )
 
     private val REQUEST_GENERAL_PERMISSIONS = 1
+    private val PREFS_NAME = "AppPrefs"
+    private val PREFS_KEY_PERMISSION_REQUESTED = "permissionRequested"
+    private val PREFS_KEY_FIRST_REQUESTED = "firstRequested"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
-        getSupportActionBar()?.hide()
+        supportActionBar?.hide()
 
         setContentView(R.layout.activity_main)
 
@@ -43,62 +45,52 @@ class MainActivity : AppCompatActivity(){
         replaceFragment(reportFragment)
 
         bottomNavigationView.setOnItemSelectedListener {
-            when(it.itemId){
+            when (it.itemId) {
                 R.id.reportItem -> replaceFragment(reportFragment)
                 R.id.calenderitem -> replaceFragment(calenderFragment)
                 R.id.regularyItem -> replaceFragment(fixedInformationFragment)
                 R.id.settingitem -> replaceFragment(settingFragment)
-                //R.id.yearItem -> replaceFragment(yearFragment)
+                // R.id.yearItem -> replaceFragment(yearFragment)
             }
             true
         }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.frame_layout, fragment)
-            transaction.commit()
+        if (!hasRequestedPermissions(PREFS_KEY_FIRST_REQUESTED)) {
+            PermissionUtils.showPermissionExplanationDialog(this, REQUEST_GENERAL_PERMISSIONS)
+            setPermissionRequested(PREFS_KEY_FIRST_REQUESTED)
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        checkAndRequestGeneralPermissions()
-    }
 
-    private fun checkAndRequestGeneralPermissions() {
-        val missingPermissions = generalPermissions.filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }
-
-        if (missingPermissions.isNotEmpty()) {
-            ActivityCompat.requestPermissions(this, missingPermissions.toTypedArray(), REQUEST_GENERAL_PERMISSIONS)
-        } else {
-            checkAndRequestNotificationAccess()
+        // 권한이 요청된 상태인지 확인하고, 필요시 다시 요청
+        if (!hasRequestedPermissions(PREFS_KEY_PERMISSION_REQUESTED)) {
+            // 알림 권한이 허용되었는지 확인
+            if (PermissionUtils.isNotificationListenerPermissionGranted(this)) {
+                // 알림 권한이 허용되었으면 SMS 권한 요청
+                PermissionUtils.checkPermissions(this, generalPermissions, REQUEST_GENERAL_PERMISSIONS)
+                setPermissionRequested(PREFS_KEY_PERMISSION_REQUESTED)
+            }
         }
     }
 
-    private fun checkAndRequestNotificationAccess() {
-        if (!isNotificationListenerPermissionGranted()) {
-            // 알림 접근 권한이 없는 경우 설정 화면으로 이동
-            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-            startActivity(intent)
-            Toast.makeText(
-                this,
-                "알림 접근 권한을 허용해야 앱이 정상 동작합니다.",
-                Toast.LENGTH_LONG
-            ).show()
-        }
-        else
-        {
-            MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
-        }
+    private fun replaceFragment(fragment: Fragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.frame_layout, fragment)
+        transaction.commit()
     }
 
-    private fun isNotificationListenerPermissionGranted(): Boolean {
-        val enabledListeners = NotificationManagerCompat.getEnabledListenerPackages(this)
-        return enabledListeners.contains(packageName)
+    private fun hasRequestedPermissions(key: String): Boolean {
+        val sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        return sharedPrefs.getBoolean(key, false)
     }
 
+    private fun setPermissionRequested(key: String) {
+        val sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+        sharedPrefs.edit().putBoolean(key, true).apply()
+    }
+
+    // 권한 요청 결과 처리
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -112,12 +104,14 @@ class MainActivity : AppCompatActivity(){
                 .map { it.first }
 
             if (deniedPermissions.isEmpty()) {
-                // 일반 권한 요청이 모두 허용되었으므로 알림 접근 권한 요청 진행
-                checkAndRequestNotificationAccess()
+                // 모든 권한이 허용되었을 때 알림 접근 권한 확인
+                PermissionUtils.requestSmsPermissionAfterNotification(this, REQUEST_GENERAL_PERMISSIONS)
+                MonthlyAlarmScheduler().scheduleMonthlyAlarm(this)
             } else {
+                // 권한이 거부된 경우
                 Toast.makeText(
                     this,
-                    "모든 권한을 허용해야 앱이 정상 동작합니다.",
+                    "권한을 허용하지 않으면 앱에 기능을 정상적으로 사용할 수 없어요.",
                     Toast.LENGTH_LONG
                 ).show()
             }
