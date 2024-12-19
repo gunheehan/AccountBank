@@ -17,8 +17,6 @@ import java.time.YearMonth
 
 class MonthlyAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent?) {
-        Log.d("MonthlyAlarmReceiver", "Alarm triggered for monthly data insertion")
-
         // 데이터 삽입 작업
         CoroutineScope(Dispatchers.IO).launch {
             insertDataToDatabase(context)

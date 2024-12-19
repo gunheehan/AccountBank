@@ -72,7 +72,6 @@ class SettingFragment : Fragment() {
         cardView.Container.removeAllViews()
 
         isNotificationGranted = PermissionUtils.isPushNotificationPermissionGranted(requireActivity())
-        Log.d("SettingPage","${isNotificationGranted}")
         cardView.addTitle("알림 설정")
         cardView.addTextWithToggle(
             text = "푸시 알림",

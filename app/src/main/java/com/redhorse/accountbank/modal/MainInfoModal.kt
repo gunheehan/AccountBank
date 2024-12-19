@@ -80,46 +80,33 @@ class MainInfoModal : DialogFragment(){
     }
 
     private fun onClickSave() {
-        Log.d("onClickSave", "onClickSave triggered") // 함수 시작 시점 로그
 
         if (!D_Day_title.text.isEmpty() && !D_Day_day.text.isEmpty()) {
-            Log.d("onClickSave", "D-Day title and day are not empty") // D-Day 타이틀과 일자 텍스트가 비어있지 않으면 로그
-
             appinfoHelper.save(AppInfo.STRING_D_DAY_TITLE, D_Day_title.text.toString())
-            Log.d("onClickSave", "Saved D-Day title: ${D_Day_title.text.toString()}") // 타이틀 저장 후 로그
-
             val daystring = D_Day_day.text.toString()
-            Log.d("onClickSave", "D-Day day string: $daystring") // D-Day day 값 확인
 
             try {
                 val dayint = daystring.toInt()
                 appinfoHelper.save(AppInfo.INT_D_DAY_DAY, dayint)
-                Log.d("onClickSave", "Saved D-Day day: $dayint") // D-Day 일자 저장 후 로그
             } catch (e: NumberFormatException) {
                 Log.e("onClickSave", "Invalid number format for D-Day day: $daystring", e) // 숫자 포맷 예외 처리
             }
         }
 
         if (!targetAmout.text.isEmpty()) {
-            Log.d("onClickSave", "Target amount is not empty") // 목표 금액 텍스트가 비어있지 않으면 로그
 
             val amountstring = targetAmout.text.toString()
-            Log.d("onClickSave", "Target amount string: $amountstring") // 목표 금액 값 확인
-
             try {
                 val amountint = amountstring.toInt()
                 appinfoHelper.save(AppInfo.INT_EXPENSE_TARGET, amountint)
-                Log.d("onClickSave", "Saved target amount: $amountint") // 목표 금액 저장 후 로그
             } catch (e: NumberFormatException) {
                 Log.e("onClickSave", "Invalid number format for target amount: $amountstring", e) // 숫자 포맷 예외 처리
             }
         }
 
         saveCallback?.invoke()
-        Log.d("onClickSave", "Callback invoked") // 콜백 호출 후 로그
 
         dismiss()
-        Log.d("onClickSave", "Dialog dismissed") // 다이얼로그 종료 후 로그
     }
 
 

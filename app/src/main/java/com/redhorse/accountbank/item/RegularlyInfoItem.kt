@@ -39,7 +39,6 @@ class RegularlyInfoItem @JvmOverloads constructor(
                 onClickEdit: (Payment) -> Unit,
                 onClickDelete: (Payment) -> Unit) {
 
-        Log.d("FixedUI","SetData")
         titleView.text = payment.title
         amountView.text = formatCurrency(payment.amount) + " 원"
         descriptionView.text = "매월 ${payment.date}일"

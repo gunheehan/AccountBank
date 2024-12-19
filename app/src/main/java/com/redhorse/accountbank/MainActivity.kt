@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.Window
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.redhorse.accountbank.alarm.MonthlyAlarmScheduler
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
 
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         supportActionBar?.hide()
+        WindowCompat.getInsetsController(window, window.decorView)
+            .isAppearanceLightStatusBars = true
 
         setContentView(R.layout.activity_main)
 

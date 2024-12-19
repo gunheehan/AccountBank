@@ -107,7 +107,6 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
                 )
             }
         } catch (e: Exception) {
-            Log.d("GetAll",e.toString())
             e.printStackTrace()
         } finally {
             // 커서 닫기
@@ -145,7 +144,6 @@ class SavePaymentRepository(private val dbHelper: AppDatabaseHelper) {
                 )
             }
         } catch (e: Exception) {
-            Log.d("GetPaymentsByType", e.toString())
             e.printStackTrace()
         } finally {
             // 커서 닫기

@@ -19,7 +19,6 @@ class RcsContentObserver(
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         super.onChange(selfChange, uri)
-        Log.d("RcsContentObserver", "데이터 변경 감지: $uri")
         uri?.let {
             // RCS 메시지 읽기 및 처리
             CoroutineScope(Dispatchers.IO).launch {
@@ -42,8 +41,6 @@ class RcsContentObserver(
                 val dbHelper = AppDatabaseHelper(context)
                 val paymentRepository = PaymentRepository(dbHelper)
                 paymentRepository.insertOrCreateTableAndInsert(payment)
-
-                Log.d("RcsContentObserver", "결제 정보 저장 완료: $payment")
             }
         }
     }

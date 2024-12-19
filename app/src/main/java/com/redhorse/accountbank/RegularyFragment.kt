@@ -50,7 +50,6 @@ class RegularyFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        Log.d("FixedUI","Start UI")
         // Inflate the layout for this fragment
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
@@ -60,7 +59,6 @@ class RegularyFragment : Fragment() {
         val info_title = rootView.findViewById<CustomCardView>(R.id.fixed_info_title)
         info_title.addTitle("매달 입/출금 되는 정보를 입력해두면 간편하게 사용할 수 있어요!")
         info_title.addDescription("입력한 데이터는 매달 1일 자동으로 입력이 됩니다.", Color.DKGRAY)
-        Log.d("FixedUI","Start Loaded")
 
         expensesCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_expenses)
         SetExpensesCard(expensesCardView, "정기 지출 금액","expense")
@@ -84,13 +82,11 @@ class RegularyFragment : Fragment() {
         CoroutineScope(Dispatchers.IO).launch {
             // 비동기 작업을 IO 스레드에서 수행
             val paymentsList = savepaymentRepository.getPaymentsByType(type)
-            Log.d("FixedUI","${type} Loaded")
             // UI 업데이트는 Main 스레드에서 수행해야 함
             withContext(Dispatchers.Main) {
                 // paymentsList가 비어있지 않으면 UI 업데이트
                 if (paymentsList.isNotEmpty()) {
                     for (payment in paymentsList) {
-                        Log.d("FixedUI","${payment.title} Loaded")
                         val regularlyInfoItem = RegularlyInfoItem(requireContext())
                         regularlyInfoItem.setData(payment, onClickEdit = ::editRegularlyData,
                             onClickDelete = ::deleteRegularlyData)

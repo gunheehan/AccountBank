@@ -122,7 +122,6 @@ class CalenderFragment : Fragment() {
         // 비동기로 데이터 생성 후 어댑터에 업데이트
         CoroutineScope(Dispatchers.IO).launch {
             val daysInMonth = generateCalendarDataForMonth(currentMonth)
-            Log.d("EarningFragment", "daysInMonth: $daysInMonth")
             // 메인 스레드에서 어댑터 업데이트
             withContext(Dispatchers.Main) {
                 (calendarRecyclerView.adapter as CalendarAdapter).updateDays(daysInMonth)
@@ -181,8 +180,6 @@ class CalenderFragment : Fragment() {
         // 날짜별로 결제 정보를 추가
         for (day in 1.rangeTo(endOfMonth.dayOfMonth)) {
             val date = month.atDay(day)
-
-            Log.d("Earning", "Day : ${date.toString()}")
 
             // 해당 날짜에 맞는 결제 정보만 필터링
             val paymentsForDay = allPaymentsDTO.filter { it.date == date.toString() }

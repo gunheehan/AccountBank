@@ -21,7 +21,6 @@ class NotificationReceiver : NotificationListenerService() {
         val packageName = sbn.packageName
 
         if (packageName == applicationContext.packageName) {
-            Log.d("PaymentLog", "현재 앱(${packageName})에서 발생한 알림은 무시됩니다.")
             return
         }
 

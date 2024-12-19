@@ -14,8 +14,6 @@ class RcsMonitorService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("RcsMonitorService", "서비스 시작")
-
         val rcsUri = Uri.parse("content://im/chat")
         contentObserver = RcsContentObserver(this, Handler())
         contentResolver.registerContentObserver(
@@ -27,7 +25,6 @@ class RcsMonitorService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d("RcsMonitorService", "서비스 종료")
         contentResolver.unregisterContentObserver(contentObserver)
     }
 
