@@ -11,7 +11,7 @@
     <!-- 메인 색상 -->
     <color name="main_bg">#FAF3E0</color>
     <color name="main_text">#5D4631</color>
-    <color name="main_button">#D4A373</color>
+    <color name="main_button">#C9A785</color>
     <color name="main_button_text">#FFFFFF</color>
 
     <!-- 카드 -->
@@ -23,8 +23,8 @@
     <color name="modal_bg">#FFFFFF</color>
     <color name="modal_bg_line">#D5D5D5</color>
     <color name="modal_text">#5D4631</color>
-    <color name="modal_button_bg">#8C9A92</color>
-    <color name="modal_button_text">#5D4631</color>
+    <color name="modal_button_bg">#8A7E72</color>
+    <color name="modal_button_text">#FFFFFF</color>
 
     <!-- 캘린더 -->
     <color name="calender_text">#5D4631</color>

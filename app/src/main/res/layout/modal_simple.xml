@@ -29,21 +29,21 @@
         android:weightSum="2">
 
         <!-- 예 버튼 -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/modal_simple_yes_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_margin="20px"
             android:text="예"
-            android:textColor="@color/modal_text"
+            android:textColor="@color/modal_button_text"
             android:textSize="12sp"
             android:ellipsize="end"
             android:singleLine="true"
             android:background="@drawable/rounded_modal_button" />
 
         <!-- 아니오 버튼 -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/modal_simple_no_button"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
             android:layout_margin="20px"
             android:text="아니오"
             android:textSize="12sp"
-            android:textColor="@color/modal_text"
+            android:textColor="@color/modal_button_text"
             android:ellipsize="end"
             android:singleLine="true"
             android:background="@drawable/rounded_modal_button" />

@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.redhorse.accountbank.data.DayData
@@ -73,7 +74,6 @@ class CalenderFragment : Fragment() {
     ): View? {
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
-
         val view = inflater.inflate(R.layout.fragment_calender, container, false)
         setupViews(view)
         setupRecyclerView()

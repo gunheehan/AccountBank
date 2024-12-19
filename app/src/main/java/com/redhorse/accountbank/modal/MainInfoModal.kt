@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.DialogFragment
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.AppInfo
@@ -48,8 +49,8 @@ class MainInfoModal : DialogFragment(){
         D_Day_day = rootView.findViewById(R.id.modal_maininfo_DDay_day)
         targetAmout = rootView.findViewById(R.id.modal_maininfo_targetAmount)
 
-        val saveButton = rootView.findViewById<Button>(R.id.modal_maininfo_saveButton)
-        val cloaseButton = rootView.findViewById<Button>(R.id.modal_maininfo_closeButton)
+        val saveButton = rootView.findViewById<AppCompatButton>(R.id.modal_maininfo_saveButton)
+        val cloaseButton = rootView.findViewById<AppCompatButton>(R.id.modal_maininfo_closeButton)
 
         saveButton.setOnClickListener(){
             onClickSave()

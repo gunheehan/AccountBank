@@ -41,7 +41,7 @@
             android:layout_weight="1" /> <!-- 왼쪽에 정렬하고 공간을 차지함 -->
 
         <!-- 삭제 버튼 -->
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/deleteButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

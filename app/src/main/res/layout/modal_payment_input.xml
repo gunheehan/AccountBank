@@ -92,7 +92,7 @@
                 android:textColor="@color/modal_text"
                 android:hint="날짜"/>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/payment_select_day_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -196,14 +196,14 @@
         </LinearLayout>
 
         <!-- 입력 버튼 -->
-        <Button
-            android:id="@+id/payment_insert_btn"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/payment_modal_insert_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="확인"
             android:textSize="14sp"
-            android:textColor="@android:color/white"
-            android:background="@drawable/rounded_button"
+            android:textColor="@color/modal_button_text"
+            android:background="@drawable/rounded_modal_button"
             android:layout_marginTop="16dp"
             android:padding="16dp"/>
     </LinearLayout>

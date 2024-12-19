@@ -4,11 +4,11 @@ import PaymentRepository
 import android.app.DatePickerDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.AppCompatButton
 import androidx.fragment.app.DialogFragment
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.Payment
@@ -30,11 +30,11 @@ class PaymentEditFragment : DialogFragment() {
     private lateinit var onSaveCallback: () -> Unit
     private lateinit var payment_title_EditText : EditText
     private lateinit var select_day_TextView : TextView
-    private lateinit var select_day_Button : Button
+    private lateinit var select_day_Button : AppCompatButton
     private lateinit var amount_EditText : EditText
     private lateinit var payment_type_Spinner : Spinner
     private lateinit var payment_subtype_Spinner : Spinner
-    private lateinit var insert_Button : Button
+    private lateinit var insert_Button : AppCompatButton
 
     private var isInsertMode : Boolean = false
     private var paymentData: Payment? = null
@@ -62,13 +62,13 @@ class PaymentEditFragment : DialogFragment() {
         }
 
         // Fragment의 레이아웃을 인플레이트합니다.
-        val rootView = inflater.inflate(R.layout.fragment_payment_input, container, false)
+        val rootView = inflater.inflate(R.layout.modal_payment_input, container, false)
 
         payment_title_EditText = rootView.findViewById(R.id.payment_title_edit)
         select_day_TextView = rootView.findViewById(R.id.payment_select_day_text)
         amount_EditText = rootView.findViewById(R.id.payment_amount_edit)
         payment_type_Spinner = rootView.findViewById(R.id.payment_type_spinner)
-        insert_Button = rootView.findViewById(R.id.payment_insert_btn)
+        insert_Button = rootView.findViewById(R.id.payment_modal_insert_btn)
         payment_subtype_Spinner = rootView.findViewById(R.id.payment_subtype_spinner)
 
 

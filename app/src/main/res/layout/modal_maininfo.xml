@@ -147,7 +147,7 @@
             android:elevation="2dp"
             android:layout_gravity="center">
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/modal_maininfo_saveButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -161,7 +161,7 @@
                 android:layout_width="20dp"
                 android:layout_height="wrap_content" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/modal_maininfo_closeButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
