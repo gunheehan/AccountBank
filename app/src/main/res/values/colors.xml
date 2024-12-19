@@ -18,7 +18,6 @@
     <color name="card_bg">#FFFFFF</color>
     <color name="card_bg_line">#D5D5D5</color>
     <color name="card_text">#5D4631</color>
-    <color name="card_button">#D4A373</color>
 
     <!-- 모달 -->
     <color name="modal_bg">#FFFFFF</color>

@@ -1,177 +1,185 @@
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="20dp"
     android:background="@color/main_bg">
 
+    <!-- 기존 LinearLayout -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center">
-
-        <Button
-            android:id="@+id/prevMonthButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/calender_button"
-            android:text="이전 월" />
-
-        <TextView
-            android:id="@+id/yearMonthTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="12월"
-            android:textSize="20sp"
-            android:textColor="@color/calender_text"/>
-
-        <Button
-            android:id="@+id/nextMonthButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@color/calender_button"
-            android:text="다음 월"/>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingTop="20dp"
-        >
-
-        <!-- 요일 텍스트 뷰 -->
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="일"
-            android:textColor="@color/calender_text"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="월"
-            android:textColor="@color/calender_text"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="화"
-            android:textColor="@color/calender_text"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="수"
-            android:textColor="@color/calender_text"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="목"
-            android:textColor="@color/calender_text"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="금"
-            android:textColor="@color/calender_text"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="토"
-            android:textColor="@color/calender_text"/>
-    </LinearLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/calendarRecyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        >
+        android:padding="20dp">
 
-        <!-- 총 수입과 총 지출 라인 -->
+        <!-- 월 선택과 제목 영역 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/prevMonthButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/icon_calender_left"
+                android:text="이전 월" />
 
             <TextView
-                android:id="@+id/calendarTotalEarning"
+                android:id="@+id/yearMonthTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/income_text"
-                android:text="총 수입: "
-                android:textSize="18sp"
-                android:layout_weight="1"/>
-
-            <!-- + 버튼 추가 -->
-            <Button
-                android:id="@+id/payment_insert_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+"
+                android:layout_gravity="center"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:text="12월"
                 android:textSize="20sp"
-                android:layout_marginStart="8dp"/>
+                android:textColor="@color/calender_text" />
 
+            <ImageButton
+                android:id="@+id/nextMonthButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@drawable/icon_calender_right"
+                android:text="다음 월" />
         </LinearLayout>
 
+        <!-- 요일 표시 영역 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingBottom="20px">
+            android:paddingTop="20dp">
 
             <TextView
-                android:id="@+id/calendarTotalExpenses"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:textColor="@color/expense_text"
-                android:text="총 지출:"
-                android:textSize="18sp"
-                android:layout_weight="1"/>
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="일"
+                android:textColor="@color/calender_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="월"
+                android:textColor="@color/calender_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="화"
+                android:textColor="@color/calender_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="수"
+                android:textColor="@color/calender_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="목"
+                android:textColor="@color/calender_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="금"
+                android:textColor="@color/calender_text" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="토"
+                android:textColor="@color/calender_text" />
         </LinearLayout>
+
+        <!-- 캘린더 RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/calendarRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- 총 수입/지출 영역 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/calendarTotalSave"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/save_text"
-                android:text="총 적금:"
-                android:textSize="18sp"
-                android:layout_weight="1"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/calendarTotalEarning"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/income_text"
+                    android:text="수입: "
+                    android:textSize="18sp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/calendarTotalExpenses"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/expense_text"
+                    android:text="지출:"
+                    android:textSize="18sp"
+                    android:layout_weight="1" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="10dp">
+
+                <TextView
+                    android:id="@+id/calendarTotalSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/save_text"
+                    android:text="적금:"
+                    android:textSize="18sp"
+                    android:layout_weight="1" />
+            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 
-</LinearLayout>
+    <!-- 항상 우측 하단에 위치하는 버튼 -->
+    <ImageButton
+        android:id="@+id/payment_insert_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/icon_modal_add"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp" />
+</FrameLayout>

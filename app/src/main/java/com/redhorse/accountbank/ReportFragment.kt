@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import com.redhorse.accountbank.data.AppInfo
 import com.redhorse.accountbank.data.Payment
@@ -46,9 +47,9 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
     private lateinit var cardRemain: CustomCardView
     private lateinit var cardPaymentRatio: CustomCardView
     private lateinit var currentDayText: TextView
-    private lateinit var premonthButton: Button
-    private lateinit var nextmonthButton: Button
-    private lateinit var fixedButton: Button
+    private lateinit var premonthButton: ImageButton
+    private lateinit var nextmonthButton: ImageButton
+    private lateinit var fixedButton: ImageButton
     private lateinit var appinfoHelper: AppinfoHelper
 
 
@@ -175,6 +176,7 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         val targetAmount = appinfoHelper.getInt(AppInfo.INT_EXPENSE_TARGET, 0)
 
         if (targetAmount == 0) {
+            cardRemain.addTitle("소비 설정 금액 : 0 원")
             cardRemain.addSubtitle("하단 버튼으로 데이터를 설정 후 사용해주세요")
         } else {
             cardRemain.addTitle("소비 설정 금액 : ${formatCurrency(targetAmount)} 원")

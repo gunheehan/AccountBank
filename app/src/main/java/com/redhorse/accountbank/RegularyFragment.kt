@@ -76,7 +76,7 @@ class RegularyFragment : Fragment() {
 
     private fun SetExpensesCard(dataView: CustomCardView, title: String, type: String) {
         dataView.addTitle(title)
-        dataView.addImageAndButton(imageResId = R.drawable.icon_plus,
+        dataView.addImageAndButton(imageResId = R.drawable.icon_modal_add,
             onClickAction = {
                 OnClickOpenModal()
             })

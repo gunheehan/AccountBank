@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,12 +49,12 @@ class CalenderFragment : Fragment() {
 
     private lateinit var calendarRecyclerView: RecyclerView
     private lateinit var yearMonthTextView: TextView
-    private lateinit var prevMonthButton: Button
-    private lateinit var nextMonthButton: Button
+    private lateinit var prevMonthButton: ImageButton
+    private lateinit var nextMonthButton: ImageButton
     private lateinit var calendarTotalEarningText : TextView
     private lateinit var calendarTotalExpenseText : TextView
     private lateinit var calendarTotalSave : TextView
-    private lateinit var payment_insert_Button: Button
+    private lateinit var payment_insert_Button: ImageButton
 
     private var currentMonth: YearMonth = YearMonth.now()
 
@@ -137,9 +138,9 @@ class CalenderFragment : Fragment() {
                 val formattedIncome = formatCurrency(totalIncome) + " 원"
                 val formattedExpense = formatCurrency(totalExpense) + " 원"
                 val formattedSave = formatCurrency(totalSave) + " 원"
-                calendarTotalEarningText.text = "총 수입: ${formattedIncome}"
-                calendarTotalExpenseText.text = "총 지출: ${formattedExpense}"
-                calendarTotalSave.text = "총 적금: ${formattedSave}"
+                calendarTotalEarningText.text = "수입: ${formattedIncome}"
+                calendarTotalExpenseText.text = "지출: ${formattedExpense}"
+                calendarTotalSave.text = "적금: ${formattedSave}"
             }
         }
     }

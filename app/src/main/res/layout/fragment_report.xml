@@ -32,11 +32,11 @@
                 android:orientation="horizontal"
                 android:paddingBottom="20dp">
 
-                <Button
+                <ImageButton
                     android:id="@+id/mainboard_day_leftButton"
-                    android:layout_width="30dp"
+                    android:layout_width="40dp"
                     android:layout_height="match_parent"
-                    android:background="@color/main_button" />
+                    android:background="@drawable/icon_calender_left" />
 
                 <TextView
                     android:id="@+id/mainboard_day_text"
@@ -45,15 +45,15 @@
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
                     android:text="2024년 12월"
-                    android:textSize="15dp"
+                    android:textSize="18dp"
                     android:textStyle="bold"
                     android:textColor="@color/main_text"/>
 
-                <Button
+                <ImageButton
                     android:id="@+id/mainboard_day_rightButton"
-                    android:layout_width="30dp"
+                    android:layout_width="40dp"
                     android:layout_height="match_parent"
-                    android:background="@color/main_button" />
+                    android:background="@drawable/icon_calender_right" />
             </LinearLayout>
 
             <com.redhorse.accountbank.item.CustomCardView
@@ -78,11 +78,11 @@
     </ScrollView>
 
     <!-- 고정 버튼 -->
-    <Button
+    <ImageButton
         android:id="@+id/fixed_button"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:background="@color/modal_button_bg"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/icon_modal_add"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp" />
 </FrameLayout>
