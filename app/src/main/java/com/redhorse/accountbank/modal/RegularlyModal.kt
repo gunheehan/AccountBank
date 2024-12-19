@@ -5,10 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.Button
-import android.widget.Spinner
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.DialogFragment
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.adapter.CustomSpinnerAdapter
@@ -155,6 +152,11 @@ class RegularlyModal : DialogFragment(){
         var subtype = subtype.selectedItemPosition
 
         type = if (type == "수입") "income" else if(type == "지출") "expense" else "save"
+
+        if (titleData.isEmpty() || date.isEmpty() || amount == 0 || type.isEmpty()) {
+            Toast.makeText(context, "입력값이 모두 채워져야 합니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // 새 Payment 객체 생성
         val newPayment = Payment(

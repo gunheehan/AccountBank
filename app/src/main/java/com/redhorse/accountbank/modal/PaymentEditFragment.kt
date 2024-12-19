@@ -211,8 +211,13 @@ class PaymentEditFragment : DialogFragment() {
         val date = select_day_TextView.text.toString()
         val amount = amount_EditText.text.toString().toIntOrNull() ?: 0
         var type = payment_type_Spinner.selectedItem.toString()
-        type = if (type == "수입") "income" else if(type == "지출") "expense" else "save"
-        var subtype = payment_subtype_Spinner.selectedItemPosition
+        type = if (type == "수입") "income" else if (type == "지출") "expense" else "save"
+        val subtype = payment_subtype_Spinner.selectedItemPosition
+
+        if (titleData.isEmpty() || date.isEmpty() || amount == 0 || type.isEmpty()) {
+            Toast.makeText(context, "입력값이 모두 채워져야 합니다.", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         // 새 Payment 객체 생성
         val newPayment = Payment(
@@ -239,14 +244,19 @@ class PaymentEditFragment : DialogFragment() {
     fun updatePayment() {
         paymentData?.let { existingPayment ->
 
-            val titleData = payment_title_EditText.text.toString()
-            val updatedDate = select_day_TextView.text.toString()
+            val titleData = payment_title_EditText.text.toString().trim()
+            val updatedDate = select_day_TextView.text.toString().trim()
             val updatedAmount = amount_EditText.text.toString().toIntOrNull() ?: 0
             var updatedType = payment_type_Spinner.selectedItem.toString()
             val updatedSubType = payment_subtype_Spinner.selectedItemPosition
 
             // "수입"을 "income", "지출"을 "expense"로 변환
             updatedType = if (updatedType == "수입") "income" else if(updatedType == "지출") "expense" else "save"
+
+            if (titleData.isEmpty() || updatedDate.isEmpty() || updatedAmount == 0 || updatedType.isEmpty()) {
+                Toast.makeText(context, "입력값이 모두 채워져야 합니다.", Toast.LENGTH_SHORT).show()
+                return
+            }
 
             val payment = Payment(existingPayment.id, titleData, updatedType, updatedSubType, updatedAmount, updatedDate)
 
