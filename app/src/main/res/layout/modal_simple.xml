@@ -11,14 +11,15 @@
     <!-- 제목 -->
     <TextView
         android:id="@+id/modal_simple_title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"
         android:gravity="center"
         android:paddingBottom="20dp"
         android:textColor="@color/modal_text"
-        android:ellipsize="end"
-        android:singleLine="true"/>
+        android:singleLine="false"
+        android:lines="5"
+        android:scrollHorizontally="false"/>
 
     <!-- 버튼을 수평으로 배치 -->
     <LinearLayout

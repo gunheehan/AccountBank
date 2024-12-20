@@ -41,15 +41,15 @@
             android:layout_weight="1" /> <!-- 왼쪽에 정렬하고 공간을 차지함 -->
 
         <!-- 삭제 버튼 -->
-        <androidx.appcompat.widget.AppCompatButton
+        <ImageButton
             android:id="@+id/deleteButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginStart="8dp"
             android:textSize="10dp"
             android:text="삭제"
             android:textColor="@color/modal_text"
-            android:background="@drawable/rounded_modal_button"/>
+            android:background="@drawable/icon_delete"/>
     </LinearLayout>
 
     <!-- 결제 금액 -->

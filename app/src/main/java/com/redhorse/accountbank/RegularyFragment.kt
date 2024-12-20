@@ -112,7 +112,7 @@ class RegularyFragment : Fragment() {
     private fun deleteRegularlyData(payment: Payment)
     {
         val dialog = SimpleDialogFragment.newInstance(
-            "정말 삭제하시겠습니까?",
+            "삭제하시겠습니까?",
             onYesClick = { CoroutineScope(Dispatchers.IO).launch {
                 withContext(Dispatchers.Main) {
                     savepaymentRepository.deletePaymentById(payment.date, payment.id)

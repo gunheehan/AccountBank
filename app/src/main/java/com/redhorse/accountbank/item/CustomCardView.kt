@@ -1,6 +1,7 @@
 package com.redhorse.accountbank.item
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.Typeface
@@ -174,7 +175,7 @@ class CustomCardView @JvmOverloads constructor(
             val imageView = ImageView(context).apply {
                 setImageResource(imageResId)
                 layoutParams = LinearLayout.LayoutParams(
-                    65, 65
+                    80, 80
                 ).apply {
                     marginEnd = 16 // 이미지와 버튼 사이 간격
                 }
@@ -202,6 +203,31 @@ class CustomCardView @JvmOverloads constructor(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 ).apply { marginEnd = 16 }
+
+                // 배경 색상 설정
+                trackTintList = ColorStateList(
+                    arrayOf(
+                        intArrayOf(-android.R.attr.state_checked), // 꺼진 상태
+                        intArrayOf(android.R.attr.state_checked)   // 켜진 상태
+                    ),
+                    intArrayOf(
+                        Color.parseColor("#B5A89A"), // 꺼진 상태 색상
+                        Color.parseColor("#D4A24D")  // 켜진 상태 색상
+                    )
+                )
+
+                // 토글 버튼 색상 설정
+                thumbTintList = ColorStateList(
+                    arrayOf(
+                        intArrayOf(-android.R.attr.state_checked), // 꺼진 상태
+                        intArrayOf(android.R.attr.state_checked)   // 켜진 상태
+                    ),
+                    intArrayOf(
+                        Color.parseColor("#8A7563"), // 꺼진 상태 색상
+                        Color.parseColor("#C8923D")  // 켜진 상태 색상
+                    )
+                )
+
                 setOnCheckedChangeListener { _, isChecked ->
                     onToggleValueChange(isChecked)
                 }
@@ -220,7 +246,7 @@ class CustomCardView @JvmOverloads constructor(
             val imageView = ImageView(context).apply {
                 setImageResource(imageResId)
                 layoutParams = LinearLayout.LayoutParams(
-                    65, 65
+                    80, 80
                 ).apply { marginEnd = 16 }
                 setOnClickListener {
                     onClickAction()

@@ -90,17 +90,15 @@
                 android:layout_marginStart="16dp"
                 android:gravity="center_vertical"
                 android:textColor="@color/modal_text"
-                android:hint="날짜"/>
+                android:hint="2024-12-20" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <ImageButton
                 android:id="@+id/payment_select_day_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="선택"
-                android:textSize="12sp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_marginStart="30dp"
                 android:textColor="@color/modal_button_text"
-                android:background="@drawable/rounded_modal_button"
+                android:background="@drawable/icon_navi_calender"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_gravity="end"/>

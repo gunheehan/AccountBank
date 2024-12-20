@@ -97,6 +97,11 @@ class PermissionUtils {
                 val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                     data = Uri.fromParts("package", activity.packageName, null)
                     addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    Toast.makeText(
+                        activity,
+                        "SMS 권한을 허용해야 사용할 수 있습니다.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
                 activity.startActivity(intent)
                 return false
@@ -135,19 +140,6 @@ class PermissionUtils {
                 ActivityCompat.requestPermissions(activity, missingPermissions.toTypedArray(), requestCode)
                 false
             }
-        }
-
-        // 권한 요청 전에 설명을 제공하는 다이얼로그
-        fun showPermissionExplanationDialog(activity: Activity, requestCode: Int) {
-            val builder = AlertDialog.Builder(activity)
-            builder.setTitle("권한 요청")
-            builder.setMessage("이 앱은 결제 알림 및 SMS 정보를 자동으로 기록하려면 알림과 SMS 권한이 필요합니다.")
-            builder.setPositiveButton("허용") { _, _ ->
-                // 알림 권한을 먼저 요청
-                requestNotificationPermission(activity)
-            }
-            builder.setNegativeButton("취소") { dialog, _ -> dialog.dismiss() }
-            builder.show()
         }
 
         // 알림 권한이 허용되면 SMS 권한 요청

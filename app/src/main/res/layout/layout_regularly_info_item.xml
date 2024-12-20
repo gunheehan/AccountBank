@@ -13,10 +13,10 @@
         android:layout_weight="1"
         android:gravity="center"
         android:textColor="@color/card_text"
-        android:textSize="16sp"
+        android:textSize="13sp"
         android:ellipsize="end"
         android:singleLine="true"
-        android:minEms="4" />
+        android:minEms="5" />
 
     <TextView
         android:id="@+id/amountView"
@@ -25,7 +25,7 @@
         android:layout_weight="1"
         android:gravity="center"
         android:textColor="@color/card_text"
-        android:textSize="16sp"
+        android:textSize="13sp"
         android:ellipsize="end"
         android:singleLine="true"
         android:minEms="10" />
@@ -37,13 +37,13 @@
         android:layout_weight="1"
         android:gravity="center"
         android:textColor="@color/card_text"
-        android:textSize="14sp" />
+        android:textSize="13sp" />
 
     <!-- 수정 아이콘 -->
     <ImageView
         android:id="@+id/editIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginLeft="10dp"
         android:src="@drawable/icon_edit"
     android:contentDescription="Edit Icon" />
@@ -51,8 +51,8 @@
     <!-- 삭제 아이콘 -->
     <ImageView
         android:id="@+id/deleteIcon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_marginLeft="10dp"
         android:src="@drawable/icon_delete"
     android:contentDescription="Delete Icon" />

@@ -1,6 +1,7 @@
 package com.redhorse.accountbank
 
 import android.Manifest.permission.*
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -8,11 +9,14 @@ import android.provider.Settings
 import android.util.Log
 import android.view.Window
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.redhorse.accountbank.alarm.MonthlyAlarmScheduler
+import com.redhorse.accountbank.modal.SimpleDialogFragment
 import com.redhorse.accountbank.utils.PermissionUtils
 
 class MainActivity : AppCompatActivity() {
@@ -58,9 +62,20 @@ class MainActivity : AppCompatActivity() {
             true
         }
         if (!hasRequestedPermissions(PREFS_KEY_FIRST_REQUESTED)) {
-            PermissionUtils.showPermissionExplanationDialog(this, REQUEST_GENERAL_PERMISSIONS)
+            showPermissionExplanationDialog(this)
             setPermissionRequested(PREFS_KEY_FIRST_REQUESTED)
         }
+    }
+
+    fun showPermissionExplanationDialog(activity: FragmentActivity) {
+        val dialog = SimpleDialogFragment.newInstance(
+            title = "이 앱은 결제 알림 및 SMS 정보를 자동으로 기록하려면 알림과 SMS 권한이 필요합니다.",
+            onYesClick = {
+                PermissionUtils.requestNotificationPermission(activity)
+            },
+            onNoClick = { /* 취소 시 추가 동작 없음 */ }
+        )
+        dialog.show(activity.supportFragmentManager, "PermissionExplanationDialog")
     }
 
     override fun onResume() {

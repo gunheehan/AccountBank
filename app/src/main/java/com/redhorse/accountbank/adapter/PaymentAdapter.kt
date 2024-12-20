@@ -1,24 +1,23 @@
 package com.redhorse.accountbank.adapter
 
-import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.redhorse.accountbank.R
 import com.redhorse.accountbank.data.Payment
+import com.redhorse.accountbank.modal.SimpleDialogFragment
 import com.redhorse.accountbank.utils.PaymentProcessor
 import com.redhorse.accountbank.utils.formatCurrency
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class PaymentAdapter(
     private val payments: MutableList<Payment>,
-    private val onItemClick: (Payment) -> Unit
+    private val onItemClick: (Payment) -> Unit,
+    private val fragmentManager: FragmentManager
 ) : RecyclerView.Adapter<PaymentAdapter.PaymentViewHolder>(), CoroutineScope {
 
     // CoroutineScope를 위한 Job 생성
@@ -30,7 +29,7 @@ class PaymentAdapter(
         val typeText: TextView = itemView.findViewById(R.id.typeText)
         val subtypeText: TextView = itemView.findViewById(R.id.subtypeText)
         val amountText: TextView = itemView.findViewById(R.id.amountText)
-        val deleteButton: Button = itemView.findViewById(R.id.deleteButton)
+        val deleteButton: ImageButton = itemView.findViewById(R.id.deleteButton)
 
         fun bind(payment: Payment) {
             titleText.text = payment.title
@@ -44,27 +43,23 @@ class PaymentAdapter(
 
             // 삭제 버튼 클릭 리스너
             deleteButton.setOnClickListener {
-                val builder = AlertDialog.Builder(itemView.context)
-                builder.setMessage("삭제하시겠습니까?")
-                    .setCancelable(false)
-                    .setPositiveButton("예") { dialog, id ->
-                        launch {
-                            onDeleteClick(payment)
+                val dialog = SimpleDialogFragment.newInstance(
+                    "삭제하시겠습니까?",
+                    onYesClick = {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            withContext(Dispatchers.Main) {
+                                val position = adapterPosition
+                                if (position != RecyclerView.NO_POSITION) {
+                                    payments.removeAt(position)
+                                    notifyItemRemoved(position)
+                                    PaymentProcessor.deletePaymentFromDB(itemView.context, payment.date, payment.id)
+                                }
+                            }
                         }
-                    }
-                    .setNegativeButton("아니오") { dialog, id ->
-                        dialog.dismiss()
-                    }
-                builder.create().show()
-            }
-        }
-
-        private suspend fun onDeleteClick(payment: Payment) {
-            val position = adapterPosition
-            if (position != RecyclerView.NO_POSITION) {
-                payments.removeAt(position)
-                notifyItemRemoved(position)
-                PaymentProcessor.deletePaymentFromDB(itemView.context, payment.date, payment.id)
+                    },
+                    onNoClick = { null }
+                )
+                dialog.show(fragmentManager, "SimpleDialogFragment") // FragmentManager 사용
             }
         }
 

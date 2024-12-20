@@ -94,9 +94,11 @@ class DayDetailFragment : DialogFragment() {
             recyclerView.layoutManager = LinearLayoutManager(context)
 
             // PaymentDTO 객체의 목록을 전달합니다. onItemClick으로 클릭 시 showEditPayment 호출
-            recyclerView.adapter = PaymentAdapter(it.payments.toMutableList(), onItemClick = { payment ->
-                showEditPayment(payment)
-            })
+            recyclerView.adapter = PaymentAdapter(
+                payments = it.payments.toMutableList(),
+                onItemClick = { payment -> showEditPayment(payment) },
+                fragmentManager = parentFragmentManager
+            )
         }
     }
 

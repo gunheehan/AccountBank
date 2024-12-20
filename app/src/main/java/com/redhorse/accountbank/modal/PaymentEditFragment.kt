@@ -30,7 +30,7 @@ class PaymentEditFragment : DialogFragment() {
     private lateinit var onSaveCallback: () -> Unit
     private lateinit var payment_title_EditText : EditText
     private lateinit var select_day_TextView : TextView
-    private lateinit var select_day_Button : AppCompatButton
+    private lateinit var select_day_Button : ImageButton
     private lateinit var amount_EditText : EditText
     private lateinit var payment_type_Spinner : Spinner
     private lateinit var payment_subtype_Spinner : Spinner

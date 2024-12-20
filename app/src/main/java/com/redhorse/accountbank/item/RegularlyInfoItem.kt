@@ -40,7 +40,7 @@ class RegularlyInfoItem @JvmOverloads constructor(
                 onClickDelete: (Payment) -> Unit) {
 
         titleView.text = payment.title
-        amountView.text = formatCurrency(payment.amount) + " 원"
+        amountView.text = formatCurrency(payment.amount) + "원"
         descriptionView.text = "매월 ${payment.date}일"
 
         editButton.setOnClickListener(){
