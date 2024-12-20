@@ -18,7 +18,7 @@
         android:paddingBottom="20dp"
         android:textColor="@color/modal_text"
         android:singleLine="false"
-        android:lines="5"
+        android:maxLines="5"
         android:scrollHorizontally="false"/>
 
     <!-- 버튼을 수평으로 배치 -->
