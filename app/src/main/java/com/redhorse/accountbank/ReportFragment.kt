@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.DateTimeException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -147,7 +148,7 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
             UpdateMainInfo()
         }
         // 수정 모달 표시
-        mainInfoModal.show(parentFragmentManager, "MainInfoModal")
+        mainInfoModal.show(childFragmentManager, "MainInfoModal")
     }
 
     private fun UpdateMainInfo() {
@@ -280,10 +281,18 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
     }
 
     fun calculateDaysToSalary(day: Int): String {
+        var errormsg = "";
         val today = LocalDate.now()
-        val salaryDay = today.withDayOfMonth(day) // 이번 달의 25일
+        val salaryDay: LocalDate = try {
+            // 설정한 날짜를 기반으로 LocalDate 생성
+            today.withDayOfMonth(day)
+        } catch (e: DateTimeException) {
+            // 유효하지 않은 날짜일 경우 설정일을 1일로 변경
+            errormsg = " 설정일 확인이 필요합니다.(현재 설정일 ${day})"
+            today.withDayOfMonth(1)
+        }
 
-        // 월급날이 이미 지난 경우 다음 달 25일로 설정
+        // 월급날이 이미 지난 경우 다음 달 설정일로 설정
         val targetDate = if (today.isAfter(salaryDay)) {
             salaryDay.plusMonths(1)
         } else {
@@ -291,8 +300,9 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         }
 
         val daysLeft = ChronoUnit.DAYS.between(today, targetDate)
-        return daysLeft.toString()
+        return daysLeft.toString() + errormsg
     }
+
 
     private fun calculatePercentage(expenseTotla: Int): Int {
         return if (totalExpense == 0) {
