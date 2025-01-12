@@ -17,6 +17,7 @@ import kotlinx.coroutines.*
 class PaymentAdapter(
     private val payments: MutableList<Payment>,
     private val onItemClick: (Payment) -> Unit,
+    private val OnDeleteClick: (String) -> Unit,
     private val fragmentManager: FragmentManager
 ) : RecyclerView.Adapter<PaymentAdapter.PaymentViewHolder>(), CoroutineScope {
 
@@ -54,6 +55,7 @@ class PaymentAdapter(
                                     notifyItemRemoved(position)
                                     PaymentProcessor.deletePaymentFromDB(itemView.context, payment.date, payment.id)
                                 }
+                                OnDeleteClick(payment.date)
                             }
                         }
                     },

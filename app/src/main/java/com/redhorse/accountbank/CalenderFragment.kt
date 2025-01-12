@@ -25,10 +25,7 @@ import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.databinding.ActivityMainBinding
 import com.redhorse.accountbank.modal.PaymentEditFragment
 import com.redhorse.accountbank.utils.formatCurrency
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -50,6 +47,7 @@ class CalenderFragment : Fragment() {
     private lateinit var binding: ActivityMainBinding
 
     private lateinit var paymentRepository: PaymentRepository
+    private lateinit var currentDayList : List<DayData>
 
     private lateinit var calendarRecyclerView: RecyclerView
     private lateinit var yearMonthTextView: TextView
@@ -99,7 +97,23 @@ class CalenderFragment : Fragment() {
         )
 
         dayDetailFragment.SetOnEditDataCallback { updateCalendar() }
+        dayDetailFragment.setOnDetailUpdatedCallback { updatedDate ->
+            UpdateDayDetail(updatedDate)
+        }
         dayDetailFragment.show(parentFragmentManager, "DayDetailFragment")
+    }
+
+    private fun UpdateDayDetail(dayString: String){
+        updateCalendar()
+
+        CoroutineScope(Dispatchers.Main).launch {
+            val updateDayData = currentDayList.find { it.date.toString() == dayString }
+
+            if (updateDayData != null) {
+                delay(500)
+                showDayDetail(updateDayData)
+            }
+        }
     }
 
     private fun setupViews(view: View) {
@@ -235,6 +249,8 @@ class CalenderFragment : Fragment() {
 
             daysList.add(dayData)
         }
+
+        currentDayList = daysList
 
         return daysList
     }

@@ -28,6 +28,8 @@ class PaymentEditFragment : DialogFragment() {
     private lateinit var paymentRepository: PaymentRepository
 
     private lateinit var onSaveCallback: () -> Unit
+    private lateinit var onDetailUpdatedCallback: ((String) -> Unit)
+
     private lateinit var payment_title_EditText : EditText
     private lateinit var select_day_TextView : TextView
     private lateinit var select_day_Button : ImageButton
@@ -172,6 +174,10 @@ class PaymentEditFragment : DialogFragment() {
         this.onSaveCallback = callback
     }
 
+    fun setOnDetailUpdatedCallback(callback: (String) -> Unit) {
+        this.onDetailUpdatedCallback = callback
+    }
+
     companion object {
         // 새로운 인스턴스를 만들 때 Payment 객체가 null일 수 있으므로 null 처리 추가
         fun newInstance(payment: Payment?): PaymentEditFragment {
@@ -269,6 +275,7 @@ class PaymentEditFragment : DialogFragment() {
                     dismiss() // 다이얼로그 닫기
 
                     onSaveCallback!!.invoke()
+                    onDetailUpdatedCallback!!.invoke(updatedDate)
                 }
             }
         }

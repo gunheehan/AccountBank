@@ -22,6 +22,7 @@ import java.time.LocalDate
 class DayDetailFragment : DialogFragment() {
 
     private lateinit var onEditDataCallback: () -> Unit
+    private lateinit var onDetailUpdatedCallback: ((String) -> Unit)
 
     private var dayData: DayData? = null
 
@@ -44,7 +45,10 @@ class DayDetailFragment : DialogFragment() {
 
     fun SetOnEditDataCallback(callback: () -> Unit) {
         this.onEditDataCallback = callback
-        Log.e("PaymentEditFragment", "onSaveCallback set")
+    }
+
+    fun setOnDetailUpdatedCallback(callback: (String) -> Unit) {
+        this.onDetailUpdatedCallback = callback
     }
 
     override fun onCreateView(
@@ -97,6 +101,7 @@ class DayDetailFragment : DialogFragment() {
             recyclerView.adapter = PaymentAdapter(
                 payments = it.payments.toMutableList(),
                 onItemClick = { payment -> showEditPayment(payment) },
+                OnDeleteClick = { dayString -> UpdatePayment(dayString) },
                 fragmentManager = parentFragmentManager
             )
         }
@@ -116,13 +121,20 @@ class DayDetailFragment : DialogFragment() {
 
     private fun showEditPayment(payment: Payment) {
         dismiss()
-        Log.e("PaymentAdapter", payment.title)
 
         // 수정 모달 열기
         val editPaymentDialog = PaymentEditFragment.newInstance(payment)
         editPaymentDialog.setOnSaveCallback(onEditDataCallback)
+        editPaymentDialog.setOnDetailUpdatedCallback{ updatedDate ->
+            UpdatePayment(updatedDate)
+        }
         // 수정 모달 표시
         editPaymentDialog.show(parentFragmentManager, "PaymentEditFragment")
     }
 
+    private fun UpdatePayment(dayString: String)
+    {
+        dismiss()
+        onDetailUpdatedCallback!!.invoke(dayString)
+    }
 }

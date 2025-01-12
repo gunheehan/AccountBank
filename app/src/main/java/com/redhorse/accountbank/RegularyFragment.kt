@@ -99,7 +99,6 @@ class RegularyFragment : Fragment() {
         }
     }
 
-
     private fun editRegularlyData(payment: Payment)
     {
         val regularlyModal = RegularlyModal.newInstance(payment) { payment ->
