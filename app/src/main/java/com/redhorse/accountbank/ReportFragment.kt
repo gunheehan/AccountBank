@@ -78,7 +78,6 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
         appinfoHelper = AppinfoHelper(requireContext())
-        initializeDate()
 
         val view = inflater.inflate(R.layout.fragment_report, container, false)
 
@@ -104,8 +103,10 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
             showMainInfoModal()
         }
 
+        initializeDate()
         SetMainCard()
         SetMainInfo()
+        updateDateUI()
         return view
     }
 
@@ -114,6 +115,7 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         currentYear = currentDate.year
         currentMonth = currentDate.monthValue
     }
+
     fun updateDateUI() {
         val formattedDate = "${currentYear}년 ${currentMonth}월"
         currentDayText.text = formattedDate // TextView에 날짜 표시
