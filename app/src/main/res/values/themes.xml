@@ -14,7 +14,7 @@
         <item name="android:textColor">@color/main_text</item>
         <!-- Customize your theme here. -->
         <item name="windowNoTitle">true</item>
-        <item name="android:fontFamily">@font/maruburi_regular</item>
+        <item name="android:fontFamily">@font/hakgyoansim_chilpanjiugae_ttf_l</item>
         <item name="android:fitsSystemWindows">true</item>
     </style>
 </resources>
