@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -15,6 +16,8 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatButton
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.redhorse.accountbank.data.DayData
 import com.redhorse.accountbank.data.Payment
@@ -76,6 +79,7 @@ class CalenderFragment : Fragment() {
         paymentRepository = PaymentRepository(dbHelper)
         val view = inflater.inflate(R.layout.fragment_calender, container, false)
         setupViews(view)
+        SetCalenterSwipeEvent()
         setupRecyclerView()
         updateCalendar()
         setupButtonListeners()
@@ -107,6 +111,39 @@ class CalenderFragment : Fragment() {
         calendarTotalExpenseText = view.findViewById(R.id.calendarTotalExpenses)
         calendarTotalSave = view.findViewById(R.id.calendarTotalSave)
         payment_insert_Button = view.findViewById(R.id.payment_insert_btn)
+    }
+
+    private fun SetCalenterSwipeEvent()
+    {
+        var startX: Float = 0f
+
+        calendarRecyclerView.addOnItemTouchListener(object : RecyclerView.OnItemTouchListener {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                when (e.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        startX = e.x
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        val endX = e.x
+                        val diffX = endX - startX
+
+                        if (Math.abs(diffX) > 50) {
+                            if (diffX > 0) {
+                                currentMonth = currentMonth.minusMonths(1)
+                            } else {
+                                // 왼쪽 스와이프 -> 다음 달
+                                currentMonth = currentMonth.plusMonths(1)
+                            }
+                            updateCalendar()
+                        }
+                    }
+                }
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {}
+            override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+        })
     }
 
     private fun setupRecyclerView() {

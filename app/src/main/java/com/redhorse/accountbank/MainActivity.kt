@@ -14,12 +14,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.redhorse.accountbank.alarm.MonthlyAlarmScheduler
 import com.redhorse.accountbank.modal.SimpleDialogFragment
 import com.redhorse.accountbank.utils.PermissionUtils
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewPager: ViewPager2
 
     private val generalPermissions = arrayOf(
         POST_NOTIFICATIONS,
@@ -42,30 +45,39 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
-        val reportFragment = ReportFragment()
-        val calenderFragment = CalenderFragment()
-        val settingFragment = SettingFragment()
-        val fixedInformationFragment = RegularyFragment()
-        val yearFragment = YearFragment()
+        // ViewPager2 설정
+        viewPager = findViewById(R.id.viewPager)
+        viewPager.adapter = MainPagerAdapter(this)
 
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavi)
-        replaceFragment(reportFragment)
 
+        // BottomNavigationView와 ViewPager2 동기화
         bottomNavigationView.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.reportItem -> replaceFragment(reportFragment)
-                R.id.calenderitem -> replaceFragment(calenderFragment)
-                R.id.regularyItem -> replaceFragment(fixedInformationFragment)
-                R.id.settingitem -> replaceFragment(settingFragment)
-                // R.id.yearItem -> replaceFragment(yearFragment)
+                R.id.reportItem -> viewPager.setCurrentItem(0, true)
+                R.id.calenderitem -> viewPager.setCurrentItem(1, true)
+                R.id.regularyItem -> viewPager.setCurrentItem(2, true)
+                R.id.settingitem -> viewPager.setCurrentItem(3, true)
+                // R.id.yearItem -> viewPager.setCurrentItem(4, true)
             }
             true
         }
+
+        // ViewPager2와 BottomNavigationView 상태 동기화
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                bottomNavigationView.menu.getItem(position).isChecked = true
+            }
+        })
+
+        // 권한 요청 처리
         if (!hasRequestedPermissions(PREFS_KEY_FIRST_REQUESTED)) {
             showPermissionExplanationDialog(this)
             setPermissionRequested(PREFS_KEY_FIRST_REQUESTED)
         }
     }
+
 
     fun showPermissionExplanationDialog(activity: FragmentActivity) {
         val dialog = SimpleDialogFragment.newInstance(
