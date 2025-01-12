@@ -10,6 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:minWidth="300dp"
         android:orientation="vertical"
         android:padding="16dp"
         android:background="@drawable/rounded_modal_bg">
@@ -68,6 +69,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="예: 월급날"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"
                 android:ellipsize="end"
@@ -92,6 +94,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="예: 10"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"
                 android:inputType="number" />
@@ -133,6 +136,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="예: 500,000"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"
                 android:inputType="number" />

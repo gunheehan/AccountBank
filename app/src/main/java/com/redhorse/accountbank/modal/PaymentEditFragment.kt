@@ -3,6 +3,9 @@ package com.redhorse.accountbank.modal
 import PaymentRepository
 import android.app.DatePickerDialog
 import android.app.Dialog
+import android.content.DialogInterface
+import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -207,6 +210,25 @@ class PaymentEditFragment : DialogFragment() {
             },
             year, month, dayOfMonth
         )
+
+        datePickerDialog.setOnShowListener {
+            val positiveButton = datePickerDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+            val negativeButton = datePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+
+            // 다크 모드인지 확인
+            val isDarkMode = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_YES -> true
+                else -> false
+            }
+
+            if (isDarkMode) {
+                positiveButton.setTextColor(Color.parseColor("#FFFFFFFF"))
+                negativeButton.setTextColor(Color.parseColor("#FFFFFFFF"))
+            } else {
+                positiveButton.setTextColor(Color.parseColor("#FF000000"))
+                negativeButton.setTextColor(Color.parseColor("#FF000000"))
+            }
+        }
 
         // 날짜 선택 다이얼로그 표시
         datePickerDialog.show()
