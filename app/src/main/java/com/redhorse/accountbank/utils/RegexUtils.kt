@@ -1,8 +1,4 @@
-import android.util.Log
 import com.redhorse.accountbank.data.Payment
-import com.redhorse.accountbank.utils.formatCurrency
-import java.time.LocalDate
-import java.util.regex.Pattern
 
 object RegexUtils {
     // 금액 패턴 예시 (ex: "1,000원" 또는 "1000원" 형태)
@@ -37,17 +33,17 @@ object RegexUtils {
 
     // 결제 관련 메시지 여부 확인 (결제, 일시불, 카드, 승인 등을 포함한 메시지 확인)
     fun paymentMessageType(text: String): String {
-        var paymentKeywords = listOf("결제", "일시불", "송금", "승인")
-        if(paymentKeywords.any { text.contains(it) })
-            return "expense"
-
-        paymentKeywords = listOf("입금, 환금, 취소")
+        var paymentKeywords = listOf("입금, 환급, 취소")
         if(paymentKeywords.any { text.contains(it) })
             return "income"
 
         paymentKeywords = listOf("기일출금")
         if(paymentKeywords.any { text.contains(it) })
             return "save"
+
+        paymentKeywords = listOf("결제", "일시불", "송금", "승인")
+        if(paymentKeywords.any { text.contains(it) })
+            return "expense"
 
         return "expense"
     }
@@ -56,7 +52,7 @@ object RegexUtils {
         if(!type.equals("expense"))
             return 0
 
-        var paymentKeywords = listOf("음식점", "고기", "국밥", "food", "치킨", "버거", "피자", "배달","형제")
+        var paymentKeywords = listOf("음식점", "고기", "국밥", "food", "치킨", "버거", "피자", "배달", "형제")
         if(paymentKeywords.any { text.contains(it) })
             return 0
 
