@@ -59,6 +59,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="예: 커피 구매"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"/>
         </LinearLayout>
@@ -90,6 +91,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="날짜 입력"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"
                 android:inputType="number"/>
@@ -122,6 +124,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="금액 입력"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"
                 android:inputType="number"/>

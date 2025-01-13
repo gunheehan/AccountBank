@@ -59,6 +59,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="예: 커피 구매"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"/>
         </LinearLayout>
@@ -90,7 +91,8 @@
                 android:layout_marginStart="16dp"
                 android:gravity="center_vertical"
                 android:textColor="@color/modal_text"
-                android:hint="2024-12-20" />
+                android:hint="2024-12-20"
+                android:textColorHint="@color/modal_button_bg" />
 
             <ImageButton
                 android:id="@+id/payment_select_day_btn"
@@ -131,6 +133,7 @@
                 android:layout_marginStart="16dp"
                 android:textSize="14sp"
                 android:hint="금액 입력"
+                android:textColorHint="@color/modal_button_bg"
                 android:textColor="@color/modal_text"
                 android:gravity="center_vertical"
                 android:inputType="number"/>
