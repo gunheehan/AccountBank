@@ -25,24 +25,13 @@ class NotificationReceiver : NotificationListenerService() {
         }
 
         val extras = sbn.notification.extras
-        val title = extras.getString(Notification.EXTRA_TITLE) ?: "알림"
         val message = extras.getString(Notification.EXTRA_TEXT) ?: "메시지 내용 없음"
 
-        // 금융 관련 알림인지 확인
         if (isPaymentRelated(message)) {
             CoroutineScope(Dispatchers.IO).launch {
                 PaymentProcessor.processPayment(applicationContext, message)
             }
         }
-    }
-
-    private fun extractMessageFromNotification(extras: Bundle): String {
-        // 알림의 내용 추출 (예: 제목과 텍스트)
-        val title = extras.getString(Notification.EXTRA_TITLE, "")
-        val text = extras.getString(Notification.EXTRA_TEXT, "")
-
-        // 필요시 특정 형태의 데이터를 가공하여 반환
-        return "$title $text".trim()
     }
 
     private fun isPaymentRelated(message: String): Boolean {

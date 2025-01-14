@@ -13,10 +13,8 @@ class RCSReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val message = extractRcsMessageFromIntent(intent)
-        sendNotification(context, message)
 
         if (message.isNotBlank()) {
-            // PaymentProcessor에 메시지 전달
             CoroutineScope(Dispatchers.IO).launch {
                 PaymentProcessor.processPayment(context, message)
             }
@@ -25,13 +23,6 @@ class RCSReceiver : BroadcastReceiver() {
 
     private fun extractRcsMessageFromIntent(intent: Intent): String {
         val body = intent.getStringExtra("body") ?: return ""
-        // 필요 시 추가 데이터 처리
         return body
-    }
-
-    private fun sendNotification(context: Context, msg: String) {
-        val title = "RCS Receiver"
-        val message = msg
-        NotificationUtils.showNotification(context, title, message)
     }
 }

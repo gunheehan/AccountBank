@@ -20,7 +20,7 @@ object NotificationUtils {
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon_main) // 알림 아이콘
+            .setSmallIcon(R.drawable.icon_main)
             .setContentTitle(title)
             .setContentText(message)
             .setAutoCancel(true)
@@ -28,21 +28,5 @@ object NotificationUtils {
             .build()
 
         notificationManager.notify(System.currentTimeMillis().toInt(), notification)
-    }
-
-    fun updateNotificationChannelImportance(context: Context, enabled: Boolean) {
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = if (enabled) NotificationManager.IMPORTANCE_DEFAULT
-            else NotificationManager.IMPORTANCE_NONE
-
-            val channel = notificationManager.getNotificationChannel(CHANNEL_ID)
-            if (channel != null) {
-                channel.importance = importance
-                notificationManager.createNotificationChannel(channel)
-            }
-        }
     }
 }

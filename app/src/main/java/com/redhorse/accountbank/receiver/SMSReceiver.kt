@@ -15,7 +15,6 @@ class SmsReceiver : BroadcastReceiver() {
         val message = extractMessageFromIntent(intent)
 
         if (message.isNotBlank()) {
-            // 결제 메시지 처리
             CoroutineScope(Dispatchers.IO).launch {
                 PaymentProcessor.processPayment(context, message)
             }
@@ -23,7 +22,6 @@ class SmsReceiver : BroadcastReceiver() {
     }
 
     private fun extractMessageFromIntent(intent: Intent): String {
-        // 메시지 추출 로직 (예시: SMS 메시지 내용)
         val bundle = intent.extras
         val smsMessage = bundle?.get("pdus") as Array<*>
         val messages = smsMessage.map {
