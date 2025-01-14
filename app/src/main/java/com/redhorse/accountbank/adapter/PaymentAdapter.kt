@@ -35,7 +35,11 @@ class PaymentAdapter(
         fun bind(payment: Payment) {
             titleText.text = payment.title
             typeText.text = getPaymentType(payment.type)
-            subtypeText.text = getPaymentSubType(payment.subtype)
+            if(typeText.text.equals("expense"))
+                subtypeText.text = getPaymentSubType(payment.subtype)
+            else
+                subtypeText.text = getPaymentSubType(4)
+
             amountText.text = "${formatCurrency(payment.amount)}" // 포맷된 금액 표시
 
             itemView.setOnClickListener {
