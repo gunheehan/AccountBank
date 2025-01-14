@@ -79,9 +79,12 @@ class CalenderFragment : Fragment() {
         setupViews(view)
         SetCalenterSwipeEvent()
         setupRecyclerView()
-        updateCalendar()
         setupButtonListeners()
         return view
+    }
+    override fun onResume() {
+        super.onResume()
+        updateCalendar()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

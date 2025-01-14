@@ -104,10 +104,15 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         }
 
         initializeDate()
+
+        return view
+    }
+
+    override fun onResume() {
+        super.onResume()
         SetMainCard()
         SetMainInfo()
         updateDateUI()
-        return view
     }
 
     fun initializeDate() {
