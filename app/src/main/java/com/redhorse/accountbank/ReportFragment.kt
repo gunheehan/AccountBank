@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import com.redhorse.accountbank.data.AppInfo
@@ -27,16 +26,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ReportFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ReportFragment : Fragment(R.layout.fragment_report) {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -60,28 +49,16 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
     private var totalExpense: Int = 0
     private var totalSave: Int = 0
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        // DB 초기화
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
         appinfoHelper = AppinfoHelper(requireContext())
 
         val view = inflater.inflate(R.layout.fragment_report, container, false)
 
-        // CustomCardView 초기화
         cardDay = view.findViewById(R.id.card_day)
         cardEarnings = view.findViewById(R.id.card_earnings)
         cardRemain = view.findViewById(R.id.card_remain)
@@ -154,7 +131,6 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         val mainInfoModal = MainInfoModal.newInstance(appinfoHelper) {
             UpdateMainInfo()
         }
-        // 수정 모달 표시
         mainInfoModal.show(childFragmentManager, "MainInfoModal")
     }
 
@@ -291,15 +267,12 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
         var errormsg = "";
         val today = LocalDate.now()
         val salaryDay: LocalDate = try {
-            // 설정한 날짜를 기반으로 LocalDate 생성
             today.withDayOfMonth(day)
         } catch (e: DateTimeException) {
-            // 유효하지 않은 날짜일 경우 설정일을 1일로 변경
             errormsg = " 설정일 확인이 필요합니다.(현재 설정일 ${day})"
             today.withDayOfMonth(1)
         }
 
-        // 월급날이 이미 지난 경우 다음 달 설정일로 설정
         val targetDate = if (today.isAfter(salaryDay)) {
             salaryDay.plusMonths(1)
         } else {
@@ -318,26 +291,5 @@ class ReportFragment : Fragment(R.layout.fragment_report) {
             val percentage = (expenseTotla * 100) / totalExpense
             percentage
         }
-    }
-
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MainboardFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            ReportFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }

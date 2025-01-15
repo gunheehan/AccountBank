@@ -23,7 +23,6 @@ class MainInfoModal : DialogFragment(){
     private lateinit var targetAmout: EditText
 
     companion object {
-        // 새로운 인스턴스를 만들 때 Payment 객체가 null일 수 있으므로 null 처리 추가
         fun newInstance(infohelper: AppinfoHelper, callback: () -> Unit): MainInfoModal {
             val fragment = MainInfoModal()
             fragment.appinfoHelper = infohelper
