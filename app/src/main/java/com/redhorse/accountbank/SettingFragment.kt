@@ -3,7 +3,6 @@ package com.redhorse.accountbank
 import DatabaseIOController
 import PaymentRepository
 import RegexUtils
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,16 +10,13 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.redhorse.accountbank.data.helper.AppDatabaseHelper
 import com.redhorse.accountbank.item.CustomCardView
-import com.redhorse.accountbank.utils.NotificationUtils
 import com.redhorse.accountbank.utils.PermissionUtils
 import kotlinx.coroutines.*
 import org.json.JSONObject
@@ -34,11 +30,6 @@ class SettingFragment : Fragment() {
     private lateinit var paymentRepository: PaymentRepository
     private lateinit var databaseIOController: DatabaseIOController
     private lateinit var notification_card: CustomCardView
-    private var isNotificationGranted: Boolean = false
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,7 +39,6 @@ class SettingFragment : Fragment() {
         paymentRepository = PaymentRepository(dbHelper)
         databaseIOController = DatabaseIOController(dbHelper)
 
-        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_setting, container, false)
 
         notification_card = view.findViewById<CustomCardView>(R.id.set_notification_card)
@@ -71,7 +61,7 @@ class SettingFragment : Fragment() {
     private fun setNotificationCard(cardView: CustomCardView){
         cardView.Container.removeAllViews()
 
-        isNotificationGranted = PermissionUtils.isPushNotificationPermissionGranted(requireActivity())
+        val isNotificationGranted = PermissionUtils.isPushNotificationPermissionGranted(requireActivity())
         cardView.addTitle("알림 설정")
         cardView.addTextWithToggle(
             text = "푸시 알림",
@@ -156,19 +146,21 @@ class SettingFragment : Fragment() {
 
     fun extractAndFormatDate(dateString: String): String {
         try {
-            // 현재 년도 가져오기
-            val currentYear = LocalDate.now().year
+            val datePart = dateString.substringBefore(" ")
 
-            // 날짜 정보 추출: 예시 "11/15 22:03"에서 "11/15"만 추출
-            val datePart = dateString.substringBefore(" ") // "11/15"
+            val currentDate = LocalDate.now()
+            val currentYear = currentDate.year
+            val currentMonth = currentDate.monthValue
 
-            // 월과 일 분리
             val (month, day) = datePart.split("/").map { it.toInt() }
 
-            // 현재 년도를 추가하여 LocalDate 객체 생성
-            val formattedDate = LocalDate.of(currentYear, month, day)
+            var year = currentYear
+            if (currentMonth <= 3 && month > currentMonth) {
+                year = currentYear - 1
+            }
 
-            // 원하는 포맷으로 변환
+            val formattedDate = LocalDate.of(year, month, day)
+
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             return formattedDate.format(formatter)
 
@@ -178,8 +170,8 @@ class SettingFragment : Fragment() {
         }
     }
 
+
     fun parseMessageBody(messageBody: String): String? {
-        // 날짜를 추출하기 위한 정규 표현식 (MM/dd 형식만 추출)
         val dateRegex = """(\d{1,2}/\d{1,2})""".toRegex()  // "MM/dd" 형식의 날짜 추출
         val matchResult = dateRegex.find(messageBody)
 
@@ -187,24 +179,21 @@ class SettingFragment : Fragment() {
     }
 
     suspend fun fetchAndSavePaymentMessages() {
-        val thirtyDaysAgo = LocalDate.now().minusDays(90) // 데이터 불러올 날짜(오늘부터 이전 DAY)
-        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val thirtyDaysAgo = LocalDate.now().minusDays(90)
         val rcsUri = Uri.parse("content://im/chat")
 
         withContext(Dispatchers.IO) {
             try {
-                // 30일 전의 날짜로 쿼리
                 val cursor = requireContext().contentResolver.query(
                     rcsUri,
-                    null, // 모든 컬럼 선택
-                    "date >= ?", // 조건: 30일 이내
+                    null,
+                    "date >= ?",
                     arrayOf(thirtyDaysAgo.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli().toString()),
-                    "date DESC" // 최신 메시지부터 정렬
+                    "date DESC"
                 )
 
                 cursor?.use {
                     val messageCount = it.count
-
                     if (messageCount == 0) {
                         return@use
                     }
@@ -212,22 +201,15 @@ class SettingFragment : Fragment() {
                     if (it.moveToFirst()) {
                         val columnCount = it.columnCount
 
-                        // 모든 메시지를 리스트로 저장
-                        val messages = mutableListOf<Map<String, String>>()
-
                         do {
                             val messageData = mutableMapOf<String, String>()
 
                             for (i in 0 until columnCount) {
                                 val columnName = it.getColumnName(i)
-                                val columnValue = it.getString(i) ?: "null" // null 체크 추가
+                                val columnValue = it.getString(i) ?: "null"
                                 messageData[columnName] = columnValue
                             }
 
-                            // 메시지 데이터 로그 출력
-                            messages.add(messageData)
-
-                            // body 내용 처리
                             val body = messageData["body"]
 
                             if (body != null) {
@@ -235,7 +217,7 @@ class SettingFragment : Fragment() {
                                     val jsonObject = JSONObject(body)
                                     val cardLayout = jsonObject.getJSONObject("layout")
                                     val children = cardLayout.getJSONArray("children")
-                                    val firstChild = children.getJSONObject(1) // 두 번째 child
+                                    val firstChild = children.getJSONObject(1)
                                     val textWidget = firstChild.getJSONArray("children").getJSONObject(0)
                                     val text = textWidget.getString("text")
 
@@ -260,9 +242,6 @@ class SettingFragment : Fragment() {
                                 }
                             }
                         } while (it.moveToNext()) // 다음 메시지로 이동
-
-                        // 모든 메시지 로그 출력
-                        Log.d("RCSReader", "All Messages: $messages")
                     } else {
                         Log.d("RCSReader", "No messages found in content://im/chat")
                     }

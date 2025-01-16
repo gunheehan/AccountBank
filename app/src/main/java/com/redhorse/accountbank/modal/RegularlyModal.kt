@@ -23,7 +23,6 @@ class RegularlyModal : DialogFragment(){
     private lateinit var saveButton : Button
 
     companion object {
-        // 새로운 인스턴스를 만들 때 Payment 객체가 null일 수 있으므로 null 처리 추가
         fun newInstance(editData: Payment?, callback: (Payment) -> Unit): RegularlyModal {
             val fragment = RegularlyModal()
 
@@ -58,14 +57,11 @@ class RegularlyModal : DialogFragment(){
         type = view.findViewById(R.id.modal_regularly_type_spinner)
         subtype = view.findViewById(R.id.modal_regularly_subtype_spinner)
 
-        // string-array에서 값을 가져옴
         val paymentTypes = resources.getStringArray(R.array.payment_types).toList()
 
-// Spinner에 데이터를 직접 설정 (ArrayAdapter 없이)
         val adapter = CustomSpinnerAdapter(requireContext(), paymentTypes)
         type.adapter = adapter
 
-// payment_type_Spinner에 선택 이벤트 리스너 추가
         type.setOnItemSelectedListener(object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parentView: AdapterView<*>,
@@ -73,12 +69,10 @@ class RegularlyModal : DialogFragment(){
                 position: Int,
                 id: Long
             ) {
-                // 선택된 payment type에 따라 subtype 값을 변경
                 updateSubtypeSpinner(position)
             }
 
             override fun onNothingSelected(parentView: AdapterView<*>) {
-                // 아무것도 선택되지 않았을 때의 처리
             }
         })
 
@@ -103,11 +97,9 @@ class RegularlyModal : DialogFragment(){
             2-> paymentTypes = resources.getStringArray(R.array.save_subtypes).toList()
         }
 
-        // payment_subtype_Spinner에 새롭게 선택된 subtype 리스트 설정
         val subtypeAdapter = CustomSpinnerAdapter(requireContext(), paymentTypes)
         subtype.adapter = subtypeAdapter
 
-        // 기본값은 항상 "기타"로 설정
         subtype.setSelection(paymentTypes.indexOf("기타"))
     }
 
@@ -115,23 +107,22 @@ class RegularlyModal : DialogFragment(){
         title.text = editpayment!!.title
         day.text = editpayment!!.date
         amount.text = editpayment!!.amount.toString()
-        // PaymentType 설정
         when (editpayment?.type) {
             "income" -> {
                 type.setSelection(0)
-                updateSubtypeSpinner(0)  // "수입"에 맞는 서브타입 설정
+                updateSubtypeSpinner(0)
             }
             "expense" -> {
                 type.setSelection(1)
-                updateSubtypeSpinner(1)  // "지출"에 맞는 서브타입 설정
+                updateSubtypeSpinner(1)
             }
             "save" -> {
                 type.setSelection(2)
-                updateSubtypeSpinner(2)  // "적금"에 맞는 서브타입 설정
+                updateSubtypeSpinner(2)
             }
             else -> {
                 type.setSelection(0)
-                updateSubtypeSpinner(0)  // 기본 "기타"
+                updateSubtypeSpinner(0)
             }
         }
 

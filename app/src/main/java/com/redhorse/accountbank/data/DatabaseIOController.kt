@@ -44,6 +44,17 @@ class DatabaseIOController(private val dbHelper: AppDatabaseHelper) {
         }
     }
 
+    // 모든 테이블 가져오기
+    private fun getAllTables(db: SQLiteDatabase): List<String> {
+        val tables = mutableListOf<String>()
+        val cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null)
+        while (cursor.moveToNext()) {
+            tables.add(cursor.getString(0))
+        }
+        cursor.close()
+        return tables
+    }
+
     // 테이블 데이터를 CSV로 내보내는 함수
     private suspend fun exportTableToCSV(context: Context, db: SQLiteDatabase, tableName: String) {
         val cursor = db.rawQuery("SELECT * FROM $tableName", null)
@@ -94,17 +105,6 @@ class DatabaseIOController(private val dbHelper: AppDatabaseHelper) {
         withContext(Dispatchers.Main) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    // 모든 테이블 가져오기
-    private fun getAllTables(db: SQLiteDatabase): List<String> {
-        val tables = mutableListOf<String>()
-        val cursor = db.rawQuery("SELECT name FROM sqlite_master WHERE type='table'", null)
-        while (cursor.moveToNext()) {
-            tables.add(cursor.getString(0))
-        }
-        cursor.close()
-        return tables
     }
 
     // CSV 데이터 가져오기 및 데이터베이스에 삽입

@@ -99,7 +99,6 @@ class DayDetailFragment : DialogFragment() {
         }
     }
 
-
     override fun onStart() {
         super.onStart()
         val dialog = dialog

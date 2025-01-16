@@ -1,9 +1,7 @@
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -27,7 +25,6 @@ class RegularlyInfoItem @JvmOverloads constructor(
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
 
-        // View 연결
         titleView = findViewById(R.id.titleView)
         amountView = findViewById(R.id.amountView)
         descriptionView = findViewById(R.id.descriptionView)

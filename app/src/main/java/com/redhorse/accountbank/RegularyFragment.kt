@@ -6,7 +6,6 @@ import SavePaymentRepository
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -24,16 +23,6 @@ import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.YearMonth
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RegularyFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RegularyFragment : Fragment() {
     private lateinit var paymentRepository: PaymentRepository
     private lateinit var savepaymentRepository: SavePaymentRepository
@@ -41,16 +30,11 @@ class RegularyFragment : Fragment() {
     private lateinit var incomeCardView: CustomCardView
     private lateinit var saveCardView: CustomCardView
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     @SuppressLint("MissingInflatedId")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         val dbHelper = AppDatabaseHelper(requireContext())
         paymentRepository = PaymentRepository(dbHelper)
         savepaymentRepository = SavePaymentRepository(dbHelper)
@@ -61,13 +45,13 @@ class RegularyFragment : Fragment() {
         info_title.addDescription("입력한 데이터는 매달 1일 자동으로 입력이 됩니다.", Color.DKGRAY)
 
         expensesCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_expenses)
-        SetExpensesCard(expensesCardView, "정기 지출 금액","expense")
+        SetExpensesCard(expensesCardView, "정기 지출 금액", "expense")
 
         incomeCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_earning)
-        SetExpensesCard(incomeCardView, "정기 수입 금액","income")
+        SetExpensesCard(incomeCardView, "정기 수입 금액", "income")
 
         saveCardView = rootView.findViewById<CustomCardView>(R.id.fixed_info_save)
-        SetExpensesCard(saveCardView, "정기 적금 금액","save")
+        SetExpensesCard(saveCardView, "정기 적금 금액", "save")
 
         return rootView
     }
@@ -80,18 +64,14 @@ class RegularyFragment : Fragment() {
             })
 
         CoroutineScope(Dispatchers.IO).launch {
-            // 비동기 작업을 IO 스레드에서 수행
             val paymentsList = savepaymentRepository.getPaymentsByType(type)
-            // UI 업데이트는 Main 스레드에서 수행해야 함
             withContext(Dispatchers.Main) {
-                // paymentsList가 비어있지 않으면 UI 업데이트
                 if (paymentsList.isNotEmpty()) {
                     for (payment in paymentsList) {
                         val regularlyInfoItem = RegularlyInfoItem(requireContext())
                         regularlyInfoItem.setData(payment, onClickEdit = ::editRegularlyData,
                             onClickDelete = ::deleteRegularlyData)
 
-                        // UI에서 안전하게 Container에 추가
                         dataView.Container.addView(regularlyInfoItem)
                     }
                 }
@@ -104,7 +84,6 @@ class RegularyFragment : Fragment() {
         val regularlyModal = RegularlyModal.newInstance(payment) { payment ->
             UpdatePayment(payment)
         }
-        // 수정 모달 표시
         regularlyModal.show(parentFragmentManager, "RegularlyModal")
     }
 
@@ -130,10 +109,8 @@ class RegularyFragment : Fragment() {
 
     private fun OnClickOpenModal() {
         val regularlyModal = RegularlyModal.newInstance(null) { payment ->
-            // 이곳에서 Payment 객체를 처리
             InsertNewPayment(payment)
         }
-        // 수정 모달 표시
         regularlyModal.show(childFragmentManager, "RegularlyModal")
     }
 
@@ -155,10 +132,8 @@ class RegularyFragment : Fragment() {
     private fun UpdatePayment(payment: Payment){
         CoroutineScope(Dispatchers.IO).launch {
             withContext(Dispatchers.Main) {
-                // 정기 데이터 업데이트
                 savepaymentRepository.updatePaymentById(payment.id, payment)
 
-                // 신규 데이터 추가
                 payment.date = formatToFullDate(payment.date.toInt())
                 paymentRepository.insertOrCreateTableAndInsert(payment)
                 when (payment.type) {
@@ -183,19 +158,15 @@ class RegularyFragment : Fragment() {
     }
 
     fun formatToFullDate(day: Int): String {
-        // 현재 날짜 가져오기
         val currentDate = LocalDate.now()
 
-        // 현재 년, 월 가져오기
         val currentYearMonth = YearMonth.of(currentDate.year, currentDate.monthValue)
 
-        // 입력된 날짜가 월에 유효한 날짜인지 확인
         if (day < 1 || day > currentYearMonth.lengthOfMonth()) {
             Toast.makeText(context, "유효하지 않은 날짜입니다. $day", Toast.LENGTH_SHORT).show()
             day == 1
         }
 
-        // 완전한 날짜로 변환
         return "${currentDate.year}-${"%02d".format(currentDate.monthValue)}-${"%02d".format(day)}"
     }
 }

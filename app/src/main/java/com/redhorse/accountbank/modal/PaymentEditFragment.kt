@@ -66,7 +66,6 @@ class PaymentEditFragment : DialogFragment() {
             paymentData = it.getParcelable("payment") // 전달된 Payment 객체 받기
         }
 
-        // Fragment의 레이아웃을 인플레이트합니다.
         val rootView = inflater.inflate(R.layout.modal_payment_input, container, false)
 
         payment_title_EditText = rootView.findViewById(R.id.payment_title_edit)
@@ -97,7 +96,6 @@ class PaymentEditFragment : DialogFragment() {
             }
         })
 
-        // 날짜 버튼 초기화 추가
         select_day_Button = rootView.findViewById(R.id.payment_select_day_btn)
 
         if(paymentData == null){
@@ -131,43 +129,34 @@ class PaymentEditFragment : DialogFragment() {
             2-> paymentTypes = resources.getStringArray(R.array.save_subtypes).toList()
         }
 
-        // payment_subtype_Spinner에 새롭게 선택된 subtype 리스트 설정
         val subtypeAdapter = CustomSpinnerAdapter(requireContext(), paymentTypes)
         payment_subtype_Spinner.adapter = subtypeAdapter
 
-        // 기본값은 항상 "기타"로 설정
         payment_subtype_Spinner.setSelection(paymentTypes.indexOf("기타"))
     }
 
     private fun setupUI(rootView: View) {
         paymentData?.let {
-            // 내역 표시
             payment_title_EditText.setText(it.title)
-            if (isInsertMode)
-            {
-                // 오늘 날짜 가져오기
+            if (isInsertMode) {
                 val today = LocalDate.now()
                 val formattedDate = today.format(DateTimeFormatter.ofPattern("yyyy-dd-MM"))
 
                 select_day_TextView.text = formattedDate
-            }
-            else
+            } else
                 select_day_TextView.setText(it.date)
             amount_EditText.setText(it.amount.toString())
-            val isIncome = if (it.type == "지출") "expense" else if(it.type == "수입") "income" else "save"
 
-            if (it.type.equals("income")){
+            if (it.type.equals("income")) {
                 payment_type_Spinner.setSelection(0)
                 updateSubtypeSpinner(0)
-            }
-            else if(it.type.equals("expense")){
+            } else if (it.type.equals("expense")) {
                 payment_type_Spinner.setSelection(1)
                 updateSubtypeSpinner(1)
+            } else {
+                payment_type_Spinner.setSelection(2)
+                updateSubtypeSpinner(2)
             }
-            else{
-            payment_type_Spinner.setSelection(2)
-            updateSubtypeSpinner(2)
-        }
 
         } ?: run {
         }
@@ -182,12 +171,11 @@ class PaymentEditFragment : DialogFragment() {
     }
 
     companion object {
-        // 새로운 인스턴스를 만들 때 Payment 객체가 null일 수 있으므로 null 처리 추가
         fun newInstance(payment: Payment?): PaymentEditFragment {
             val fragment = PaymentEditFragment()
             val bundle = Bundle()
             payment?.let {
-                bundle.putParcelable("payment", it) // Payment 객체가 null이 아니면 전달
+                bundle.putParcelable("payment", it)
             }
             fragment.arguments = bundle
             return fragment
@@ -200,11 +188,9 @@ class PaymentEditFragment : DialogFragment() {
         val month = calendar.get(Calendar.MONTH)
         val dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH)
 
-        // DatePickerDialog 생성
         val datePickerDialog = DatePickerDialog(
             requireContext(),
             { _, selectedYear, selectedMonth, selectedDay ->
-                // 선택된 날짜를 yyyy-MM-dd 형식으로 TextView에 설정
                 val selectedDate = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay)
                 select_day_TextView.text = selectedDate
             },
@@ -215,7 +201,6 @@ class PaymentEditFragment : DialogFragment() {
             val positiveButton = datePickerDialog.getButton(DialogInterface.BUTTON_POSITIVE)
             val negativeButton = datePickerDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
 
-            // 다크 모드인지 확인
             val isDarkMode = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_YES -> true
                 else -> false
@@ -230,7 +215,6 @@ class PaymentEditFragment : DialogFragment() {
             }
         }
 
-        // 날짜 선택 다이얼로그 표시
         datePickerDialog.show()
     }
 
@@ -247,9 +231,8 @@ class PaymentEditFragment : DialogFragment() {
             return
         }
 
-        // 새 Payment 객체 생성
         val newPayment = Payment(
-            id = 0, // Room에서 자동 생성되므로 0으로 설정
+            id = 0,
             title = titleData,
             type = type,
             subtype = subtype,
@@ -260,7 +243,6 @@ class PaymentEditFragment : DialogFragment() {
         CoroutineScope(Dispatchers.IO).launch {
             paymentRepository.insertOrCreateTableAndInsert(newPayment)
 
-            // UI 업데이트를 위한 콜백 호출
             withContext(Dispatchers.Main) {
                 dismiss() // 다이얼로그 닫기
 
@@ -278,7 +260,6 @@ class PaymentEditFragment : DialogFragment() {
             var updatedType = payment_type_Spinner.selectedItem.toString()
             val updatedSubType = payment_subtype_Spinner.selectedItemPosition
 
-            // "수입"을 "income", "지출"을 "expense"로 변환
             updatedType = if (updatedType == "수입") "income" else if(updatedType == "지출") "expense" else "save"
 
             if (titleData.isEmpty() || updatedDate.isEmpty() || updatedAmount == 0 || updatedType.isEmpty()) {
@@ -289,12 +270,10 @@ class PaymentEditFragment : DialogFragment() {
             val payment = Payment(existingPayment.id, titleData, updatedType, updatedSubType, updatedAmount, updatedDate)
 
             CoroutineScope(Dispatchers.IO).launch {
-                // Room을 사용하여 데이터 업데이트
                 paymentRepository.updatePaymentById(existingPayment.id, payment)
 
-                // UI 업데이트를 위한 콜백 호출
                 withContext(Dispatchers.Main) {
-                    dismiss() // 다이얼로그 닫기
+                    dismiss()
 
                     onSaveCallback!!.invoke()
                     onDetailUpdatedCallback!!.invoke(updatedDate)
