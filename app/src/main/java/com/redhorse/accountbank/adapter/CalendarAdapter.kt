@@ -25,22 +25,20 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
                 expenseText.visibility = View.GONE
                 saveText.visibility = View.GONE
             } else {
-                // 날짜와 수입, 지출 표시
                 dayText.text = dayData.date.dayOfMonth.toString()
 
-                // 수입과 지출 텍스트를 0으로 초기화하고 필요한 경우에만 업데이트
                 incomeText.text = if (dayData.getTotalIncome() > 0) {
-                    "${formatCurrency(dayData.getTotalIncome())}" // 포맷팅된 수입 표시
+                    "${formatCurrency(dayData.getTotalIncome())}"
                 } else {
                     ""
                 }
                 expenseText.text = if (dayData.getTotalExpense() > 0) {
-                    "${formatCurrency(dayData.getTotalExpense())}" // 포맷팅된 지출 표시
+                    "${formatCurrency(dayData.getTotalExpense())}"
                 } else {
                     ""
                 }
                 saveText.text = if (dayData.getTotalSave() > 0) {
-                    "${formatCurrency(dayData.getTotalSave())}" // 포맷팅된 지출 표시
+                    "${formatCurrency(dayData.getTotalSave())}"
                 } else {
                     ""
                 }
@@ -56,15 +54,14 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
 
                 // 클릭 리스너 설정
                 itemView.setOnClickListener{
-                    onItemClick(dayData) // 클릭된 DayData 객체를 전달
+                    onItemClick(dayData)
                 }
             }
         }
 
         private fun adjustTextSize(textView: TextView) {
-            // 글자 크기를 줄여야 할 경우
-            if (textView.visibility == View.VISIBLE && textView.text.length > 5) { // 예시: 6자 이상일 경우
-                textView.textSize = 8f // 글자 크기 조정
+            if (textView.visibility == View.VISIBLE && textView.text.length > 5) {
+                textView.textSize = 8f
             }
         }
     }
@@ -81,12 +78,11 @@ class CalendarAdapter(private var days: List<DayData>, private val onItemClick:(
     }
 
     override fun getItemCount(): Int {
-        return days.size // 데이터 항목 수 반환
+        return days.size
     }
 
-    // 데이터 업데이트 메서드
     fun updateDays(newDays: List<DayData>) {
         days = newDays
-        notifyDataSetChanged() // 데이터 변경 통지
+        notifyDataSetChanged()
     }
 }

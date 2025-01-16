@@ -12,10 +12,8 @@ class CustomRecyclerView @JvmOverloads constructor(
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
     override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
-        // 가로 스크롤을 감지하여 ViewPager 이벤트 차단
         when (e.action) {
             MotionEvent.ACTION_DOWN -> {
-                // 부모(ViewPager)에게 이벤트 전달 중단
                 parent?.requestDisallowInterceptTouchEvent(true)
             }
         }

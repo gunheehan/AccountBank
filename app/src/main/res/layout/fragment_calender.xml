@@ -22,8 +22,7 @@
                 android:id="@+id/prevMonthButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/icon_calender_left"
-                android:text="이전 월" />
+                android:background="@drawable/icon_calender_left" />
 
             <TextView
                 android:id="@+id/yearMonthTextView"
@@ -40,8 +39,7 @@
                 android:id="@+id/nextMonthButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:background="@drawable/icon_calender_right"
-                android:text="다음 월" />
+                android:background="@drawable/icon_calender_right" />
         </LinearLayout>
 
         <!-- 요일 표시 영역 -->

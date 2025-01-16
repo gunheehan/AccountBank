@@ -21,9 +21,8 @@ class PaymentAdapter(
     private val fragmentManager: FragmentManager
 ) : RecyclerView.Adapter<PaymentAdapter.PaymentViewHolder>(), CoroutineScope {
 
-    // CoroutineScope를 위한 Job 생성
     private val job = Job()
-    override val coroutineContext = Dispatchers.Main + job // Main 스레드에서 UI 업데이트
+    override val coroutineContext = Dispatchers.Main + job
 
     inner class PaymentViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val titleText: TextView = itemView.findViewById(R.id.titleText)
@@ -35,7 +34,7 @@ class PaymentAdapter(
         fun bind(payment: Payment) {
             titleText.text = payment.title
             typeText.text = getPaymentType(payment.type)
-            if(typeText.text.equals("expense"))
+            if(payment.type.equals("expense"))
                 subtypeText.text = getPaymentSubType(payment.subtype)
             else
                 subtypeText.text = getPaymentSubType(4)

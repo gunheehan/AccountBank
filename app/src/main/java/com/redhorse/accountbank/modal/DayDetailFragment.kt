@@ -54,10 +54,8 @@ class DayDetailFragment : DialogFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Fragment의 레이아웃을 인플레이트합니다.
         val rootView = inflater.inflate(R.layout.fragment_day_detail, container, false)
 
-        // arguments에서 데이터를 가져와서 dayData에 설정
         arguments?.let {
             val date = it.getString("date")
             val payments: List<PaymentDTO>? = it.getParcelableArrayList("payments")
@@ -76,12 +74,10 @@ class DayDetailFragment : DialogFragment() {
             )
         }
 
-        // UI에 데이터를 설정하는 로직
         setupUI(rootView)
 
-        // Close 버튼 설정
         rootView.findViewById<Button>(R.id.closeButton).setOnClickListener {
-            dismiss()  // Fragment를 닫음
+            dismiss()
         }
 
         return rootView
@@ -89,14 +85,11 @@ class DayDetailFragment : DialogFragment() {
 
     private fun setupUI(rootView: View) {
         dayData?.let {
-            // 날짜 표시
             rootView.findViewById<TextView>(R.id.dayText).text = it.date.toString()
 
-            // 결제 목록 표시
             val recyclerView = rootView.findViewById<RecyclerView>(R.id.paymentsRecyclerViews)
             recyclerView.layoutManager = LinearLayoutManager(context)
 
-            // PaymentDTO 객체의 목록을 전달합니다. onItemClick으로 클릭 시 showEditPayment 호출
             recyclerView.adapter = PaymentAdapter(
                 payments = it.payments.toMutableList(),
                 onItemClick = { payment -> showEditPayment(payment) },
@@ -111,23 +104,22 @@ class DayDetailFragment : DialogFragment() {
         super.onStart()
         val dialog = dialog
         if (dialog != null) {
-            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()  // 화면 너비의 85% 크기
-            val height = (resources.displayMetrics.heightPixels * 0.65).toInt()  // 화면 높이의 65% 크기
-            dialog.window?.setLayout(width, height)  // 모달 크기 설정
-            dialog.window?.setGravity(Gravity.CENTER)  // 중앙 배치
+            val width = (resources.displayMetrics.widthPixels * 0.85).toInt()
+            val height = (resources.displayMetrics.heightPixels * 0.65).toInt()
+            dialog.window?.setLayout(width, height)
+            dialog.window?.setGravity(Gravity.CENTER)
         }
     }
 
     private fun showEditPayment(payment: Payment) {
         dismiss()
 
-        // 수정 모달 열기
         val editPaymentDialog = PaymentEditFragment.newInstance(payment)
         editPaymentDialog.setOnSaveCallback(onEditDataCallback)
         editPaymentDialog.setOnDetailUpdatedCallback{ updatedDate ->
             UpdatePayment(updatedDate)
         }
-        // 수정 모달 표시
+
         editPaymentDialog.show(parentFragmentManager, "PaymentEditFragment")
     }
 
