@@ -48,7 +48,13 @@ class SettingFragment : Fragment() {
         SetDBMSCard(dbms_card)
 
         val versionTextView = view.findViewById<TextView>(R.id.set_version_text)
-        val versionName = BuildConfig.VERSION_NAME
+        val context = requireContext()
+        val versionName = try {
+            val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            packageInfo.versionName ?: "unknown"
+        } catch (e: Exception) {
+            "unknown"
+        }
         versionTextView.text = "버전: $versionName"
         return view
     }
